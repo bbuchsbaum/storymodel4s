@@ -4,7 +4,6 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Literal
 
-from .artifacts import publish_json
 from .execution import RecordedRun, RunProfile
 from .model import Digest, Model, Name, _validate_instance, canonical
 from .serialization import strict_json
@@ -71,19 +70,20 @@ def read_source_request(path: Path, *, expected_sha256: str | None = None) -> So
     return validate_source_request(raw)
 
 
-def import_source(value: SourceRequest, recording: SourceRecording, root: Path) -> None:
+def import_source(
+    value: SourceRequest, recording: SourceRecording, root: Path, *, recover: bool = False
+) -> None:
     """Record the supplied reply before parsing it; this never makes a provider call."""
     request = validate_source_request(value)
     supplied = _validate_instance(SourceRecording, recording)
     if supplied.request_sha256 != source_request_digest(request):
         raise ValueError("source recording belongs to another request")
-    root.mkdir(parents=True, exist_ok=False)
-    RecordedRun(root, _profile(request)).run(
+    RecordedRun(root, _profile(request)).import_replies(
         (source_prompt(request),),
-        transport=lambda _: supplied.reply,
-        max_new_calls=1,
+        (supplied.reply,),
+        supplied.model_dump(mode="json"),
+        recover=recover,
     )
-    publish_json(root / "import.json", supplied.model_dump(mode="json"))
 
 
 def replay_source(

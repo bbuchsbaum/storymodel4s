@@ -4,7 +4,6 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Literal
 
-from .artifacts import publish_json
 from .execution import RecordedRun, RunProfile
 from .fidelity import (
     ContextFidelityRequest,
@@ -67,17 +66,20 @@ def read_fidelity_request(path: Path, *, expected_sha256: str | None = None) -> 
     return validate_fidelity_request(raw)
 
 
-def import_fidelity(value: FidelityInput, recording: FidelityRecording, root: Path) -> None:
+def import_fidelity(
+    value: FidelityInput, recording: FidelityRecording, root: Path, *, recover: bool = False
+) -> None:
     """Store imported raw text before parse; this path never invokes a provider."""
     request = _exportable(value)
     supplied = _validate_instance(FidelityRecording, recording)
     if supplied.request_sha256 != fidelity_request_digest(request):
         raise ValueError("fidelity recording belongs to another request")
-    root.mkdir(parents=True, exist_ok=False)
-    RecordedRun(root, _profile(request)).run(
-        (_prompt(request),), transport=lambda _: supplied.reply, max_new_calls=1
+    RecordedRun(root, _profile(request)).import_replies(
+        (_prompt(request),),
+        (supplied.reply,),
+        supplied.model_dump(mode="json"),
+        recover=recover,
     )
-    publish_json(root / "import.json", supplied.model_dump(mode="json"))
 
 
 def replay_fidelity(

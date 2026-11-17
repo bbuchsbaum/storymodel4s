@@ -4,7 +4,6 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Literal
 
-from .artifacts import publish_json
 from .direct_mapping import (
     MappingInput,
     MappingOutput,
@@ -62,17 +61,20 @@ def read_mapping_request(path: Path, *, expected_sha256: str | None = None) -> M
     return validate_mapping_request(raw)
 
 
-def import_mapping(value: MappingInput, recording: MappingRecording, root: Path) -> None:
+def import_mapping(
+    value: MappingInput, recording: MappingRecording, root: Path, *, recover: bool = False
+) -> None:
     """Store imported raw text before parse; this path never invokes a provider."""
     request = _exportable(value)
     supplied = _validate_instance(MappingRecording, recording)
     if supplied.request_sha256 != mapping_request_digest(request):
         raise ValueError("mapping recording belongs to another request")
-    root.mkdir(parents=True, exist_ok=False)
-    RecordedRun(root, _profile(request)).run(
-        (_prompt(request),), transport=lambda _: supplied.reply, max_new_calls=1
+    RecordedRun(root, _profile(request)).import_replies(
+        (_prompt(request),),
+        (supplied.reply,),
+        supplied.model_dump(mode="json"),
+        recover=recover,
     )
-    publish_json(root / "import.json", supplied.model_dump(mode="json"))
 
 
 def replay_mapping(

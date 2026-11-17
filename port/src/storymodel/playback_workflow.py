@@ -4,7 +4,6 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Literal
 
-from .artifacts import publish_json
 from .execution import RecordedRun, RunProfile
 from .model import Digest, Model, Name, _validate_instance
 from .playback_construction import (
@@ -77,19 +76,20 @@ def read_playback_request(path: Path, *, expected_sha256: str | None = None) -> 
     return validate_playback_request(raw)
 
 
-def import_playback(value: PlaybackRequest, recording: PlaybackRecording, root: Path) -> None:
+def import_playback(
+    value: PlaybackRequest, recording: PlaybackRecording, root: Path, *, recover: bool = False
+) -> None:
     """Record exact raw proposals before parse, without invoking a media or language provider."""
     request = _exportable(value)
     supplied = _validate_instance(PlaybackRecording, recording)
     if supplied.request_sha256 != digest(request.model_dump(mode="json")):
         raise ValueError("playback recording belongs to another request")
-    root.mkdir(parents=True, exist_ok=False)
-    RecordedRun(root, _profile(request)).run(
+    RecordedRun(root, _profile(request)).import_replies(
         (playback_prompt(request),),
-        transport=lambda _: supplied.reply,
-        max_new_calls=1,
+        (supplied.reply,),
+        supplied.model_dump(mode="json"),
+        recover=recover,
     )
-    publish_json(root / "import.json", supplied.model_dump(mode="json"))
 
 
 def replay_playback(

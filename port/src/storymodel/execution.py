@@ -16,9 +16,12 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
+from .serialization import strict_json
+
 _PROFILE_SCHEMA = "storymodel.port.recorded-run-profile/v1"
 _REPLY_SCHEMA = "storymodel.port.recorded-reply/v1"
 _JOURNAL_SCHEMA = "storymodel.port.recorded-run-journal/v1"
+_IMPORT_INTENT_SCHEMA = "storymodel.port.recorded-run-import-intent/v1"
 
 
 class RecordedExecutionError(RuntimeError):
@@ -171,6 +174,168 @@ class RecordedRun:
                 replies.append(reply)
             return tuple(replies)
 
+    def import_replies(
+        self,
+        prompts: Sequence[str],
+        responses: Sequence[str],
+        manifest: dict[str, Any],
+        *,
+        recover: bool = False,
+    ) -> None:
+        """Durably import supplied replies, optionally completing a recorded import.
+
+        Recovery is deliberately opt-in: a pre-existing root is never adopted unless
+        its exact durable import intent binds this profile, every prompt/reply pair,
+        and the complete supplied manifest.
+        """
+        checked_prompts = self._validate_prompts(prompts)
+        checked_responses = self._validate_responses(responses)
+        if len(checked_prompts) != len(checked_responses):
+            raise InvalidRequest("prompts and responses must have the same length")
+        checked_manifest = self._validate_manifest(manifest)
+        expected = self._import_intent(checked_prompts, checked_responses, checked_manifest)
+        expected_replies = self._expected_replies(checked_prompts, checked_responses)
+
+        if recover:
+            if not self.root.exists():
+                raise RecordingMissing("recovery requires an existing recording root")
+        else:
+            self.root.mkdir(parents=True, exist_ok=False)
+        if not _is_directory(self.root):
+            raise CacheTampered("recording root is not a directory")
+
+        with self._writer_lock():
+            intent_path = self._import_intent_path
+            if recover:
+                saved_intent = (
+                    _read_json(intent_path, "import intent") if _path_present(intent_path) else None
+                )
+                if saved_intent is None:
+                    raise PreviousAttemptUnknown("recovery requires a durable import intent")
+                if not _same_json(saved_intent, expected):
+                    raise CacheTampered("durable import intent differs from supplied import")
+                self._validate_import_state(expected_replies, checked_manifest)
+            else:
+                _atomic_json_new(intent_path, expected)
+
+            self._complete_import(expected_replies, checked_manifest)
+
+    @staticmethod
+    def _validate_responses(responses: Sequence[str]) -> tuple[str, ...]:
+        if isinstance(responses, str):
+            raise InvalidRequest("responses must be a sequence of strings, not one string")
+        try:
+            checked = tuple(responses)
+        except TypeError as error:
+            raise InvalidRequest("responses must be a finite sequence of strings") from error
+        if not all(isinstance(response, str) for response in checked):
+            raise InvalidRequest("each response must be a string")
+        return checked
+
+    @staticmethod
+    def _validate_manifest(manifest: dict[str, Any]) -> dict[str, Any]:
+        if not isinstance(manifest, dict):
+            raise InvalidRequest("manifest must be a JSON object")
+        try:
+            encoded = json.dumps(
+                manifest, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False
+            )
+            parsed = json.loads(encoded)
+        except (TypeError, ValueError) as error:
+            raise InvalidRequest("manifest must be JSON-serializable") from error
+        if not isinstance(parsed, dict) or parsed != manifest:
+            raise InvalidRequest("manifest must be a JSON object")
+        return parsed
+
+    def _import_intent(
+        self, prompts: tuple[str, ...], responses: tuple[str, ...], manifest: dict[str, Any]
+    ) -> dict[str, Any]:
+        return {
+            "schema": _IMPORT_INTENT_SCHEMA,
+            "profile": self.profile.descriptor(),
+            "prompts": list(prompts),
+            "responses": list(responses),
+            "manifest": manifest,
+        }
+
+    def _expected_replies(
+        self, prompts: tuple[str, ...], responses: tuple[str, ...]
+    ) -> dict[str, tuple[str, str]]:
+        expected: dict[str, tuple[str, str]] = {}
+        for prompt, response in zip(prompts, responses, strict=True):
+            key = self._key(prompt)
+            prior = expected.setdefault(key, (prompt, response))
+            if prior != (prompt, response):
+                raise InvalidRequest("duplicate prompt has different supplied responses")
+        return expected
+
+    def _validate_import_state(
+        self, expected_replies: dict[str, tuple[str, str]], manifest: dict[str, Any]
+    ) -> None:
+        expected_root_entries = {
+            ".recorded-run.lock",
+            "import-intent.json",
+            "profile.json",
+            "journal.json",
+            "replies",
+            "import.json",
+        }
+        stageable_root_entries = expected_root_entries - {".recorded-run.lock", "replies"}
+        if any(
+            path.name not in expected_root_entries
+            and not _is_staging_file(path, stageable_root_entries)
+            for path in self.root.iterdir()
+        ):
+            raise CacheTampered("recording root contains a foreign import entry")
+        self._check_profile_for_import()
+        journal = self._read_journal()
+        if set(journal) - set(expected_replies):
+            raise CacheTampered("journal contains a foreign import reply")
+        for key in journal:
+            if self._read_reply(key, expected_replies[key][0]) is None:
+                raise PreviousAttemptUnknown(f"prior {journal[key]} attempt for {key} has no reply")
+        if _path_present(self._replies):
+            if not _is_directory(self._replies):
+                raise CacheTampered("reply directory is not a real directory")
+            children = tuple(self._replies.iterdir())
+            expected_names = {f"{key}.json" for key in expected_replies}
+            if any(
+                (not _is_regular_file(path) or path.suffix != ".json")
+                and not _is_staging_file(path, expected_names)
+                for path in children
+            ):
+                raise CacheTampered("reply directory contains an invalid entry")
+            reply_keys = {path.stem for path in children if path.suffix == ".json"}
+            foreign = reply_keys - set(expected_replies)
+            if foreign:
+                raise CacheTampered("reply directory contains a foreign import reply")
+            for key, (prompt, response) in expected_replies.items():
+                recorded = self._read_reply(key, prompt)
+                if recorded is not None and recorded != response:
+                    raise CacheTampered(f"reply {key} differs from supplied import")
+        import_path = self._import_path
+        if _path_present(import_path):
+            if not _same_json(_read_canonical_json(import_path, "import manifest"), manifest):
+                raise CacheTampered("import manifest differs from supplied import")
+
+    def _check_profile_for_import(self) -> None:
+        if not _path_present(self._profile_path):
+            return
+        self._check_profile(writable=False)
+
+    def _complete_import(
+        self, expected_replies: dict[str, tuple[str, str]], manifest: dict[str, Any]
+    ) -> None:
+        self._check_profile(writable=True)
+        # Validate all durable state before the first completion write, including after
+        # a newly-created intent, so malformed state never gets partially repaired.
+        self._validate_import_state(expected_replies, manifest)
+        for key, (prompt, response) in expected_replies.items():
+            if self._read_reply(key, prompt) is None:
+                self._write_reply(key, prompt, response)
+        if not _path_present(self._import_path):
+            _atomic_json_new(self._import_path, manifest, newline=True)
+
     def _validate_prompts(self, prompts: Sequence[str]) -> tuple[str, ...]:
         if isinstance(prompts, str):
             raise InvalidRequest("prompts must be a sequence of strings, not one string")
@@ -200,12 +365,20 @@ class RecordedRun:
         return self.root / "journal.json"
 
     @property
+    def _import_intent_path(self) -> Path:
+        return self.root / "import-intent.json"
+
+    @property
+    def _import_path(self) -> Path:
+        return self.root / "import.json"
+
+    @property
     def _replies(self) -> Path:
         return self.root / "replies"
 
     def _check_profile(self, writable: bool) -> None:
         path = self._profile_path
-        if not path.exists():
+        if not _path_present(path):
             if not writable:
                 raise RecordingMissing("recording profile is missing")
             _atomic_json(path, self.profile.descriptor())
@@ -248,7 +421,7 @@ class RecordedRun:
 
     def _read_journal(self) -> dict[str, str]:
         path = self._journal_path
-        if not path.exists():
+        if not _path_present(path):
             return {}
         raw = _read_json(path, "journal")
         if not isinstance(raw, dict) or set(raw) != {"schema", "entries"}:
@@ -257,7 +430,8 @@ class RecordedRun:
             raise CacheTampered("journal schema is invalid")
         entries = raw["entries"]
         if not all(
-            _is_digest(key) and value in {"started", "failed"} for key, value in entries.items()
+            _is_digest(key) and isinstance(value, str) and value in {"started", "failed"}
+            for key, value in entries.items()
         ):
             raise CacheTampered("journal entry is invalid")
         return dict(entries)
@@ -267,7 +441,7 @@ class RecordedRun:
 
     def _read_reply(self, key: str, prompt: str) -> str | None:
         path = self._replies / f"{key}.json"
-        if not path.exists():
+        if not _path_present(path):
             return None
         raw = _read_json(path, "reply")
         expected = {
@@ -318,24 +492,35 @@ class _WriterLock:
         self.fd: int | None = None
 
     def __enter__(self) -> None:
-        flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+        # Import lazily so inspection-only users on unsupported platforms can still
+        # import this module. POSIX advisory locks are the qualified macOS/Linux path.
+        try:
+            import fcntl
+        except ImportError as error:
+            raise RecordedExecutionError(
+                "recorded execution requires POSIX advisory locks on this platform"
+            ) from error
+        flags = os.O_CREAT | os.O_RDWR
         if hasattr(os, "O_NOFOLLOW"):
             flags |= os.O_NOFOLLOW
         try:
             self.fd = os.open(self.path, flags, 0o600)
-            os.write(self.fd, str(os.getpid()).encode("ascii"))
-            os.fsync(self.fd)
-        except FileExistsError as error:
-            raise WriterBusy("another recorded execution owns this root") from error
+            if not stat.S_ISREG(os.fstat(self.fd).st_mode):
+                raise CacheTampered("recording lock is not a regular file")
+            try:
+                fcntl.flock(self.fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError as error:
+                raise WriterBusy("another recorded execution owns this root") from error
+        except BaseException:
+            if self.fd is not None:
+                os.close(self.fd)
+                self.fd = None
+            raise
 
     def __exit__(self, exc_type: object, exc: object, traceback: object) -> None:
         if self.fd is not None:
             os.close(self.fd)
             self.fd = None
-        try:
-            self.path.unlink()
-        except FileNotFoundError:
-            pass
 
 
 def _digest(value: str) -> str:
@@ -344,6 +529,15 @@ def _digest(value: str) -> str:
 
 def _digest_json(value: object) -> str:
     return _digest(json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False))
+
+
+def _same_json(left: object, right: object) -> bool:
+    """Compare JSON values without Python's bool/numeric equality coercion."""
+    return json.dumps(
+        left, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False
+    ) == json.dumps(
+        right, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False
+    )
 
 
 def _is_digest(value: object) -> bool:
@@ -361,12 +555,36 @@ def _is_directory(path: Path) -> bool:
         return False
 
 
+def _path_present(path: Path) -> bool:
+    """Report a directory entry even when it is a dangling symlink."""
+    try:
+        path.lstat()
+    except FileNotFoundError:
+        return False
+    return True
+
+
+def _is_regular_file(path: Path) -> bool:
+    try:
+        return stat.S_ISREG(path.lstat().st_mode)
+    except FileNotFoundError:
+        return False
+
+
+def _is_staging_file(path: Path, destinations: set[str]) -> bool:
+    """Accept only crash-left regular staging files for known durable destinations."""
+    return _is_regular_file(path) and any(
+        path.name.startswith(f".{destination}.") and path.name.endswith(".tmp")
+        for destination in destinations
+    )
+
+
 def _read_json(path: Path, label: str) -> Any:
     try:
-        if not stat.S_ISREG(path.lstat().st_mode):
+        if not _is_regular_file(path):
             raise CacheTampered(f"{label} is not a regular file")
-        return json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as error:
+        return strict_json(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError) as error:
         raise CacheTampered(f"{label} is unreadable or malformed") from error
 
 
@@ -389,6 +607,52 @@ def _atomic_json(path: Path, value: object) -> None:
             os.unlink(temporary)
         except FileNotFoundError:
             pass
+
+
+def _atomic_json_new(path: Path, value: object, *, newline: bool = False) -> None:
+    """Publish a new canonical JSON file without replacing completed import bytes."""
+    encoded = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
+        "utf-8"
+    )
+    if newline:
+        encoded += b"\n"
+    fd, temporary = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(encoded)
+            handle.flush()
+            os.fsync(handle.fileno())
+        try:
+            os.link(temporary, path)
+        except FileExistsError:
+            raise CacheTampered(f"refusing to replace existing {path.name}") from None
+        _fsync_directory(path.parent)
+    except OSError as error:
+        raise CacheTampered(f"cannot atomically persist {path.name}") from error
+    finally:
+        try:
+            os.unlink(temporary)
+        except FileNotFoundError:
+            pass
+
+
+def _read_canonical_json(path: Path, label: str) -> Any:
+    try:
+        if not _is_regular_file(path):
+            raise CacheTampered(f"{label} is not a regular file")
+        raw = path.read_bytes()
+        value = strict_json(raw)
+        canonical = (
+            json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
+                "utf-8"
+            )
+            + b"\n"
+        )
+        if raw != canonical:
+            raise CacheTampered(f"{label} is not canonical JSON with a final newline")
+        return value
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError) as error:
+        raise CacheTampered(f"{label} is unreadable or malformed") from error
 
 
 def _fsync_directory(path: Path) -> None:

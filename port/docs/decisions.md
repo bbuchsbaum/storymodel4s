@@ -447,3 +447,15 @@ all Scala wrappers; replacing the repair declaration with unverified caller labe
 notebook offsets onto media clocks; dropping unused CSV columns; automatically granting export
 from caller-provided lineage; float timestamps or filling a missing first onset from later words.
 Shared example functions exercise the same downstream analysis stages. [Contract](sherlock-intake.md).
+
+## Explicit offline import recovery (2026-11-17, provisional)
+
+All existing offline importers share `RecordedRun.import_replies`, retaining their current
+request checks, grants, prompts, profiles and result schemas. Persist complete import intent
+before reply writes; explicit recovery accepts only identical supplied inputs and completes
+missing artifacts without replacing completed ones. Rejected alternatives: silently reusing
+any existing directory, replaying an uncertain remote dispatch, changing origin during resume,
+and implementing a separate workflow engine. Use a stable-inode POSIX advisory lock so process
+death releases ownership without guessing from PID files; unsupported recording platforms
+refuse explicitly. Legacy replay remains supported, but missing legacy intent is not invented.
+[Contract](import-recovery.md).

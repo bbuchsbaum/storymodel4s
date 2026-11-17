@@ -8,7 +8,6 @@ from typing import Literal, Self
 
 from pydantic import model_validator
 
-from .artifacts import publish_json
 from .execution import RecordedRun, RunProfile
 from .model import Digest, Model, Name, Recipe, Span, _validate_instance
 from .recall_intake import PreparedRecall, prepare_recall_utf8, validate_prepared_recall
@@ -242,20 +241,23 @@ def read_prepared_construction(
 
 
 def import_prepared_construction(
-    value: PreparedConstruction, recording: PreparedConstructionRecording, root: Path
+    value: PreparedConstruction,
+    recording: PreparedConstructionRecording,
+    root: Path,
+    *,
+    recover: bool = False,
 ) -> None:
-    """Persist raw replies before parsing; refuse existing or interrupted directories."""
+    """Persist before parsing; explicitly recover only matching durable import intent."""
     prepared = _checked(value)
     supplied = _validate_instance(PreparedConstructionRecording, recording)
     if supplied.prepared_sha256 != digest(prepared.model_dump(mode="json")):
         raise ValueError("recording belongs to another prepared input")
-    root.mkdir(parents=True, exist_ok=False)
-    RecordedRun(root, _profile(prepared)).run(
+    RecordedRun(root, _profile(prepared)).import_replies(
         (prepared_construction_prompt(prepared),),
-        transport=lambda _: supplied.reply,
-        max_new_calls=1,
+        (supplied.reply,),
+        supplied.model_dump(mode="json"),
+        recover=recover,
     )
-    publish_json(root / "import.json", supplied.model_dump(mode="json"))
 
 
 def replay_prepared_construction(

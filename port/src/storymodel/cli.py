@@ -243,6 +243,9 @@ def main(argv: list[str] | None = None) -> int:
     mapping_import.add_argument("request")
     mapping_import.add_argument("reply")
     mapping_import.add_argument("recording")
+    mapping_import.add_argument(
+        "--recover", action="store_true", help="resume only matching saved import intent"
+    )
     mapping_replay = commands.add_parser(
         "replay-mapping", help="resolve a recorded mapping offline"
     )
@@ -268,6 +271,9 @@ def main(argv: list[str] | None = None) -> int:
     details_import.add_argument("request")
     details_import.add_argument("reply")
     details_import.add_argument("recording")
+    details_import.add_argument(
+        "--recover", action="store_true", help="resume only matching saved import intent"
+    )
     details_replay = commands.add_parser(
         "replay-details", help="admit recorded v4 recall details offline"
     )
@@ -340,6 +346,9 @@ def main(argv: list[str] | None = None) -> int:
     prepared_construction_import.add_argument("request")
     prepared_construction_import.add_argument("reply")
     prepared_construction_import.add_argument("recording")
+    prepared_construction_import.add_argument(
+        "--recover", action="store_true", help="resume only matching saved import intent"
+    )
     prepared_construction_replay = commands.add_parser(
         "replay-prepared-construction", help="construct a raw-intake graph offline"
     )
@@ -372,6 +381,9 @@ def main(argv: list[str] | None = None) -> int:
     native_import.add_argument("request")
     native_import.add_argument("reply")
     native_import.add_argument("recording")
+    native_import.add_argument(
+        "--recover", action="store_true", help="resume only matching saved import intent"
+    )
     native_replay = commands.add_parser("replay-playback", help="construct a native graph offline")
     native_replay.add_argument("request")
     native_replay.add_argument("recording")
@@ -398,6 +410,9 @@ def main(argv: list[str] | None = None) -> int:
     rich_import.add_argument("request")
     rich_import.add_argument("reply")
     rich_import.add_argument("recording")
+    rich_import.add_argument(
+        "--recover", action="store_true", help="resume only matching saved import intent"
+    )
     rich_replay = commands.add_parser("replay-rich", help="construct a rich account offline")
     rich_replay.add_argument("request")
     rich_replay.add_argument("recording")
@@ -426,6 +441,9 @@ def main(argv: list[str] | None = None) -> int:
     imported.add_argument("request")
     imported.add_argument("replies")
     imported.add_argument("recording")
+    imported.add_argument(
+        "--recover", action="store_true", help="resume only matching saved import intent"
+    )
     imported.add_argument("--expected-request-sha256")
     replay = commands.add_parser("replay-time-study", help="resolve a recorded time study offline")
     replay.add_argument("request")
@@ -464,6 +482,9 @@ def main(argv: list[str] | None = None) -> int:
     extract_import.add_argument("request")
     extract_import.add_argument("reply")
     extract_import.add_argument("recording")
+    extract_import.add_argument(
+        "--recover", action="store_true", help="resume only matching saved import intent"
+    )
     extract_replay = commands.add_parser(
         "replay-extraction", help="resolve recorded extraction offline"
     )
@@ -489,6 +510,9 @@ def main(argv: list[str] | None = None) -> int:
     source_import.add_argument("request")
     source_import.add_argument("reply")
     source_import.add_argument("recording")
+    source_import.add_argument(
+        "--recover", action="store_true", help="resume only matching saved import intent"
+    )
     source_replay = commands.add_parser("replay-source", help="compile a recorded source offline")
     source_replay.add_argument("request")
     source_replay.add_argument("recording")
@@ -517,6 +541,9 @@ def main(argv: list[str] | None = None) -> int:
     semantic_import.add_argument("request")
     semantic_import.add_argument("reply")
     semantic_import.add_argument("recording")
+    semantic_import.add_argument(
+        "--recover", action="store_true", help="resume only matching saved import intent"
+    )
     semantic_replay = commands.add_parser(
         "replay-semantic", help="resolve a recorded surface-embedding reply offline"
     )
@@ -589,6 +616,7 @@ def main(argv: list[str] | None = None) -> int:
         fidelity_command.add_argument("--expected-request-sha256")
         if command == "import-fidelity":
             fidelity_command.add_argument("reply")
+            fidelity_command.add_argument("--recover", action="store_true")
         if command != "fidelity-prompt":
             fidelity_command.add_argument("recording")
         if command == "replay-fidelity":
@@ -1171,7 +1199,9 @@ def main(argv: list[str] | None = None) -> int:
                 fidelity_recording = FidelityRecording.model_validate_json(
                     canonical(strict_json(Path(args.reply).read_bytes()))
                 )
-                import_fidelity(fidelity_request, fidelity_recording, Path(args.recording))
+                import_fidelity(
+                    fidelity_request, fidelity_recording, Path(args.recording), recover=args.recover
+                )
                 emit({"recording": args.recording, "imported": 1}, None)
             else:
                 fidelity_result = replay_fidelity(
@@ -1252,7 +1282,9 @@ def main(argv: list[str] | None = None) -> int:
                 detail_recording = DetailRecording.model_validate_json(
                     canonical(strict_json(Path(args.reply).read_bytes()))
                 )
-                import_details(detail_request, detail_recording, Path(args.recording))
+                import_details(
+                    detail_request, detail_recording, Path(args.recording), recover=args.recover
+                )
             else:
                 detail_result = replay_details(
                     detail_request,
@@ -1295,7 +1327,9 @@ def main(argv: list[str] | None = None) -> int:
                 native_recording = PlaybackRecording.model_validate_json(
                     canonical(strict_json(Path(args.reply).read_bytes()))
                 )
-                import_playback(native_request, native_recording, Path(args.recording))
+                import_playback(
+                    native_request, native_recording, Path(args.recording), recover=args.recover
+                )
             else:
                 native_result = replay_playback(
                     native_request,
@@ -1420,7 +1454,10 @@ def main(argv: list[str] | None = None) -> int:
                     canonical(strict_json(Path(args.reply).read_bytes()))
                 )
                 import_prepared_construction(
-                    construction_prepared, prepared_recording, Path(args.recording)
+                    construction_prepared,
+                    prepared_recording,
+                    Path(args.recording),
+                    recover=args.recover,
                 )
             elif args.command == "replay-prepared-construction":
                 prepared_result = replay_prepared_construction(
@@ -1459,7 +1496,9 @@ def main(argv: list[str] | None = None) -> int:
                 rich_recording = RichRecording.model_validate_json(
                     canonical(strict_json(Path(args.reply).read_bytes()))
                 )
-                import_rich(rich_request, rich_recording, Path(args.recording))
+                import_rich(
+                    rich_request, rich_recording, Path(args.recording), recover=args.recover
+                )
             else:
                 rich_result = replay_rich(
                     rich_request,
@@ -1540,7 +1579,9 @@ def main(argv: list[str] | None = None) -> int:
                 mapping_recording = MappingRecording.model_validate_json(
                     canonical(strict_json(Path(args.reply).read_bytes()))
                 )
-                import_mapping(mapping_request, mapping_recording, Path(args.recording))
+                import_mapping(
+                    mapping_request, mapping_recording, Path(args.recording), recover=args.recover
+                )
             else:
                 mapping_result = replay_mapping(
                     mapping_request,
@@ -1724,7 +1765,7 @@ def main(argv: list[str] | None = None) -> int:
                 source_recording = SourceRecording.model_validate_json(
                     canonical(strict_json(Path(args.reply).read_bytes()))
                 )
-                import_source(source, source_recording, Path(args.recording))
+                import_source(source, source_recording, Path(args.recording), recover=args.recover)
                 emit({"recording": args.recording, "imported": 1}, None)
             else:
                 if source.export_permission != "allowed":
@@ -1799,7 +1840,9 @@ def main(argv: list[str] | None = None) -> int:
                 semantic_recording = SemanticRecording.model_validate_json(
                     canonical(strict_json(Path(args.reply).read_bytes()))
                 )
-                import_semantic(semantic_request, semantic_recording, Path(args.recording))
+                import_semantic(
+                    semantic_request, semantic_recording, Path(args.recording), recover=args.recover
+                )
                 emit({"recording": args.recording, "imported": 1}, None)
             elif args.command == "replay-semantic":
                 semantic_result = replay_semantic(
@@ -1828,7 +1871,9 @@ def main(argv: list[str] | None = None) -> int:
                 extraction_recording = ExtractionRecording.model_validate_json(
                     canonical(strict_json(Path(args.reply).read_bytes()))
                 )
-                import_extraction(extraction, extraction_recording, Path(args.recording))
+                import_extraction(
+                    extraction, extraction_recording, Path(args.recording), recover=args.recover
+                )
                 emit({"recording": args.recording, "imported": 1}, None)
             else:
                 if extraction.export_permission != "allowed":
@@ -1860,7 +1905,7 @@ def main(argv: list[str] | None = None) -> int:
                 replies = ImportedReplies.model_validate_json(
                     canonical(strict_json(Path(args.replies).read_bytes()))
                 )
-                import_time_replies(request, replies, Path(args.recording))
+                import_time_replies(request, replies, Path(args.recording), recover=args.recover)
                 emit({"imported": len(replies.replies), "recording": args.recording}, None)
             else:
                 if request.export_permission != "allowed":

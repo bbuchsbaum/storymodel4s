@@ -13,7 +13,6 @@ from typing import Annotated, Any, Literal, Self
 
 from pydantic import Field, JsonValue, field_validator, model_validator
 
-from .artifacts import publish_json
 from .execution import RecordedRun, RunProfile
 from .model import Model, Name, _validate_instance, canonical, digest
 from .serialization import strict_json as strict_json
@@ -165,11 +164,13 @@ def _prompt(request: TimeStudy, chunk: int, attempt: int) -> str:
     )
 
 
-def import_time_replies(value: TimeStudy, replies: ImportedReplies, root: Path) -> None:
+def import_time_replies(
+    value: TimeStudy, replies: ImportedReplies, root: Path, *, recover: bool = False
+) -> None:
     """Store exported raw replies using the existing journal/cache, with no model calls.
 
-    The destination must be new. Interrupted imports remain inspectable; choose a new
-    directory after diagnosis. A supplied reply is never relabelled as a live provider call.
+    The destination must be new unless explicit recovery matches its durable intent.
+    A supplied reply is never relabelled as a live provider call.
     """
     request = checked_request(value)
     replies = _validate_instance(ImportedReplies, replies)
@@ -187,19 +188,12 @@ def import_time_replies(value: TimeStudy, replies: ImportedReplies, root: Path) 
     for chunk, attempt in slots:
         if any((chunk, previous) not in slots for previous in range(attempt)):
             raise ValueError("recorded attempt sequence has a gap")
-    root.mkdir(parents=True, exist_ok=False)
-    run = RecordedRun(root, _profile(request))
-    for reply in replies.replies:
-
-        def imported_text(_: str) -> str:
-            return reply.text
-
-        run.run(
-            (_prompt(request, reply.chunk, reply.attempt),),
-            transport=imported_text,
-            max_new_calls=1,
-        )
-    publish_json(root / "import.json", replies.model_dump(mode="json"))
+    RecordedRun(root, _profile(request)).import_replies(
+        tuple(_prompt(request, reply.chunk, reply.attempt) for reply in replies.replies),
+        tuple(reply.text for reply in replies.replies),
+        replies.model_dump(mode="json"),
+        recover=recover,
+    )
 
 
 def replay_time_study(

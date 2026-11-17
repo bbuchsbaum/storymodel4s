@@ -4,7 +4,6 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Literal
 
-from .artifacts import publish_json
 from .execution import RecordedRun, RunProfile
 from .model import Digest, Model, Name, _validate_instance
 from .rich_construction import (
@@ -109,17 +108,20 @@ def read_rich_request(path: Path, *, expected_sha256: str | None = None) -> Rich
     return validate_rich_construction_request(raw)
 
 
-def import_rich(value: RichConstructionRequest, recording: RichRecording, root: Path) -> None:
-    """Save the raw reply before parsing, refusing a prior or interrupted recording directory."""
+def import_rich(
+    value: RichConstructionRequest, recording: RichRecording, root: Path, *, recover: bool = False
+) -> None:
+    """Save the raw reply before parsing, with explicit exact-intent recovery."""
     request = _checked(value)
     supplied = _validate_instance(RichRecording, recording)
     if supplied.request_sha256 != digest(request.model_dump(mode="json")):
         raise ValueError("rich recording belongs to another request")
-    root.mkdir(parents=True, exist_ok=False)
-    RecordedRun(root, _profile(request)).run(
-        (rich_prompt(request),), transport=lambda _: supplied.reply, max_new_calls=1
+    RecordedRun(root, _profile(request)).import_replies(
+        (rich_prompt(request),),
+        (supplied.reply,),
+        supplied.model_dump(mode="json"),
+        recover=recover,
     )
-    publish_json(root / "import.json", supplied.model_dump(mode="json"))
 
 
 def replay_rich(

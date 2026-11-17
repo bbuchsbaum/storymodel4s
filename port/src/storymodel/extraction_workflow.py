@@ -4,7 +4,6 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Literal
 
-from .artifacts import publish_json
 from .execution import RecordedRun, RunProfile
 from .extraction import (
     RECIPE,
@@ -71,19 +70,20 @@ def read_extraction_request(path: Path, *, expected_sha256: str | None = None) -
     return validate_request(raw)
 
 
-def import_extraction(value: ExtractionRequest, recording: ExtractionRecording, root: Path) -> None:
+def import_extraction(
+    value: ExtractionRequest, recording: ExtractionRecording, root: Path, *, recover: bool = False
+) -> None:
     """Record even malformed proposal text; an imported reply is never a live provider call."""
     request = validate_request(value)
     supplied = _validate_instance(ExtractionRecording, recording)
     if supplied.request_sha256 != request_digest(request):
         raise ValueError("extraction recording belongs to another request")
-    root.mkdir(parents=True, exist_ok=False)
-    RecordedRun(root, _profile(request)).run(
+    RecordedRun(root, _profile(request)).import_replies(
         (extraction_prompt(request),),
-        transport=lambda _: supplied.reply,
-        max_new_calls=1,
+        (supplied.reply,),
+        supplied.model_dump(mode="json"),
+        recover=recover,
     )
-    publish_json(root / "import.json", supplied.model_dump(mode="json"))
 
 
 def replay_extraction(

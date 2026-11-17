@@ -4,7 +4,6 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Literal
 
-from .artifacts import publish_json
 from .execution import RecordedRun, RunProfile
 from .model import Digest, Model, Name, _validate_instance
 from .semantic import (
@@ -51,16 +50,19 @@ def read_semantic_request(path: Path) -> SemanticRequest:
     return validate_semantic_request(path.read_bytes())
 
 
-def import_semantic(value: SemanticRequest, recording: SemanticRecording, root: Path) -> None:
+def import_semantic(
+    value: SemanticRequest, recording: SemanticRecording, root: Path, *, recover: bool = False
+) -> None:
     request = _exportable(value)
     supplied = _validate_instance(SemanticRecording, recording)
     if supplied.request_sha256 != semantic_request_digest(request):
         raise ValueError("semantic recording belongs to another request")
-    root.mkdir(parents=True, exist_ok=False)
-    RecordedRun(root, _profile(request)).run(
-        (semantic_prompt(request),), transport=lambda _: supplied.reply, max_new_calls=1
+    RecordedRun(root, _profile(request)).import_replies(
+        (semantic_prompt(request),),
+        (supplied.reply,),
+        supplied.model_dump(mode="json"),
+        recover=recover,
     )
-    publish_json(root / "import.json", supplied.model_dump(mode="json"))
 
 
 def replay_semantic(
