@@ -698,7 +698,7 @@ work and scene terms and top scene; the same split by the producer's row categor
 windows version (every fitted quantity refitted on the windowed rows); and the decoder on the
 two-sample ensemble and on sample 2.
 
-**Round 4 outcome** (harness deb5364e0; `hillclimb-r4/results.json`; no model calls).
+**Round 4 outcome** (harness 0414be9f1; `hillclimb-r4/results.json`; no model calls).
 
 **Verdict: DROP by the recorded rule.** Conditions 1, 2 and 4 hold; condition 3 fails.
 `producer_decoded` stays a separate forecast beside `producer`, and the pre-registration draft
@@ -723,7 +723,7 @@ is unchanged. The prediction recorded before scoring was wrong about FilmFestiva
 | `gold_context_fitted` | 2.392 | 0.459 | 0.281 | 45.6% | 0.022 (0.923) | 0.035 |
 
 - **The log loss improves while top-scene accuracy falls** (82.5% to 81.2%). The decoder
-  moves mass, and it flips more right tops to wrong than wrong to right.
+  moves mass, and it flips more right tops to wrong (144) than wrong to right (119).
 - **By the producer's row category** (scene bits, producer to decoded):
   - misses, 324 rows: 3.39 to 2.80; the decoded top is right on 34.3% of them;
   - hits, 1,629 rows: 0.52 to 0.39; the decoded top stays right on 91.2%;
@@ -770,16 +770,18 @@ decoded, by the gold step from the previous scene-coded row of the same work:
 | Backward | 69 | 1.45 to 2.61 | 40 | 1.47 to 3.98 |
 | First in the work | 97 | 1.00 to 0.58 | 10 | 1.25 to 0.41 |
 
-- **Mechanism on Sherlock.** A row's distribution is a mixture over its words, and the words
-  that abstain or stay at work level put a floor under every scene.
-  - The floor is 0.17 of the prior on the median Sherlock row, and the located scene stands at
-    about 23 to 35 times the prior. Content can therefore outweigh order by at most about 7.5
-    bits, or 6 after α = 0.8.
+- **Mechanism on Sherlock** (`post_hoc_evidence_bound` in the results). A row's distribution
+  is a mixture over its words, and the words that abstain or stay at work level put a floor
+  under every scene.
+  - The floor is 0.17 of the prior on the median Sherlock row, and the top scene stands at
+    about 33 times the prior. Content can therefore outweigh order by at most about 7.5 bits,
+    or 6 after α = 0.8.
   - One step forward against a jump is worth about 7.3 bits of prior. So the order wins on a
-    skip or a return, even when the row is clearly located.
-- **On FilmFestival** the floor is the ε floor (0.012), so that bound binds less. Its flipped
-  tops are mostly near-ties: the median evidence ratio between the producer's top and the
-  decoded top is 0.17 bits.
+    skip or a return, even when the row is clearly located. It turned 49 right tops wrong and
+    25 wrong tops right.
+- **On FilmFestival** the floor is the ε floor (0.011) and the bound is about 13 bits against
+  6.3 bits of prior, so the bound binds less. Its flipped tops are mostly near-ties: the
+  median evidence ratio between the producer's top and the decoded top is 0.17 bits.
 - **Backward steps suffer on both.** The decoded top is right on 52% of them on FilmFestival
   (producer 74%) and on 33% on Sherlock (producer 68%).
 - **Why the corpora differ.** FilmFestival rows are short (median 7 s), and 76% of its
@@ -791,7 +793,7 @@ decoded, by the gold step from the previous scene-coded row of the same work:
   decoder degrades exactly those rows. That argues against it as built, apart from the rule.
 
 **Tests and mutants.** Six tests cover the decoder; mutants M52–M57 each fail their named test
-(`mutations/r4-20261117.json`, 57 mutants, all caught). Five discriminate. M53 (the backward
+(`mutations/r4-20261117.json` at deb5364e0, 57 mutants, all caught). Five discriminate. M53 (the backward
 message) is a regression guard, because the inferred-top test fails with it.
 
 **Gaps for the vocabulary ADR.**
