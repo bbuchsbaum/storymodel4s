@@ -1,0 +1,147 @@
+{
+  "scope": "Exact occurrence-preserving native playback concatenation with actual Sherlock row and scene consumers",
+  "status": "Qualified local implementation; not merged/published and not full P2-P6 parity",
+  "source_commit": "21a8d5f2eb321bc907d21a18de4b1ab94ce4d6b4",
+  "tests": {
+    "command": "cd port && .venv/bin/pytest -q",
+    "passed": 1079,
+    "seconds": 32.61
+  },
+  "typing": {
+    "command": ".venv/bin/mypy src",
+    "passed": true,
+    "source_files": 69
+  },
+  "lint": {
+    "command": ".venv/bin/ruff check src tests examples",
+    "passed": true,
+    "evidence_drivers_passed": true
+  },
+  "installed": {
+    "installed_package": "/Users/bbuchsbaum/code/scala/storymodel4s/port/data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "cli_checks": 7,
+    "commands": [
+      {
+        "command": "sherlock-compose",
+        "exit": 0
+      },
+      {
+        "command": "sherlock-composition-readout",
+        "exit": 0
+      },
+      {
+        "command": "verify-sherlock-composition-readout",
+        "exit": 0
+      },
+      {
+        "command": "sherlock-composition-readout",
+        "exit": 0
+      },
+      {
+        "command": "verify-sherlock-composition-readout",
+        "exit": 0
+      },
+      {
+        "command": "verify-sherlock-composition-readout",
+        "exit": 2
+      },
+      {
+        "command": "sherlock-composition-readout",
+        "exit": 2
+      }
+    ],
+    "schemas_checked": 4,
+    "api_cli_bytes_equal": true,
+    "full_media_seconds": "212/5",
+    "annotation_seconds": "42/1",
+    "gap_seconds": "2/5",
+    "point_duration_seconds": "0/1",
+    "repeated_occurrence_duration_seconds": "2/3"
+  },
+  "wheel": {
+    "source_commit": "21a8d5f2eb321bc907d21a18de4b1ab94ce4d6b4",
+    "python_files": 69,
+    "sha256": "71e088ebf91e891b6c52d1263ae18a0632ad85d9b5ce3769af9f6bac0279008b",
+    "exact_source_match": true
+  },
+  "review": {
+    "verdict": "PASS; no BLOCK or additional follow-up defect in bounded exact-concatenation scope",
+    "existing_targeted_passed": 58,
+    "independent_passed": 5,
+    "oracle": "All 92 points and 153 interval pairs on independently specified mixed clocks, selected native clips and repeated source occurrences; saved-result tampering controls.",
+    "probe": "port/evidence/composition-independent.py",
+    "mutation_driver": "port/evidence/composition-mutations.py",
+    "parent_rerun": {
+      "revision": "21a8d5f2e",
+      "root": "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/storymodel-composition-mutations-zmbnz6ux",
+      "results": [
+        {
+          "name": "baseline",
+          "exit": 0,
+          "summary": "5 passed",
+          "log": "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/storymodel-composition-mutations-zmbnz6ux/baseline.log",
+          "retained_log": "port/data/qualification-logs/composition/parent-mutations/baseline.log"
+        },
+        {
+          "name": "clip_guard",
+          "exit": 1,
+          "summary": "1 failed, 2 passed",
+          "log": "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/storymodel-composition-mutations-zmbnz6ux/clip_guard.log",
+          "retained_log": "port/data/qualification-logs/composition/parent-mutations/clip_guard.log"
+        },
+        {
+          "name": "integral_guard",
+          "exit": 1,
+          "summary": "1 failed, 2 passed",
+          "log": "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/storymodel-composition-mutations-zmbnz6ux/integral_guard.log",
+          "retained_log": "port/data/qualification-logs/composition/parent-mutations/integral_guard.log"
+        }
+      ]
+    },
+    "mutations": "Occurrence clipping and integral-native-tick guards separately removed. Both compile; each named refusal assertion fails while two sibling controls pass.",
+    "harness_note": "Initial parent reruns reached the expected mutation failures but the log-name assertion assumed pytest printed a filename. Corrected harness to check the actual named FAILED assertion; final baseline and both mutations passed harness expectations."
+  },
+  "behavior": [
+    "Virtual composition retains physical media declarations and creates no synthetic media SHA.",
+    "Exact common rational quantum; derived offsets and occurrence identities; registry ordering is irrelevant, sequence ordering is material.",
+    "Native support is clipped to each selected occurrence; inverse splits at boundaries, preserves repetitions and refuses nonintegral native coordinates.",
+    "Intervals remain unions, gaps remain gaps, points contribute zero duration.",
+    "Sherlock uses full declared media durations and primary playback axes, not notebook offsets or the last annotation endpoint.",
+    "Rows and scenes retain actual native/composed anchors; selection unions do not double count.",
+    "Saved readouts rederive from actual source and query; export grants checked before CLI bin or result reads."
+  ],
+  "scaling_observation": {
+    "python": "3.12.11",
+    "operation": "inverse_support over full repeated composition; construction excluded; public validation included",
+    "runs": [
+      {
+        "occurrences": 100,
+        "selected_intervals": 1,
+        "seconds_with_tracemalloc": 0.0635367920040153,
+        "peak_traced_bytes": 518624
+      },
+      {
+        "occurrences": 1000,
+        "selected_intervals": 1,
+        "seconds_with_tracemalloc": 0.7379672500101151,
+        "peak_traced_bytes": 5290784
+      }
+    ],
+    "limitation": "One local run per size with tracemalloc overhead; no Scala comparison or general speed claim."
+  },
+  "scaling_fixture": "One physical source [10,20) at 1/3 seconds/tick, repeated 100 or 1000 times; selected full target interval [0,10*N). Time inverse_support with perf_counter under tracemalloc; assert N distinct occurrences and each native interval [10,20).",
+  "remaining": [
+    "General clock maps and time warps",
+    "Target-gap edit plans and nested compositions",
+    "Cross-edition correspondence",
+    "Composed evidence admitted directly into accounts",
+    "Recording/scanner linkage and measured recall-time consumers",
+    "Remaining full P2-P6 capabilities"
+  ],
+  "limits": [
+    "Synthetic declared-coordinate engineering evidence, not audiovisual truth or scientific accuracy",
+    "Scala source and support tests inspected; no Scala runtime parity comparison executed",
+    "No live media, participant data, network provider or paid model call used",
+    "One local scaling run per size with allocation tracing; not a Scala performance comparison"
+  ]
+}

@@ -1,0 +1,1 @@
+{"actor":"codex-port-composition","entity":"bd-01M7N3QX4CDGTDK1PFEV80FWZ8","kind":"note","note_kind":"progress","op":"20261117T160129.394695Z-p11443-c0003-rb833-h17d9a6","text":"Implement separate exact playback composition sidecar and actual Sherlock row/scene readout consumer; source/recall clocks remain explicit.","ts":"2026-11-17T16:01:29.394695Z","v":1}

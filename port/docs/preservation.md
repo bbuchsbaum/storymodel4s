@@ -798,3 +798,36 @@ This closes the interrupted offline-import gap noted above for new intent-bearin
 Remote execution/retry qualification, native composition and clock linkage, remaining studies
 and computational families, and full P2–P6 closure remain owed. No Windows, network-filesystem,
 power-loss or scientific-validation claim follows from these local checks.
+
+## Exact playback composition and Sherlock exposure (P4/P5)
+
+Source `21a8d5f2e` adds a separate content-addressed playback composition, preserving physical
+media identity and distinguishing repeated occurrences. Ordered selected native intervals map
+onto an exact rational common clock. Forward support retains both axes; inverse support splits
+at occurrence boundaries and refuses coordinates between native ticks. Join points belong to
+the next half-open segment. Existing physical playback and composition share measurement code.
+
+The retained Scala reference is `core/.../source.scala` (`CompositionSegment`,
+`TrackComposition`) and its D1a/D1b support tests, plus
+`corpus-intake/.../SherlockSourceAtlas.scala`. This is a bounded Python concatenation profile;
+no Scala runtime comparison was executed for this slice. Python derives offsets and occurrence
+identities rather than accepting caller assertions, and uses unbounded integers and exact
+rational arithmetic rather than rounding to a fixed common clock.
+
+`compose_sherlock_source` consumes the actual checked raw TSV and repair receipt, concatenates
+full media extents in declared part order, and retains native/composed anchors for every row
+and scene. `project_sherlock_composition` measures selected unions with explicit points;
+overlapping row/scene selections do not double count. Saved result verification recomputes
+from the actual intake and selection. The API and three CLI commands preserve the explicit
+export grant. The synthetic control has 42.4 seconds of media, 42 seconds of annotation
+support and a 0.4-second gap; a point has zero duration.
+
+See [contract](composition.md), [executable example](../examples/composed_playback.py) and
+[qualification evidence](../evidence/composition.json): 1,079 full-suite tests passed, seven
+installed CLI success/refusal checks agreed with the API, and four schemas matched. Independent
+review checked 92 points and 153 interval pairs; two compiling guard removals each failed their
+named assertion while two controls passed. Full P2–P6 parity remains open,
+including general clock maps, edit plans with target gaps, nested composition, cross-edition
+correspondence, composed evidence admitted directly into accounts, recording/scanner links
+and measured recall-time consumers. No actual media availability or scientific accuracy claim
+follows from declared-coordinate checks.

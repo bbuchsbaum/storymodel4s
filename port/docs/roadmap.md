@@ -50,6 +50,12 @@ against supplied source observations and feeds row coverage. Native recall, hold
 assessment, full clock/anchor coverage and remaining semantic channels remain owed. Mote owns
 live status; the preservation map records each slice's behavioral coverage and limitations.
 
+The connected synthetic [Sherlock intake](sherlock-intake.md) and exact-input
+[offline import recovery](import-recovery.md) now feed saved analysis. Exact native
+[playback composition](composition.md) adds ordered physical-part concatenation, repeated
+occurrences and row/scene readouts while retaining annotation gaps and point observations.
+General clock correspondence and measured recall-time consumers remain open.
+
 Do not require a complete event graph for basic categorical localization. Conversely, graph
 construction is owed independently of whether it improves localization accuracy.
 
@@ -561,10 +567,12 @@ with a broken old implementation needs repair or replacement, not silent deletio
 
 ## Execution rules for these deliveries
 
-- **Next bead:** synthetic study intake into the connected saved account workflow, then
-  interrupted-import recovery. Remaining graph, numerical, semantic-provider and inspection
-  deliveries remain open. Connected replay and recorded surface semantic inference join
-  chronology, contextual fidelity and native assessment as qualified local checkpoints.
+- **Next bead:** explicitly bind supplied recall timing to its recording and clock, then
+  feed a saved temporal allocation/readout workflow. Reuse the retained Sherlock intake and
+  exact playback composition; do not infer a recording identity, duration or scanner link
+  from word onsets. General clock maps, remaining graph, numerical, semantic-provider and
+  inspection deliveries remain open. The synthetic study and interrupted offline-import
+  recovery are completed local slices, not full P5 closure.
 - Use one bounded bead at a time, usually one session to one working day. Open subsequent
   beads when the input contract is clear; do not create a speculative ticket tree or assign
   an unsupported calendar estimate to full parity.
