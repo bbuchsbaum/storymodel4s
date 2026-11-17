@@ -96,6 +96,7 @@ def test_entity_origin_alias_preserves_wire_name_and_identity() -> None:
     assert new.origin_document == source.id
     assert new.model_dump(mode="json")["source_document"] == source.id
     assert new.id == old.id
+    assert Entity.create(source.id, "source", (evidence,)) == old
     with pytest.raises(ValidationError):
         Entity(
             source_document=source.id,

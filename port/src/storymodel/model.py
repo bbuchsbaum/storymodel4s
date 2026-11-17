@@ -163,6 +163,11 @@ class Entity(Identified):
         """The idiomatic Python name for this entity's document-local origin."""
         return self.source_document
 
+    @classmethod
+    def create(cls, origin_document: str, label: str, evidence: Evidence) -> Entity:
+        """Construct with a statically typed origin name while retaining legacy wire fields."""
+        return cls(source_document=origin_document, label=label, evidence=evidence)
+
 
 class Participation(Model):
     """An evidenced role assignment, distinct from entity identity."""

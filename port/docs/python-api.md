@@ -29,10 +29,13 @@ The principal public operations are available directly from `storymodel`:
 | `verify_alignment` | Recompute a saved alignment receipt against the original input. |
 | `read_account`, `export_account` | Validate saved accounts and enforce export grants. |
 
-Construct primitive records from `storymodel.model`. Entities accept the Python name
-`origin_document` and expose it as a property; `source_document` remains the compatibility
+Construct primitive records from `storymodel.model`. Use the typed constructor
+`Entity.create(origin_document, label, evidence)` and the `origin_document` property;
+`source_document` remains the compatibility
 wire name. Supplying both names refuses rather than silently choosing one. Identity
 namespaces are explicit constants, so renaming a Python class does not rename its objects.
+The runtime Pydantic constructor also accepts `origin_document`, but its alias is not understood
+by all type checkers; `Entity.create` is the typed Python entry point. The package ships `py.typed`.
 
 Account v3 permits exactly the narrated roots required by its document sides. A recall-only
 account needs no source root; a source-only account needs no recall root. `pair_accounts`
