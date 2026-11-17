@@ -1,0 +1,166 @@
+{
+  "source_commit": "1407235ae41868504d3b66b24f9f7d9c4281fc8b",
+  "initial_implementation": "6c23800c999ca5041d508863e74a033187337968",
+  "bead": "bd-01M7M59R5F72YYFCDEW1A4ZDB2",
+  "scope": "Account-derived sketch/lexical local evidence and full numerical inference path; not full LocalEvidence/P4 or scientific accuracy parity",
+  "checks": {
+    "full_suite": {
+      "command": ".venv/bin/pytest -q",
+      "passed": 604,
+      "seconds": 9.17
+    },
+    "focused": {
+      "passed": 52,
+      "seconds": 0.27
+    },
+    "mypy_source_files": 42,
+    "ruff_check": "passed",
+    "ruff_format_files": 108,
+    "schema": "spec/evidence/inference generated schema equality passed",
+    "diff_check": "passed"
+  },
+  "reference_blobs": {
+    "contentcost.scala": "5fbee6313842d83f3ec04e7383288f6aea01f158",
+    "contentscore.scala": "1a59553bb2aea89b492f432622347937ac7cd6b4",
+    "cost.scala": "5fb86d1fc4ed37a6cd527790399c17362d82e945",
+    "lexical.scala": "998d54bae2ee6aebf1aa1efb57bb2f4ded7755a4"
+  },
+  "reference_evidence": "Scala implementations and relevant tests read; no executed Scala runtime comparison in this slice. Exact source/Python asset equality:90 stopwords and126 irregular mappings;33 lexical tests.",
+  "independent_review": {
+    "reviewer": "local_evidence_review",
+    "initial": "Found binary64 raw distortion multiplication could overflow before Decimal scaling and raise uncaught InvalidOperation with zero distortion weight;51 focused tests passed and independent boundary probes executed.",
+    "repair": "1407235ae explicitly refuses nonfinite raw distortion terms; documentation states finite per-term output restriction. API/CLI refusal plus nearby finite2-facet8e307 and1-facet1e308 controls.",
+    "verdict": "BLOCK closed;3 selected controls independently passed0.15s. No other BLOCK reported in original scope."
+  },
+  "controls": [
+    "All source/recall content ownership checked; multiple contained situations require selection or explicit text-only mode",
+    "Sparse candidate limit receipts separate retrieval from costs and decoding",
+    "Mode gates cannot be undone by zero costs or perfect semantic distances",
+    "Every engaged segment member must contradict; nonengaged/nonmembers do not rescue or invent evidence",
+    "Semantic observed/missing/ineligible and slot defaults remain distinct",
+    "Zero measured support excludes state; allconfiguredzero retains prior with supportNone",
+    "Subnormal weightedcost scales to literal0.5; supportunderflow and aggregate/rawtermoverflow refuse",
+    "Independent source/recall accounts unchanged; external model states do not rewrite references/fidelity"
+  ],
+  "mutation_recipe": {
+    "file": "src/storymodel/local_evidence.py",
+    "method": "Copy package and tests/test_local_evidence.py into isolated directory; set PYTHONPATH to that directory; baseline selected pytest tests; apply one exact replacement; py_compile; rerun same selected tests.",
+    "controls": [
+      "test_default_missing_sensory_scaling_has_literal_energy_and_support",
+      "test_sparse_nomination_is_bounded_and_supplied_targets_reject_foreign_or_duplicates"
+    ]
+  },
+  "mutations": [
+    {
+      "mutation": "gate-before-price",
+      "named_test": "test_zero_cost_and_perfect_semantic_score_cannot_readmit_gated_faithful_mode",
+      "compiled": true,
+      "baseline": "3 passed",
+      "mutant": "1 named failure; 2 controls passed",
+      "replacement": {
+        "old": "facets = _contradictions(content, target)",
+        "new": "facets = ()"
+      }
+    },
+    {
+      "mutation": "measured-support",
+      "named_test": "test_semantic_imputation_or_ineligibility_cannot_rank_without_weighted_measurement",
+      "compiled": true,
+      "baseline": "3 passed",
+      "mutant": "1 named failure; 2 controls passed",
+      "replacement": {
+        "old": "measured = set(terms) - set(imputed)",
+        "new": "measured = set(terms)"
+      }
+    },
+    {
+      "mutation": "segment-engagement",
+      "named_test": "test_segment_gate_uses_every_engaged_actual_member",
+      "compiled": true,
+      "baseline": "6 passed",
+      "mutant": "1 named failure; 5 controls passed",
+      "replacement": {
+        "old": "engaged = [gate for gate in gates if gate.engaged]",
+        "new": "engaged = list(gates)"
+      }
+    },
+    {
+      "mutation": "wide-scaling",
+      "named_test": "test_subnormal_priced_weight_scales_without_losing_the_measured_energy",
+      "compiled": true,
+      "baseline": "3 passed",
+      "mutant": "1 named failure; 2 controls passed",
+      "replacement": {
+        "old": "            w_present = sum(",
+        "new": "            priced = Decimal.from_float(float(priced))\n            w_present = sum("
+      }
+    },
+    {
+      "mutation": "distortion-boundary",
+      "named_test": "test_unrepresentable_distortion_term_refuses_before_weighting_and_cli_publication",
+      "compiled": true,
+      "baseline": "3 passed",
+      "mutant": "1 named failure; 2 controls passed",
+      "replacement": {
+        "old": "    if not math.isfinite(distortion):\n        raise ValueError(\"raw distortion term exceeds finite numeric range\")\n",
+        "new": ""
+      }
+    }
+  ],
+  "installed_wheel": {
+    "package": "/Users/bbuchsbaum/code/scala/storymodel4s/port/data/wheel-env/lib/python3.12/site-packages/storymodel/local_evidence.py",
+    "outside_checkout": true,
+    "pythonpath_unset": true,
+    "checks": "example/API/derive evidence/request-only/infer-accounts/verifier/infer-sequence agree",
+    "units": 3,
+    "cells": 12,
+    "posterior_rows": 3,
+    "artifact_bytes": {
+      "source": 3656,
+      "recall": 4775,
+      "spec": 1781,
+      "evidence": 64691,
+      "request": 41029,
+      "inference": 105816
+    },
+    "sha256": "f920d802b48ab576e6bf72a13af8a9f411cc4931548367f2dec524d423f906d2"
+  },
+  "sparse_control": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "python": "3.12.11",
+    "method": "One sample under tracemalloc around derive_local_evidence including account validation and transitions; no inference or Scala timing; inputs constructed beforehand; peak Python allocations, not RSS.",
+    "generator": "AA PP BB rows, each State predicate PP with same-label agent/patient local entity IDs; source no segments, recall20 units. max_candidates4/max_postings128; all repeated matches deliberately force search limits.",
+    "cases": [
+      {
+        "source_situations": 100,
+        "recall_units": 20,
+        "seconds": 0.343917,
+        "peak_python_bytes": 5246200,
+        "local_cells": 80,
+        "transition_edges": 1539,
+        "retrieval_statuses": [
+          "search-limited"
+        ]
+      },
+      {
+        "source_situations": 1000,
+        "recall_units": 20,
+        "seconds": 1.826632,
+        "peak_python_bytes": 25945180,
+        "local_cells": 80,
+        "transition_edges": 1539,
+        "retrieval_statuses": [
+          "search-limited"
+        ]
+      }
+    ],
+    "reproduction_python": "import json,platform,time,tracemalloc\nfrom pathlib import Path\nfrom storymodel import make_account\nfrom storymodel.model import Context,Document,Entity,Participation,Span,State,Support,Unit\nfrom storymodel.rich_account import upgrade_account,validate_rich_account\nfrom storymodel.local_evidence import LocalEvidenceSpec,RecallSelection,derive_local_evidence\n\ndef account(side,count):\n    document=Document.create(side,side,'AA PP BB\\n'*count)\n    root=Context(side=side,kind='narrated')\n    supports=tuple(Support(document=document.id,spans=(Span(start=i*9,end=i*9+8),)) for i in range(count))\n    entities=tuple(Entity.create(document.id,label,(supports[0],)) for label in ('AA','BB'))\n    states=tuple(State(side=side,context=root.id,predicate='PP',evidence=(s,),\n                      participants=tuple(Participation(entity=e.id,role=role,evidence=(s,)) for e,role in zip(entities,('agent','patient')))) for s in supports)\n    units=tuple(Unit(kind='recall',support=s) for s in supports) if side=='recall' else ()\n    base=upgrade_account(make_account((document,),contexts=(root,),entities=entities,units=units))\n    return validate_rich_account(base.model_copy(update={'states':states}))\nresults=[]\nrecall=account('recall',20)\nspec=LocalEvidenceSpec(units=tuple(RecallSelection(unit=u.id) for u in recall.units),max_candidates=4,max_postings=128)\nfor n in (100,1000):\n    source=account('source',n)\n    tracemalloc.start(); start=time.perf_counter()\n    result=derive_local_evidence(source,recall,spec)\n    seconds=time.perf_counter()-start\n    _,peak=tracemalloc.get_traced_memory();tracemalloc.stop()\n    assert all(r.postings_read<=128 and len(r.nominations)<=4 for r in result.retrieval)\n    edges=sum(len(t.edges) for t in result.sequence.request.transitions)\n    assert edges<=19*81\n    results.append({'source_situations':n,'recall_units':20,'seconds':round(seconds,6),'peak_python_bytes':peak,'local_cells':len(result.cells),'transition_edges':edges,'retrieval_statuses':sorted({r.status for r in result.retrieval})})\nvalue={'platform':platform.platform(),'python':platform.python_version(),'method':'One sample under tracemalloc around derive_local_evidence including account validation and transitions; no inference or Scala timing; inputs constructed beforehand; peak Python allocations, not RSS.','generator':'AA PP BB rows, each State predicate PP with same-label agent/patient local entity IDs; source no segments, recall20 units. max_candidates4/max_postings128; all repeated matches deliberately force search limits.','cases':results}\nPath('data/local-evidence-size.json').write_text(json.dumps(value,indent=2)+'\\n')\nprint(json.dumps(value))\n"
+  },
+  "limitations": [
+    "Chart-aware gates, structural comparison and provider execution remain owed",
+    "Outcome/cause slots, nominal parsing and multi-proposition composition remain owed",
+    "Retained refinement/reconstruction and richer scientific readouts remain owed",
+    "Raw terms as well as final costs must fit finite binary64, even if zero weights could conceal overflow",
+    "Bounded content controls are not scientific accuracy, calibration or comparative performance claims"
+  ]
+}
