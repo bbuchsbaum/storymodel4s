@@ -577,6 +577,115 @@ bands (±2 SE of sample 2 − sample 1, ten participants): scene 0.041, work 0.0
   sessions alone would take about 78 calls; it would fit the 83 left, but it departs from the
   prefix layout and was not the recorded rule.
 
+### Hill-climbing round 4 (2026-11-17; free; protocol recorded before the decoder is scored)
+
+**Why.** The levers so far work on each row alone. The untested stage is sequence decoding over
+the producer's own row distributions. No model call is made in this round.
+
+**Step 0: the error budget** (harness 8b890c804; `hillclimb-r4/diagnostics.json`). Rows are
+the scene-scored rows, row-weighted. A *fallback* row abstains on all of its mass; a *miss* has
+a wrong top scene; a *hit* has a right one.
+
+| Run | Category | Rows | Share | Bits | Loss share | hmm_tfidf | gold_context_fitted |
+|---|---|---|---|---|---|---|---|
+| FilmFestival s1 (1,975; 1.034) | miss | 324 | 16.4% | 3.39 | 53.8% | 3.03 | 2.37 |
+| | hit | 1,629 | 82.5% | 0.52 | 41.6% | 2.17 | 2.15 |
+| | fallback | 22 | 1.1% | 4.30 | 4.6% | 2.71 | 1.93 |
+| FilmFestival s2 (1,975; 1.028) | miss | 329 | 16.7% | 3.33 | 54.0% | 3.18 | 2.43 |
+| | hit | 1,619 | 82.0% | 0.51 | 40.3% | 2.14 | 2.14 |
+| | fallback | 27 | 1.4% | 4.31 | 5.7% | 2.52 | 1.91 |
+| Sherlock V1 (385; 1.035) | miss | 56 | 14.5% | 3.49 | 49.1% | 4.52 | 4.40 |
+| | hit | 327 | 84.9% | 0.58 | 47.8% | 3.23 | 3.38 |
+| | fallback | 2 | 0.5% | 6.19 | 3.1% | 5.47 | 0.77 |
+
+**Step 0: where the misses are.** Distance is in scene steps, within the gold work, from the
+producer's top scene to the nearest gold scene. A neighbour is the previous or next gold row.
+
+| Of the misses | FilmFestival s1 | FilmFestival s2 | Sherlock V1 |
+|---|---|---|---|
+| Distance 1 (share of all scene loss) | 71.3% (35.2%) | 67.5% (34.7%) | 60.7% (26.1%) |
+| Distance 2–3 | 20.7% (12.9%) | 23.1% (13.3%) | 28.6% (14.6%) |
+| Distance 4 or more | 8.0% (5.6%) | 9.4% (6.0%) | 10.7% (8.3%) |
+| A gold scene is the second choice | 56.5% | 59.3% | 57.1% |
+| The previous or next row's top scene is a gold scene | 53.1% | 53.2% | 7.1% |
+| The neighbours' top scenes bracket a gold scene | 68.8% | 67.5% | 58.9% |
+| Equal or bracket | 76.2% | 74.5% | 60.7% |
+| Isolated jump (share of all scene loss) | 13.0% (6.8%) | 16.4% (8.4%) | 3.6% (2.3%) |
+
+An *isolated jump* is a miss whose neighbours bracket a gold scene while its own top scene lies
+outside the neighbours' range.
+
+**Reading, recorded before the decoder is scored.**
+- Most misses are one scene away from the gold, and that is where a sequence prior has least to
+  say: staying and stepping are both likely there.
+- Isolated jumps, the errors a decoder repairs most directly, carry 7–8% of the FilmFestival
+  scene loss and 2% of Sherlock's. The ceiling from them is about 0.07–0.09 bits on
+  FilmFestival, against a band of 0.041.
+- **Prediction:** the decoder gains little on the scene term, and may fail condition 1. It is
+  built anyway because the test is free and the result settles the question.
+
+**Step 1: the decoder.** A new forecast `producer_decoded` is reported beside `producer` and
+never replaces it. The content-local forecast and the order-informed forecast are different
+estimands (ADR 0031 §4). Module `cs2/decoder.py`.
+- **Method.** Forward-backward over the gold rows of one session, in session order.
+- **States.** A state is a position and a mode.
+  - A position is a valid scene of a work, or START before any film is recalled.
+  - A mode is *film*, *search* (the between-works memory search) or *other* (gave up, off
+    task, external).
+  - A non-film row does not move the position. That is how the search state knows which work
+    came before it.
+- **Cells.** A forecast is read on the scored simplex: one cell per valid (work, scene),
+  plus *search* and *other*.
+  - P(non-film) is the forecast's own. Its claimed part is split by the producer's label;
+    its fallback part is split by ν, the LOPO share of memory search among non-film gold rows.
+  - In-work mass that sits on no valid scene (a title-only scene, or in-work outside the
+    stimulus) counts as work-level evidence, spread within the work by the duration prior.
+    The affected rows are counted in the results.
+- **Evidence.** A row's likelihood for a cell is (q / D)^α, where q is the producer's
+  content-local row distribution and D is the participant's duration forecast on the same
+  cells. A producer that abstains everywhere has q = D, so its evidence is flat.
+- **Transitions.** Corpus-neutral parameters, fitted leave-one-participant-out by smoothed
+  counts (α 0.5 per outcome) on the other participants' gold sequences.
+  - *Mode:* a 3×3 matrix between consecutive rows, and the first row's mode.
+  - *Work,* on entering a film row: same work, next work in presentation order, or any other
+    work (uniform). Rates are fitted separately after a film row, after a search row, after an
+    other row, and from START. An outcome that does not exist is dropped and the rest
+    renormalized.
+  - *Scene,* within a work: stay, a forward step that is geometric in scene steps, or a
+    backward jump that is uniform over earlier scenes. Forward mass at the last scene and
+    backward mass at the first scene go to stay.
+  - *Entry,* on entering a work: geometric in scene steps from the work's first scene.
+  - A gold row's position is the last valid scene of its set, as `hmm_tfidf` takes it.
+- **α.** Grid 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.25, 1.5. Each participant's α
+  minimises the mean of the scene, work and film terms over the other nine. A pick at the
+  edge of the grid is reported as such; the grid is not extended after scoring.
+- **Output.** The smoothed posterior per row on the same cells, scored by the same scorer.
+- **`order_prior_only`.** The same decoder with flat evidence. With a null producer,
+  `producer_decoded` must equal it exactly; a test and a mutant cover that.
+- **Evidence share.** Each decoded row records, in bits, KL(posterior ‖ the row's own
+  distribution) and KL(posterior ‖ the posterior without the row's own evidence).
+  - Own share is the second divided by the sum of the two. It has no value when both are zero.
+  - Each row also records whether its top cell is the top of its own evidence or was supplied
+    by its neighbours. An inferred location is typed as inferred and never enters the account.
+
+**Protocol.** The primary run is FilmFestival sample 1. The decoder is kept only if all four
+hold.
+1. **FilmFestival, pooled over the ten participants with LOPO fits:** the scene term improves
+   with exact two-sided sign-flip p ≤ 0.01, and by more than the pooled band (0.041).
+2. **The work and film terms** are not worse beyond their bands (0.012 each).
+3. **Out-of-corpus confirmation** on the Sherlock part-order run (ablation V1). α is fixed at
+   the value that minimises the same objective over all ten FilmFestival participants;
+   transitions are fitted LOPO within Sherlock. The scene term moves in the same direction,
+   with one-sided exact sign-flip p ≤ 0.05 over its ten participants.
+4. **It beats `hmm_tfidf`, `gold_context_fitted` and `order_prior_only`** on the scene term,
+   as participant means, on both corpora.
+
+**Reported for both corpora,** whatever the verdict: producer against decoded on the film,
+work and scene terms and top scene; the same split by the producer's row category; switch F1
+(exact and ±1) against `pass1_only`; non-film mass on memory-search rows; the gold-blind
+windows version (every fitted quantity refitted on the windowed rows); and the decoder on the
+two-sample ensemble and on sample 2.
+
 **Gaps for the vocabulary ADR.**
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the
