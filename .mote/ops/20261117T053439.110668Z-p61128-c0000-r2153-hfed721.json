@@ -1,0 +1,1 @@
+{"actor":"codex-port-p2","entity":"bd-01M7KZENYZ218MH8RKSC8QDPYY","kind":"reserve_open","mode":"exclusive","op":"20261117T053439.110668Z-p61128-c0000-r2153-hfed721","paths":["port/tests/test_python_api.py"],"reservation_id":"rv-01M7M002G6MXZNY3STBV9NHBQV","ts":"2026-11-17T05:34:39.110668Z","ttl_s":3600,"v":2}

@@ -27,8 +27,9 @@ evidence, not a claim that the branch has landed or that the full phases are com
 
 The sparse sequence kernel and rich relation path have local implementation and independent
 evidence; see [sequence inference](sequence-inference.md) and [relations](relations.md).
-Rich identity extends the same sidecar path to state participants. Structural alignment is the
-next rich consumer, followed by a discriminating correspondence workflow. Playback, attribution,
+Rich identity extends the same sidecar path to state participants; [rich structural candidates](alignment.md)
+extend the sparse local rule with separate qualifier diagnostics. The next delivery is a
+discriminating correspondence workflow. Playback, attribution,
 richer graph families, semantic channels and account-derived inference remain owed. Mote owns
 live status; the preservation map records each slice's behavioral coverage and limitations.
 

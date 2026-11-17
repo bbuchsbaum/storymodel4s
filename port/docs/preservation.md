@@ -285,3 +285,23 @@ installed CLI role readback have executable controls. These extend the existing 
 bounded text-identity path; automatic acquisition, quantity, accepted holders, cross-modal
 identity and canonical graph projection remain owed. Structured candidates are the next rich
 consumer integration.
+
+## Rich sparse candidate integration
+
+Bead `bd-01M7KZENYZ218MH8RKSC8QDPYY` extends `align_account` and `verify_alignment` to
+rich situation/detail graphs through one sparse engine. See the [rich candidate contract](alignment.md).
+Same-kind predicate/role retrieval precedes the budget; the result exposes both declared source
+universes. Qualifier and circumstance evidence is inspectable but does not decide reference or
+fidelity. Old policy/result schemas and deterministic outputs are frozen before the extension.
+
+The retained Scala distinction is consequential: `align/cost.scala` documents contradiction
+while retaining an anchor under distorted mode, and ADR 0030 separates reference and fidelity.
+The existing Python role-conflict veto remains a narrower heuristic. This integration does not
+claim to port all Scala local evidence, mode gates or candidate methods.
+
+Discriminating witnesses cover state-linked details, same-kind budget limits, wrong-kind
+distractors, matching/differing/unknown qualifiers, alternatives and same-row ambiguity,
+deterministic repeated-label circumstance evidence, prior assessments and complete graph
+preservation. The installed example constructs one source and two recalls, admits details,
+localizes both while exposing their polarity difference, and leaves fidelity pending in analysis.
+The broader recurring-scene correspondence, semantic channels and full P3/P4 exits remain owed.

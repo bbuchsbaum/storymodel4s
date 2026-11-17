@@ -4,7 +4,7 @@ from hashlib import sha256
 
 import pytest
 
-from storymodel import align_account, make_account, pair_accounts
+from storymodel import make_account, pair_accounts
 from storymodel.extraction import resolve_extraction
 from storymodel.extraction_demo import example_proposal, example_request
 from storymodel.extraction_workflow import extraction_prompt
@@ -222,7 +222,7 @@ def test_state_and_circumstance_relational_forgery_refuses(mutation):
 
 def test_old_consumers_refuse_v4_without_silent_state_loss():
     rich = fixture()
-    for consumer in (validate_account, align_account):
+    for consumer in (validate_account,):
         with pytest.raises(ValueError, match="different wire version"):
             consumer(rich)
     with pytest.raises(ValueError):

@@ -306,7 +306,9 @@ def main(argv: list[str] | None = None) -> int:
                 args.output,
             )
         elif args.command == "align":
-            account = read_account(Path(args.account), expected_sha256=args.expected_sha256)
+            account = read_supported_account(
+                Path(args.account), expected_sha256=args.expected_sha256
+            )
             if account.export_permission != "allowed":
                 raise PermissionError("producer denies alignment export")
             alignment = align_account(

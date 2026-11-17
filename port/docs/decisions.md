@@ -191,3 +191,12 @@ event-only graph. Rich role rows explicitly name situation kind. Rejected altern
 identity resolver, dropping state placement, calling a state an event, or adding a new sidecar
 version with no changed identity rule. Full accepted-holder, quantity and cross-modal contracts
 remain owed; this extension does not infer them from nearby roles.
+
+Rich structural candidates (2026-11-17): reuse the sparse local engine with same-kind predicate
+and role postings before the retrieval budget. Expose separate state-attribute and circumstance
+diagnostics without using them to choose reference or assign fidelity. Rejected alternatives:
+filtering wrong-kind candidates after they consume the budget; treating unknown/unknown as
+agreement; choosing an alternative by matching qualifiers; or labeling equal time phrases as
+equal measured times. Rich v2 receipts preserve situation IDs/kinds and complete accounts while
+legacy v1 artifacts stay unchanged. The conservative role/context/row gates are a named local
+recipe, not a replacement for Scala distorted anchors or full semantic alignment.
