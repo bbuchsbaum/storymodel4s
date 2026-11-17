@@ -117,3 +117,10 @@ queries. It deliberately checks exact text unions instead of the Scala validator
 Working auxiliary memberships, boundary beliefs, summaries and their evidence/credence policies
 remain owed, alongside richer relation families and native numerical consumers. This primary
 hierarchy slice is not full P2–P6 parity or a scientific segmentation-accuracy claim.
+
+Verification is recorded in [hierarchy.json](../evidence/hierarchy.json): source `b229cbddd`,
+843 full-suite tests, 16 focused hierarchy tests, mypy55/Ruff138, four compiled mutations and
+16 installed CLI invocations across five commands. Independent exact-commit review found no
+BLOCK after 50 focused tests and 14 probes; a v1 policy/projection/local-evidence specimen
+matched the baseline byte-for-byte. The [installed workflow](../evidence/hierarchy-installed.py)
+and [mutation script](../evidence/hierarchy-mutations.py) retain reproducible checks.

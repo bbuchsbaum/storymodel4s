@@ -1,0 +1,231 @@
+{
+  "source_commit": "b229cbddd73dfb9f49bbafdaf5cf834902e348ea",
+  "scope": "Account-bound primary narrative hierarchy preserving occurrence identity; exact text/native unions and checked queries; v2 source projection and local-evidence/inference consumers",
+  "checks": {
+    "full_suite": {
+      "command": ".venv/bin/pytest -q",
+      "cwd": "port",
+      "passed": 843,
+      "seconds": 14.77,
+      "exit_code": 0,
+      "log_sha256": "b36005abcb0bd8a459aea92982f1a14039f760cf96a1ff88d3002ff84da71880"
+    },
+    "focused": {
+      "command": ".venv/bin/pytest -q tests/test_hierarchy.py",
+      "passed": 16,
+      "seconds": 0.41,
+      "exit_code": 0
+    },
+    "mypy": {
+      "source_files": 55,
+      "exit_code": 0,
+      "log_sha256": "8e71d79dbad0b69ea084d2b82ffa1e884da682da321d892911c2549f0a4a4d72"
+    },
+    "ruff": {
+      "scope": "src tests examples and both hierarchy evidence scripts",
+      "exit_code": 0
+    },
+    "format": {
+      "files": 138,
+      "exit_code": 0
+    },
+    "compatibility": {
+      "source_commit": "b229cbddd73dfb9f49bbafdaf5cf834902e348ea",
+      "wheel_sha256": "a81d2b066a07b32f7e76399fa5de91428bfa644e549c685898fc98d21db4ea92",
+      "files_matched": 58,
+      "legacy_v1_projection_sha256": "4a345b23f526812d049d30167bcf7bbc6d8a6ccfd68ce0414720348520a42002"
+    }
+  },
+  "mutations": [
+    {
+      "mutation": "account-binding",
+      "file": "hierarchy.py",
+      "old": "if selected.account_sha256 != account_sha:",
+      "new": "if False and selected.account_sha256 != account_sha:",
+      "test": "test_stale_account_binding_is_rejected_before_hierarchy_consumption",
+      "controls": [
+        "test_complete_tree_has_expected_supports_levels_and_stable_query",
+        "test_hierarchy_transition_weight_oracle_is_independent_of_generated_edge_order"
+      ],
+      "baseline": "3 passed in 0.25s",
+      "mutant": "1 failed, 2 passed in 0.25s",
+      "compiled": true
+    },
+    {
+      "mutation": "exact-containment",
+      "file": "hierarchy.py",
+      "old": "if not all(contained_in(e, supports[key]) for e in supports[child]):",
+      "new": "if False and not all(contained_in(e, supports[key]) for e in supports[child]):",
+      "test": "test_membership_refuses_a_same_document_gap_outside_its_parent_support",
+      "controls": [
+        "test_complete_tree_has_expected_supports_levels_and_stable_query",
+        "test_hierarchy_transition_weight_oracle_is_independent_of_generated_edge_order"
+      ],
+      "baseline": "3 passed in 0.23s",
+      "mutant": "1 failed, 2 passed in 0.24s",
+      "compiled": true
+    },
+    {
+      "mutation": "complete-root",
+      "file": "hierarchy.py",
+      "old": "if selected.completeness == \"complete\" and keys and (root is None or empty):",
+      "new": "if False and selected.completeness == \"complete\" and keys and (root is None or empty):",
+      "test": "test_partial_is_explicit_but_complete_requires_one_nonempty_segment_root",
+      "controls": [
+        "test_complete_tree_has_expected_supports_levels_and_stable_query",
+        "test_hierarchy_transition_weight_oracle_is_independent_of_generated_edge_order"
+      ],
+      "baseline": "3 passed in 0.23s",
+      "mutant": "1 failed, 2 passed in 0.25s",
+      "compiled": true
+    },
+    {
+      "mutation": "parent-independent-identity",
+      "file": "hierarchy.py",
+      "old": "members=tuple(sorted(resolved[c] for c in child_keys)),",
+      "new": "members=tuple(sorted(resolved[c] for c in child_keys)) + ((parents[key][1],) if key in parents else ()),",
+      "test": "test_group_identity_is_bottom_up_and_legacy_parents_remain_unchanged",
+      "controls": [
+        "test_complete_tree_has_expected_supports_levels_and_stable_query",
+        "test_hierarchy_transition_weight_oracle_is_independent_of_generated_edge_order"
+      ],
+      "baseline": "3 passed in 0.23s",
+      "mutant": "1 failed, 2 passed in 0.25s",
+      "compiled": true
+    }
+  ],
+  "installed": {
+    "import_path": "/Users/bbuchsbaum/code/scala/storymodel4s/port/data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "example": [
+      {
+        "source_unchanged": true,
+        "source_documents": 0,
+        "event_duration": "5/3",
+        "point_state_duration": "0/1"
+      },
+      {
+        "native_hierarchy_query": true,
+        "recalls": 2,
+        "source_unchanged": true,
+        "text_hierarchy_inference": true
+      }
+    ],
+    "commands": [
+      "build-hierarchy",
+      "infer-accounts",
+      "query-hierarchy",
+      "verify-account-inference",
+      "verify-hierarchy"
+    ],
+    "cli_invocations": 16,
+    "api_cli_equal": true,
+    "generated_segments_scored_in_both_recalls": 3,
+    "denied_before_supplementary_reads": true,
+    "artifacts": {
+      "inference-1.json": {
+        "bytes": 160283,
+        "sha256": "eefd2e2c843b2cc1bd51826bd3004778b9b2b8b05ba804369b48b94e6c322ec4"
+      },
+      "inference-2.json": {
+        "bytes": 160286,
+        "sha256": "58fcd15c636dae8f892736f0609c74fbdbc43b38a967d527b2509254ff73767f"
+      },
+      "inference-spec-1.json": {
+        "bytes": 2573,
+        "sha256": "0a47ef6db8fabad987ff1d6239f3ba0729c2c7445b67956c7cf4428adccd22a0"
+      },
+      "inference-spec-2.json": {
+        "bytes": 2573,
+        "sha256": "4f507a84fa66574194b4c344eb6e0f5c386c9e3e55a466e6edf519f33b81bffe"
+      },
+      "native/hierarchy-query.json": {
+        "bytes": 992,
+        "sha256": "52b680b103878dc49871898a8da1e078b6dab6a06b9648b361ecad3c2a90858e"
+      },
+      "native/hierarchy-spec.json": {
+        "bytes": 873,
+        "sha256": "37f319ce86665f6be6e757e56010afa4824b1e984c1e590ff54339546319e1ec"
+      },
+      "native/hierarchy.json": {
+        "bytes": 5406,
+        "sha256": "77006573c7e72acd592c8e2595c3dbd599442a1e1b72a8a97793f62b5c82d483"
+      },
+      "projection.json": {
+        "bytes": 7167,
+        "sha256": "1dbade8d893ad25dedfe3f195a429084e70e62b2d44fda2ac97e3f23c0a81b8d"
+      },
+      "recall-1/hierarchy-query.json": {
+        "bytes": 1064,
+        "sha256": "a56b4ba99ffc20e99e7a04b482955dcb2b1edb36f795f7f72d17e954d35dbeed"
+      },
+      "recall-1/hierarchy-spec.json": {
+        "bytes": 969,
+        "sha256": "2272c05167c08dcf061f0e98adc585512c2c59b4b803743dc90651e548bd874a"
+      },
+      "recall-1/hierarchy.json": {
+        "bytes": 5698,
+        "sha256": "5186421ff7fbba685601b6fd741729a084c572807d43ff13f855c67fd0f67ef9"
+      },
+      "recall-2/hierarchy-query.json": {
+        "bytes": 1064,
+        "sha256": "0a30eeddcb6cef6a98d4397ffa86b724c5bf65b12c331b99baf5eae1c06477a0"
+      },
+      "recall-2/hierarchy-spec.json": {
+        "bytes": 969,
+        "sha256": "dc0cd95a30dfcd2a6eb9adf10c811742b6579b46c68a1c802472440e60cdecc3"
+      },
+      "recall-2/hierarchy.json": {
+        "bytes": 5698,
+        "sha256": "f6669f70ce5161935e9739ba55921cba27e5c58b197badcea21b8a186d4b3f91"
+      },
+      "source/hierarchy-query.json": {
+        "bytes": 1282,
+        "sha256": "e1bde7739bdd8e97ecd5b00c4be3db6b47d4ff9468930af9722dfc61241f99e7"
+      },
+      "source/hierarchy-spec.json": {
+        "bytes": 1231,
+        "sha256": "33caa94a5d9884c71831f3c79181dbfcd0b28000ac00bc4113d2c4e5c047ff3f"
+      },
+      "source/hierarchy.json": {
+        "bytes": 7002,
+        "sha256": "bed53ae93cf7c78a5d9e585ac08a6b7cef08aa869c6591518ccb7332b557483d"
+      }
+    }
+  },
+  "review": {
+    "status": "noBLOCK",
+    "commit": "b229cbddd73dfb9f49bbafdaf5cf834902e348ea",
+    "focused_passed": 50,
+    "focused_seconds": 0.7,
+    "independent_probes_passed": 14,
+    "probe_execution": "13 passed plus one corrected review-fixture case rerun; no product defect",
+    "v1_comparison": {
+      "identical": true,
+      "runs": [
+        {
+          "version": "baseline",
+          "exit_code": 0,
+          "bytes": 12963,
+          "sha256": "dd1a01581c849477aada74a7d5249a978720d55e02c98a155f9dadd5eb1aadf0"
+        },
+        {
+          "version": "candidate",
+          "exit_code": 0,
+          "bytes": 12963,
+          "sha256": "dd1a01581c849477aada74a7d5249a978720d55e02c98a155f9dadd5eb1aadf0"
+        }
+      ]
+    },
+    "verdict_sha256": "fc9ce68921fb345115658376866df37278d0d28475964d720323d820cf2a6b25",
+    "probes_sha256": "5f7e2610b8e3c9d2b23fb864cd41f7ac5fd7fd1f7b5434382fda252181e6df6b",
+    "limits": "Reviewer did not repeat full suite, installed wheel or mutations; baseline comparison is one discriminating specimen."
+  },
+  "limits": [
+    "Primary hierarchy only; auxiliary memberships, boundary beliefs and summary/credence policies remain owed.",
+    "Native construction/query support does not qualify native numerical alignment or assessment; text consumers retain explicit refusal.",
+    "Structural completeness does not certify extraction completeness or semantic accuracy.",
+    "Hierarchy inputs are independent accounts; historical Unit.parent assertions are retained, not silently overridden.",
+    "No executed Scala parity or empirical segmentation accuracy claim; text union containment and derived levels are deliberate documented changes.",
+    "P2-P6 remains incomplete and this local branch is not merged or pushed."
+  ]
+}

@@ -34,8 +34,11 @@ The [port roadmap](docs/roadmap.md) defines the next phases toward full working 
 recorded recall construction through mapping and analysis. Account-derived sequence inference,
 reconstruction, organization, native playback readouts and cross-unit construction links now
 have bounded implementations. The [next deliveries](docs/roadmap.md#next-deliveries-execution-order-from-the-current-branch)
-start with primary hierarchy and connected graphs, then consolidate construction-to-analysis
+continue with richer relation semantics and connected graphs, then consolidate construction-to-analysis
 before expanding semantic evidence, remaining numerical methods and study/inspection coverage.
+[Primary hierarchy](docs/hierarchy.md) now groups source/recall occurrences without changing their
+IDs and feeds generated segments into source projection, local evidence and inference. Native
+hierarchy queries are supported; native numerical alignment and assessment remain owed.
 
 ## Run it
 

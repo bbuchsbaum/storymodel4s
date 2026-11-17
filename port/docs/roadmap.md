@@ -235,7 +235,7 @@ proof precedes scientific claims, but scientific qualification must not block un
 
 ## Next deliveries: execution order from the current branch
 
-Refreshed 2026-11-17 against `efa365f7d`. This is the next-work plan within P2–P6,
+Refreshed 2026-11-17 through hierarchy source `b229cbddd`. This is the next-work plan within P2–P6,
 not a second phase numbering system. Mote owns live status. Completed checkpoints move
 out of the future queue; capability obligations remain until their complete exit is met.
 
@@ -250,18 +250,25 @@ row-local references to the existing relation/projection/inference consumers. It
 API/CLI agreement, four discriminating mutations and independent review. These are recorded
 local results, not checks rerun for this planning update or a full-parity claim.
 
-Two concrete gaps determine the immediate order:
+[Primary hierarchy](hierarchy.md), source `b229cbddd`, now adds identity-preserving grouping,
+exact text/native support, checked queries and v2 projection/local-evidence consumers.
+[Evidence](../evidence/hierarchy.json) records the full suite, installed workflow, mutations and
+independent review. This closes primary grouping, not auxiliary memberships or boundary beliefs.
+The historical `scenes.py` operation keeps its documented reidentification behavior; new grouping
+uses the checked hierarchy artifact. Native construction and queries work, while native numerical
+mapping and assessment remain explicitly unsupported.
 
-- `scenes.py` currently groups only unparented source text rows and changes their IDs when
-  adding parents. `source_transitions.py` accepts situation-to-row memberships but does not
-  provide the full primary hierarchy construction contract.
-- Native playback construction and exact support inspection work, but text-dependent mapping,
-  identity, assessment and analysis still explicitly refuse media accounts. Pairing a native
-  source with a text recall does not by itself close that computational gap.
+**Next implementation action:** extend retained story-world temporal relations through checked
+construction, consistency checks and a computational readout. Inspect `TemporalRelation`, the
+context/equality/interval-composition validator and their tests; preserve canonical/converse
+meaning and distinguish world time from text order or playback clocks. Keep the existing bounded
+`before` recipe stable. Continue with causal and other retained relation families, auxiliary
+hierarchy and the coherent workflow below. No absent family is retired by this checkpoint.
 
 ### Delivery 1 — Connected narrative structure (P2, then P3/P4 consumers)
 
-**First slice: primary hierarchy.** Build checked situation/segment membership and nested
+**Primary hierarchy checkpoint implemented:** see the [contract and evidence](hierarchy.md).
+Its acceptance contract remains below. Build checked situation/segment membership and nested
 scene/episode grouping for independently constructed source and recall accounts. Preserve
 occurrence identity when changing grouping. Primary nesting, auxiliary membership and generic
 `part_of` have different meanings; one must not silently become another.
@@ -381,9 +388,9 @@ with a broken old implementation needs repair or replacement, not silent deletio
 
 ## Execution rules for these deliveries
 
-- **Next bead:** primary hierarchy producer, queries and source-projection integration from
-  Delivery 1. Keep text/native and source/recall coverage explicit. Split at a saved-artifact
-  boundary if necessary; do not report the larger delivery complete after its first slice.
+- **Next bead:** retained temporal relation construction, consistency and a consuming readout
+  from Delivery 1. Keep text/native and context scope explicit. Split at a saved-artifact
+  boundary if necessary; the larger connected-graph delivery remains incomplete.
 - Use one bounded bead at a time, usually one session to one working day. Open subsequent
   beads when the input contract is clear; do not create a speculative ticket tree or assign
   an unsupported calendar estimate to full parity.
