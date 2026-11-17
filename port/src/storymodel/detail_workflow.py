@@ -15,7 +15,7 @@ from .detail_admission import (
     validate_detail_request,
 )
 from .execution import RecordedRun, RunProfile
-from .model import Digest, Model, Name, canonical
+from .model import Digest, Model, Name, _validate_instance, canonical
 from .serialization import strict_json
 
 
@@ -62,7 +62,7 @@ def read_detail_request(path: Path, *, expected_sha256: str | None = None) -> De
 def import_details(value: DetailRequest, recording: DetailRecording, root: Path) -> None:
     """Store imported raw text before parse; this path never invokes a provider."""
     request = _exportable(value)
-    supplied = DetailRecording.model_validate(recording)
+    supplied = _validate_instance(DetailRecording, recording)
     if supplied.request_sha256 != detail_request_digest(request):
         raise ValueError("detail recording belongs to another request")
     root.mkdir(parents=True, exist_ok=False)

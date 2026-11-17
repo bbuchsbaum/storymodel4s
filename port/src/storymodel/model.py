@@ -31,6 +31,13 @@ class Model(BaseModel):
     )
 
 
+def _validate_instance[T: Model](model_type: type[T], value: T) -> T:
+    """Check Python types first, then JSON/UTF-8 representability before consumption or I/O."""
+    checked = model_type.model_validate(value)
+    canonical(checked.model_dump(mode="json")).encode("utf-8")
+    return checked
+
+
 class Identified(Model):
     """Content-derived identities refuse caller substitutions on readback."""
 
@@ -613,7 +620,7 @@ def validate_account(value: Account | str | bytes) -> Account:
     if isinstance(value, _AccountFields) and not isinstance(value, Account):
         raise ValueError("legacy account consumer cannot accept a different wire version")
     if isinstance(value, Account):
-        return Account.model_validate(value)
+        return _validate_instance(Account, value)
     return Account.model_validate_json(canonical(strict_json(value)))
 
 

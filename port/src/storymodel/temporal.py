@@ -5,7 +5,7 @@ from typing import Literal, Self
 
 from pydantic import model_validator
 
-from .model import Model
+from .model import Model, _validate_instance
 
 
 def rational(value: str) -> Fraction:
@@ -52,14 +52,14 @@ def allocate(
     Bins must be ordered and nonoverlapping. Uncovered support remains unallocated.
     """
     quantity = rational(value)
-    checked = Interval.model_validate(support)
+    checked = _validate_instance(Interval, support)
     start, end = rational(checked.start), rational(checked.end)
     if mode not in ("held-level", "uniform-amount"):
         raise ValueError("unknown allocation")
     result: list[TemporalCell] = []
     previous: Fraction | None = None
     for raw in bins:
-        cell = Interval.model_validate(raw)
+        cell = _validate_instance(Interval, raw)
         lo, hi = rational(cell.start), rational(cell.end)
         if cell.clock != checked.clock:
             raise ValueError("foreign clock")

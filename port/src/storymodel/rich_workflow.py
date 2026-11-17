@@ -6,7 +6,7 @@ from typing import Literal
 
 from .artifacts import publish_json
 from .execution import RecordedRun, RunProfile
-from .model import Digest, Model, Name
+from .model import Digest, Model, Name, _validate_instance
 from .rich_construction import (
     RECIPE,
     RichConstructionProposal,
@@ -80,7 +80,7 @@ def read_rich_request(path: Path, *, expected_sha256: str | None = None) -> Rich
 def import_rich(value: RichConstructionRequest, recording: RichRecording, root: Path) -> None:
     """Save the raw reply before parsing, refusing a prior or interrupted recording directory."""
     request = _checked(value)
-    supplied = RichRecording.model_validate(recording)
+    supplied = _validate_instance(RichRecording, recording)
     if supplied.request_sha256 != digest(request.model_dump(mode="json")):
         raise ValueError("rich recording belongs to another request")
     root.mkdir(parents=True, exist_ok=False)

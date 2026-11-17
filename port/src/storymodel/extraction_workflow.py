@@ -15,7 +15,7 @@ from .extraction import (
     resolve_extraction,
     validate_request,
 )
-from .model import Digest, Model, Name, canonical
+from .model import Digest, Model, Name, _validate_instance, canonical
 from .serialization import strict_json
 
 
@@ -74,7 +74,7 @@ def read_extraction_request(path: Path, *, expected_sha256: str | None = None) -
 def import_extraction(value: ExtractionRequest, recording: ExtractionRecording, root: Path) -> None:
     """Record even malformed proposal text; an imported reply is never a live provider call."""
     request = validate_request(value)
-    supplied = ExtractionRecording.model_validate(recording)
+    supplied = _validate_instance(ExtractionRecording, recording)
     if supplied.request_sha256 != request_digest(request):
         raise ValueError("extraction recording belongs to another request")
     root.mkdir(parents=True, exist_ok=False)

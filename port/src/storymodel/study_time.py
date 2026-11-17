@@ -8,7 +8,7 @@ from typing import Any, Self
 
 from pydantic import AliasChoices, Field, field_validator, model_validator
 
-from .model import Model
+from .model import Model, _validate_instance
 
 _TIME = re.compile(r"([0-9]{1,2}):([0-5][0-9](?:\.[0-9]{1,3})?)")
 _FRACTION = re.compile(r"-?[0-9]+/[1-9][0-9]*")
@@ -268,7 +268,7 @@ def resolve_time_item(
     source: StudySource, item: dict[str, Any] | None, *, failure: str = "omitted"
 ) -> dict[str, Any]:
     """Replay and judge one strict-chunked-time reply without reading narrative source text."""
-    checked = StudySource.model_validate(source)
+    checked = _validate_instance(StudySource, source)
     if item is None:
         stated = _failed(failure)
         missing = {"stated": stated, "judgement": _judge(checked, stated)}

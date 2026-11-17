@@ -24,6 +24,7 @@ from .model import (
     Reference,
     Support,
     Unit,
+    _validate_instance,
     canonical,
     contained,
     digest,
@@ -71,7 +72,7 @@ class AlignmentPolicy(Model):
 
 def validate_policy(value: AlignmentPolicy | str | bytes) -> AlignmentPolicy:
     if isinstance(value, AlignmentPolicy):
-        return AlignmentPolicy.model_validate(value)
+        return _validate_instance(AlignmentPolicy, value)
     return AlignmentPolicy.model_validate_json(canonical(strict_json(value)))
 
 
@@ -368,7 +369,7 @@ def align_account(value: Account, policy: AlignmentPolicy | None = None) -> Alig
 def verify_alignment(original: Account, result: AlignmentResult | str | bytes) -> AlignmentResult:
     """Recompute diagnostics and bindings against the original input before trusting a receipt."""
     checked = (
-        AlignmentResult.model_validate(result)
+        _validate_instance(AlignmentResult, result)
         if isinstance(result, AlignmentResult)
         else AlignmentResult.model_validate_json(canonical(strict_json(result)))
     )

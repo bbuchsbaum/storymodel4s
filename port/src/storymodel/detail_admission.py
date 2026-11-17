@@ -19,6 +19,7 @@ from .model import (
     Span,
     State,
     Support,
+    _validate_instance,
     contained_in,
 )
 from .rich_account import RichAccount, validate_rich_account
@@ -54,7 +55,7 @@ class DetailRequest(Model):
 
 def validate_detail_request(value: DetailRequest | str | bytes) -> DetailRequest:
     if isinstance(value, DetailRequest):
-        return DetailRequest.model_validate(value)
+        return _validate_instance(DetailRequest, value)
     return DetailRequest.model_validate_json(canonical(strict_json(value)))
 
 
@@ -310,7 +311,7 @@ def admit_details(value: DetailRequest, raw: str) -> DetailAdmissionResult:
 def verify_details(
     value: DetailRequest, raw: str, result: DetailAdmissionResult
 ) -> DetailAdmissionResult:
-    checked = DetailAdmissionResult.model_validate(result)
+    checked = _validate_instance(DetailAdmissionResult, result)
     expected = admit_details(value, raw)
     if checked != expected:
         raise ValueError("detail admission result differs from recorded inputs")

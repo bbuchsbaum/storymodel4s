@@ -15,7 +15,7 @@ from typing import Self
 
 from pydantic import Field, model_validator
 
-from .model import Document, Model, Span, canonical
+from .model import Document, Model, Span, _validate_instance, canonical
 
 RECIPE = (
     "recall-intake/v1;canonicalization=story-source/v1;surface=surface-analyzer/v1;"
@@ -450,7 +450,7 @@ def prepare_recall_utf8(key: str, raw: bytes) -> PreparedRecall:
 
 def validate_prepared_recall(value: PreparedRecall) -> PreparedRecall:
     """Recompute a public artifact, refusing forged ``model_copy`` or stale derived fields."""
-    checked = PreparedRecall.model_validate(value)
+    checked = _validate_instance(PreparedRecall, value)
     rebuilt = prepare_recall(checked.key, checked.raw_text)
     if canonical(rebuilt.model_dump(mode="json")) != canonical(checked.model_dump(mode="json")):
         raise ValueError("prepared recall differs from deterministic intake")

@@ -15,7 +15,7 @@ from pydantic import Field, JsonValue, field_validator, model_validator
 
 from .artifacts import publish_json
 from .execution import RecordedRun, RunProfile
-from .model import Model, Name, canonical, digest
+from .model import Model, Name, _validate_instance, canonical, digest
 from .serialization import strict_json as strict_json
 from .study_time import StudySource, resolve_time_item
 
@@ -104,7 +104,7 @@ class TimeStudyResult(Model):
 
 def checked_request(value: TimeStudy) -> TimeStudy:
     # Validate Python types before serialization can coerce forged numbers or drop fields.
-    return TimeStudy.model_validate(value)
+    return _validate_instance(TimeStudy, value)
 
 
 def read_request(path: Path, *, expected_sha256: str | None = None) -> TimeStudy:
@@ -172,7 +172,7 @@ def import_time_replies(value: TimeStudy, replies: ImportedReplies, root: Path) 
     directory after diagnosis. A supplied reply is never relabelled as a live provider call.
     """
     request = checked_request(value)
-    replies = ImportedReplies.model_validate(replies)
+    replies = _validate_instance(ImportedReplies, replies)
     if replies.request_sha256 != request_digest(request):
         raise ValueError("imported replies belong to another request")
     chunks = _chunks(request)

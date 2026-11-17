@@ -20,6 +20,7 @@ from .model import (
     Relation,
     Span,
     Support,
+    _validate_instance,
     validate_account,
 )
 from .serialization import canonical, digest, strict_json
@@ -167,7 +168,7 @@ def admit_relations(value: Account, raw: str) -> RelationResult:
 
 def verify_relations(value: Account, raw: str, receipt: RelationResult) -> RelationResult:
     """Recompute both graph and processing decisions from independently supplied inputs."""
-    checked = RelationResult.model_validate(receipt)
+    checked = _validate_instance(RelationResult, receipt)
     expected = admit_relations(value, raw)
     if checked != expected:
         raise ValueError("relation result differs from recorded inputs")

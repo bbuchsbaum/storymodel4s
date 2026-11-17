@@ -6,7 +6,7 @@ from typing import Literal
 
 from .artifacts import publish_json
 from .execution import RecordedRun, RunProfile
-from .model import Digest, Model, Name, canonical
+from .model import Digest, Model, Name, _validate_instance, canonical
 from .serialization import strict_json
 from .source import (
     RECIPE,
@@ -74,7 +74,7 @@ def read_source_request(path: Path, *, expected_sha256: str | None = None) -> So
 def import_source(value: SourceRequest, recording: SourceRecording, root: Path) -> None:
     """Record the supplied reply before parsing it; this never makes a provider call."""
     request = validate_source_request(value)
-    supplied = SourceRecording.model_validate(recording)
+    supplied = _validate_instance(SourceRecording, recording)
     if supplied.request_sha256 != source_request_digest(request):
         raise ValueError("source recording belongs to another request")
     root.mkdir(parents=True, exist_ok=False)

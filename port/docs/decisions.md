@@ -164,10 +164,14 @@ finite binary64 absolute-log output limits. Posterior output is not calibrated c
 account mode gates, graph-derived transitions and refinement remain separate required work.
 
 Public object validation (2026-11-17): validate supplied Pydantic instances recursively with
-`model_validate` before serialization, while raw JSON retains duplicate-key/nonfinite parsing
-and strict schema validation. Rejected alternative: serializing copied/constructed objects and
+`model_validate` before serialization, then check canonical JSON and UTF-8 representability
+through one private helper. Raw JSON retains duplicate-key/nonfinite parsing and strict schema
+validation. Rejected alternative: serializing copied/constructed objects and
 then validating the JSON. That can coerce Boolean numeric fields into integers/floats and drop
 unknown fields before a validator sees them. The earlier sequence review exposed the defect;
 `AlignmentPolicy.max_candidates=True` reproduced it in an older consumer. This repair changes
 invalid-object refusal, not valid artifact schemas, identities or replay hashes. Typed mapping
 instances retain their declared version instead of disguising a forged version through JSON.
+Direct Python validation alone was also rejected: bare strings can contain lone surrogates that
+the previous JSON reader refused, so type-only admission could reach recording I/O before a
+later UTF-8 failure. Valid ASCII and supplementary Unicode remain accepted.

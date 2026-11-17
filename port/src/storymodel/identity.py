@@ -20,6 +20,7 @@ from .model import (
     Model,
     Name,
     Support,
+    _validate_instance,
     contained_in,
     validate_account,
 )
@@ -335,7 +336,7 @@ def resolve_text_identity(value: Account, raw: str) -> IdentityResult:
 
 def verify_identity(value: Account, raw: str, result: IdentityResult) -> IdentityResult:
     """Recompute the sidecar against original graph and annotation bytes before consumption."""
-    checked = IdentityResult.model_validate(result)
+    checked = _validate_instance(IdentityResult, result)
     expected = resolve_text_identity(value, raw)
     if checked != expected:
         raise ValueError("identity result differs from recorded inputs")

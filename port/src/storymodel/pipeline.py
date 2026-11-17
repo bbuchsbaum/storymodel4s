@@ -1,7 +1,7 @@
 """Connect recorded proposals to checked accounts using independently supplied inputs."""
 
 from .execution import RecordedRun
-from .model import Account, Document, validate_account
+from .model import Account, Document, _validate_instance, validate_account
 
 
 def replay_account(
@@ -13,7 +13,7 @@ def replay_account(
     implement sentence extraction, segmentation or the legacy Scala record writer.
     Expected documents come from the caller's intake, never from the model response.
     """
-    documents = tuple(Document.model_validate(d) for d in expected_documents)
+    documents = tuple(_validate_instance(Document, d) for d in expected_documents)
     if not documents or len({d.id for d in documents}) != len(documents):
         raise ValueError("expected documents must be nonempty and distinct")
     input_hashes = {d.sha256 for d in documents}

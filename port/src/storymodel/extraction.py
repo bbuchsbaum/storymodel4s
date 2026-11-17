@@ -51,6 +51,7 @@ from .model import (
     Recipe,
     Support,
     Unit,
+    _validate_instance,
     canonical,
     digest,
     validate_account,
@@ -125,7 +126,7 @@ class ExtractionRequest(Model):
 def validate_request(value: ExtractionRequest | str | bytes) -> ExtractionRequest:
     """Recheck copied Python values and duplicate/nonfinite JSON before consumption."""
     if isinstance(value, ExtractionRequest):
-        return ExtractionRequest.model_validate(value)
+        return _validate_instance(ExtractionRequest, value)
     return ExtractionRequest.model_validate_json(canonical(strict_json(value)))
 
 

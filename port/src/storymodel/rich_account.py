@@ -15,6 +15,7 @@ from .model import (
     Recipe,
     State,
     _AccountFields,
+    _validate_instance,
     contained_in,
     indexed,
     validate_account,
@@ -65,7 +66,7 @@ class RichAccount(_AccountFields):
 def validate_rich_account(value: RichAccount | str | bytes) -> RichAccount:
     """Recheck copied objects and complete graph relationships at every v4 consumer boundary."""
     if isinstance(value, RichAccount):
-        return RichAccount.model_validate(value)
+        return _validate_instance(RichAccount, value)
     return RichAccount.model_validate_json(canonical(strict_json(value)))
 
 

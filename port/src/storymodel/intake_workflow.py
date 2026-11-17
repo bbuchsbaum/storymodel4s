@@ -8,7 +8,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, model_validator
 
-from .model import Model, canonical, digest
+from .model import Model, _validate_instance, canonical, digest
 from .recall_intake import PreparedRecall, prepare_recall_utf8, validate_prepared_recall
 from .serialization import strict_json
 from .source_intake import NativeSource, compile_source, native_source_digest
@@ -60,7 +60,7 @@ class PreparedTimeStudy(Model):
 
 
 def validate_prepared_study(value: PreparedTimeStudy) -> PreparedTimeStudy:
-    return PreparedTimeStudy.model_validate(value)
+    return _validate_instance(PreparedTimeStudy, value)
 
 
 def prepare_time_study(

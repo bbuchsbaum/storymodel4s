@@ -30,6 +30,7 @@ from .model import (
     State,
     Support,
     Unit,
+    _validate_instance,
     contained_in,
 )
 from .rich_account import Circumstance, RichAccount, validate_rich_account
@@ -67,7 +68,7 @@ def validate_rich_construction_request(
 ) -> RichConstructionRequest:
     """Revalidate copied requests before compiling their evidence-bound graph."""
     if isinstance(value, RichConstructionRequest):
-        return RichConstructionRequest.model_validate(value)
+        return _validate_instance(RichConstructionRequest, value)
     return RichConstructionRequest.model_validate_json(canonical(strict_json(value)))
 
 
@@ -324,7 +325,7 @@ def verify_rich_construction(
     value: RichConstructionRequest, raw: str, result: RichConstructionResult
 ) -> RichConstructionResult:
     """Recompute the row receipts and v4 graph rather than trusting a copied result."""
-    checked = RichConstructionResult.model_validate(result)
+    checked = _validate_instance(RichConstructionResult, result)
     expected = compile_rich_construction(value, raw)
     if checked != expected:
         raise ValueError("rich construction result differs from recorded inputs")

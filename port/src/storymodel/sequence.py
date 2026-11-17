@@ -12,7 +12,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, field_validator, model_validator
 
-from .model import Digest, Model, Name
+from .model import Digest, Model, Name, _validate_instance
 from .serialization import canonical, digest, strict_json
 
 Finite = Annotated[float, Field(allow_inf_nan=False)]
@@ -261,7 +261,7 @@ def validate_sequence(value: SequenceRequest | str | bytes) -> SequenceRequest:
     if isinstance(value, SequenceRequest):
         # Serialization can coerce forged bools to floats and discard unknown fields.
         # Revalidate Python values before any serialization (including nested copies).
-        return SequenceRequest.model_validate(value)
+        return _validate_instance(SequenceRequest, value)
     return SequenceRequest.model_validate_json(canonical(strict_json(value)))
 
 
@@ -458,7 +458,7 @@ def verify_sequence(
 ) -> SequenceResult:
     """Recompute externally supplied results against independently supplied exact inputs."""
     supplied = (
-        SequenceResult.model_validate(value)
+        _validate_instance(SequenceResult, value)
         if isinstance(value, SequenceResult)
         else SequenceResult.model_validate_json(canonical(strict_json(value)))
     )

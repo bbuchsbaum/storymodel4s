@@ -8,7 +8,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, model_validator
 
-from .model import Model, Name, digest
+from .model import Model, Name, _validate_instance, digest
 from .study_time import ClipClock, Collection, Film, Scene, SceneInterval, StudySource
 
 _INTEGER = re.compile(r"-?[0-9]+")
@@ -181,7 +181,7 @@ def _derive_source(plan: NativeSource) -> StudySource:
 
 
 def validate_native_source(value: NativeSource) -> NativeSource:
-    return NativeSource.model_validate(value)
+    return _validate_instance(NativeSource, value)
 
 
 def compile_source(value: NativeSource) -> StudySource:

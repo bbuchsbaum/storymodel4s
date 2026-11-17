@@ -242,11 +242,8 @@ def detail_control():
     return prepare_details(account, (account.units[0].id,))
 
 
-@pytest.mark.parametrize(
-    "family", ["source", "extraction", "rich", "detail", "mapping-v1", "mapping-v2"]
-)
-def test_each_recording_import_refuses_forged_objects_before_creating_files(tmp_path, family):
-    request, recording_class, importer = {
+def recording_control(family):
+    return {
         "source": (example_source_request(), SourceRecording, import_source),
         "extraction": (example_request(), ExtractionRecording, import_extraction),
         "rich": (rich_control()[0], RichRecording, import_rich),
@@ -254,6 +251,13 @@ def test_each_recording_import_refuses_forged_objects_before_creating_files(tmp_
         "mapping-v1": (legacy_mapping_request(), MappingRecording, import_mapping),
         "mapping-v2": (rich_mapping_request(), MappingRecording, import_mapping),
     }[family]
+
+
+@pytest.mark.parametrize(
+    "family", ["source", "extraction", "rich", "detail", "mapping-v1", "mapping-v2"]
+)
+def test_each_recording_import_refuses_forged_objects_before_creating_files(tmp_path, family):
+    request, recording_class, importer = recording_control(family)
     recording = recording_class(
         request_sha256=digest(request.model_dump(mode="json")), origin="control", reply="{}"
     )
@@ -268,6 +272,19 @@ def test_each_recording_import_refuses_forged_objects_before_creating_files(tmp_
         with pytest.raises(ValueError):
             importer(supplied_request, supplied_recording, destination)
         assert not destination.exists()
+
+
+@pytest.mark.parametrize(
+    "family", ["source", "extraction", "rich", "detail", "mapping-v1", "mapping-v2"]
+)
+def test_unencodable_recordings_refuse_before_io_but_valid_unicode_imports(tmp_path, family):
+    request, recording_class, importer = recording_control(family)
+    common = {"request_sha256": digest(request.model_dump(mode="json")), "origin": "control"}
+    importer(request, recording_class(**common, reply="😀"), tmp_path / "valid-unicode")
+    assert (tmp_path / "valid-unicode/import.json").is_file()
+    with pytest.raises(ValueError):
+        importer(request, recording_class(**common, reply="\ud800"), tmp_path / "invalid-unicode")
+    assert not (tmp_path / "invalid-unicode").exists()
 
 
 @pytest.mark.parametrize(
@@ -362,6 +379,20 @@ def test_study_inputs_and_replies_validate_types_before_dispatch_or_disk(tmp_pat
         destination = tmp_path / f"forged-{i}"
         rejects(lambda value: import_time_replies(request, value, destination), forged)
         assert not destination.exists()
+
+    unicode_reply = replies.model_copy(
+        update={"replies": (RawReply(chunk=0, attempt=0, text="😀"),)}
+    )
+    import_time_replies(request, unicode_reply, tmp_path / "valid-unicode")
+    assert (tmp_path / "valid-unicode/import.json").is_file()
+    invalid_unicode = replies.model_copy(
+        update={"replies": (RawReply(chunk=0, attempt=0, text="\ud800"),)}
+    )
+    rejects(
+        lambda value: import_time_replies(request, value, tmp_path / "invalid-unicode"),
+        invalid_unicode,
+    )
+    assert not (tmp_path / "invalid-unicode").exists()
 
 
 def test_temporal_and_document_consumers_cannot_drop_unknown_fields(tmp_path, monkeypatch):
