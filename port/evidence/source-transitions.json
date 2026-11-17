@@ -1,0 +1,133 @@
+{
+  "source_commit": "42924603ae7050d1398ab465320019e5e67435ff",
+  "initial_implementation": "caea1d7c025b41c4909ce755f9769ae6a262194d",
+  "bead": "bd-01M7M3WSMQ8VA0CPGSFQN54VK9",
+  "scope": "P4 checked source layers and graph-derived transition producer; local state populations and costs explicitly supplied",
+  "checks": {
+    "pytest": {
+      "passed": 552,
+      "seconds": 8.74,
+      "command": ".venv/bin/pytest -q"
+    },
+    "targeted_projection_and_kernel": {
+      "passed": 28,
+      "seconds": 0.31
+    },
+    "mypy_source_files": 40,
+    "ruff_check": "passed",
+    "ruff_format_files": 103,
+    "schema": "generated policy/projection/spec/result equality checked by CLI test",
+    "diff_check": "passed before implementation and repair commits"
+  },
+  "review": {
+    "reviewer": "correspondence_review",
+    "initial": "Two independently reproduced input-boundary BLOCKs: empty parent crashed hierarchy indexing; malformed falsey policies bypassed validation. No additional semantic BLOCK found.",
+    "resolution": "Both repaired at42924603a; independent repair review reports no residual BLOCK, 28 focused tests passed in0.29s.",
+    "followup": "bd-01M7M4YVX98FP5Q1ENDF1PT1M4 tracks existing account admission of empty unit parents; this producer now refuses them."
+  },
+  "reference": {
+    "hsmm_blob": "19e91515583487fbcea62ce35a8279e57afe5a66",
+    "story_source_view_blob": "13eb38c6eb8988d5bb99e8183b47990cc8b8279d",
+    "method": "Read TransitionFeatures.between, transitionRow, StorySourceView and scoring position contract; independent Python analytical expectations. No new Scala execution."
+  },
+  "mutations": [
+    {
+      "mutation": "cover",
+      "named_test": "test_project_source_uses_declared_containment_and_checked_layers_only",
+      "compiled": true,
+      "baseline": "3 passed",
+      "mutant": "1 named failure; 2 controls passed"
+    },
+    {
+      "mutation": "external-mixture",
+      "named_test": "test_graph_transition_probabilities_features_and_receipts_are_independent",
+      "compiled": true,
+      "baseline": "3 passed",
+      "mutant": "1 named failure; 2 controls passed"
+    },
+    {
+      "mutation": "coordinate-frame",
+      "named_test": "test_position_features_omit_unpositioned_pairs_and_guard_hierarchy_upward_moves",
+      "compiled": true,
+      "baseline": "3 passed",
+      "mutant": "1 named failure; 2 controls passed"
+    },
+    {
+      "mutation": "complete-membership-v2",
+      "named_test": "test_primary_memberships_reject_wrong_rows_and_multidocument_evidence",
+      "compiled": true,
+      "baseline": "3 passed",
+      "mutant": "1 named failure; 2 controls passed"
+    },
+    {
+      "mutation": "sigmoid-complement",
+      "named_test": "test_extreme_external_logit_retains_tiny_source_mass_and_overflowed_scores_refuse",
+      "compiled": true,
+      "baseline": "3 passed",
+      "mutant": "1 named failure; 2 controls passed"
+    },
+    {
+      "mutation": "parent-guard",
+      "named_test": "test_projection_refuses_empty_primary_parent_in_direct_and_forged_accounts",
+      "compiled": true,
+      "baseline": "3 passed",
+      "mutant": "1 named failure; 2 controls passed"
+    },
+    {
+      "mutation": "falsy-default",
+      "named_test": "test_projection_refuses_invalid_falsy_policies[False]",
+      "compiled": true,
+      "baseline": "3 passed",
+      "mutant": "1 named failure; 2 controls passed"
+    }
+  ],
+  "installed_wheel": {
+    "sha256": "380811c51dc54374c8a1d18b49425960299dd575f9cfa03d034c917144304cda",
+    "outside_checkout": true,
+    "pythonpath_unset": true,
+    "import": "site-packages/storymodel",
+    "example": "examples/source_sequence.py: independent source and recall, three rows, six saved artifacts",
+    "commands": [
+      "build-source-sequence",
+      "build-source-sequence --request-only",
+      "infer-sequence",
+      "verify-source-sequence",
+      "verify-sequence"
+    ],
+    "result": "API artifacts equal both build CLI outputs and inference output; both verifiers accepted; temporary execution directory removed"
+  },
+  "sparse_projection_control": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "python": "3.12.11",
+    "measurement": "One perf_counter sample under tracemalloc around project_source including strict account validation; inputs constructed beforehand. Peak Python allocation, not RSS; no Scala comparison.",
+    "generator": "N occurrences of AA with one shared entity ID; N-1 before chain; canonical-text scoring on; entity_fanout8; no segments.",
+    "cases": [
+      {
+        "situations": 100,
+        "seconds": 0.04741,
+        "peak_python_bytes": 1504398,
+        "layer_edges": {
+          "entity": 820,
+          "discourse": 99,
+          "world-time": 99
+        }
+      },
+      {
+        "situations": 1000,
+        "seconds": 0.491568,
+        "peak_python_bytes": 14185098,
+        "layer_edges": {
+          "entity": 8020,
+          "discourse": 999,
+          "world-time": 999
+        }
+      }
+    ]
+  },
+  "remaining": [
+    "Full local evidence, candidate nominations, mode gates and local cost components",
+    "Chart/structural/semantic evidence producers and calibrated evaluation",
+    "Full narrative/evidence construction, refinement/reconstruction and scientific readouts",
+    "Executed Scala comparison on controlled artifacts; present evidence does not claim scientific accuracy or comparative speed"
+  ]
+}
