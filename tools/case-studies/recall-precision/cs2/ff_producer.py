@@ -319,9 +319,27 @@ Reply with JSON only: {"items": [{"id": "<id>", "talk": "...", "refs": [{"words"
 "extent": "...", "occurrence": "...", "mode": "...", "alts": [{"w": 0.8, "iv": [[3, 5]]}]}], \
 "frame_mismatch": false}]} covering every item exactly once."""
 
+PASS2_ARMS = {
+    "coverage": PASS2_SYSTEM,
+    # the pass-2 prompt before the anchor-coverage sentence was added (owner decision, A/B arm)
+    "pre-coverage": PASS2_SYSTEM.replace(
+        " Together, the \"words\" of an item's references must cover every word of the TARGET "
+        "that describes film content; fragments, connectives and words about remembering may "
+        "stay uncovered.",
+        "",
+    ),
+}
+if PASS2_ARMS["pre-coverage"] == PASS2_ARMS["coverage"]:
+    raise RuntimeError("the pre-coverage arm did not remove the coverage sentence")
 PASS2_TEMPLATE = "FILM ANNOTATION\n{outline}\n\nITEMS (random order)\n\n{items}\n\nAnalyse all {n} items."
 PASS2_ITEM = "ITEM {oid}\nFILM: {film}\nCONTEXT: {ctx}\nTARGET: {target}"
 RETRY = "\n\nReply with strictly valid JSON only ({attempt})."
+
+
+def context_of(units, i, window=WINDOW):
+    """CONTEXT of unit i: the texts of up to `window` preceding units joined by single spaces
+    (empty for the first unit; rendered the same way for every item)."""
+    return " ".join(x["text"] for x in units[max(0, i - window) : i])
 
 
 def pass1_prompt(units_text, outline):
@@ -341,31 +359,44 @@ def pass2_prompt(batch, outline):
     return PASS2_TEMPLATE.format(outline=outline, items=items, n=len(batch))
 
 
-def conditions(seed, salt, sample):
-    """The two passes' producer conditions (rendering identities), recorded separately."""
-    common = dict(model=MODEL, seed=seed, salt=salt, sample=sample, segmenter=SEGMENTER)
+def renderer_sha256():
+    """Digest of the code that renders prompts: outline, context join, templates' fillers."""
+    import inspect
+
+    src = "".join(inspect.getsource(f) for f in (
+        film_outline, _mmss, opaque, context_of, pass1_prompt, pass2_prompt))
+    return sha256(src)
+
+
+def conditions(seed, salt, sample, arm="coverage", word_clock=None):
+    """The two passes' producer conditions (rendering identities), recorded separately. Each id
+    is derived from its system prompt, template and renderer digests, so arms differ at the
+    reference level."""
+    common = dict(model=MODEL, seed=seed, salt=salt, sample=sample, segmenter=SEGMENTER,
+                  word_clock=word_clock)
+    rend = renderer_sha256()
+    p1 = dict(system_sha256=sha256(PASS1_SYSTEM),
+              template_sha256=sha256(PASS1_TEMPLATE + "\n" + PASS1_UNIT),
+              renderer_sha256=rend, retry_sha256=sha256(RETRY))
+    p2 = dict(system_sha256=sha256(PASS2_ARMS[arm]),
+              template_sha256=sha256(PASS2_TEMPLATE + "\n" + PASS2_ITEM),
+              renderer_sha256=rend, retry_sha256=sha256(RETRY))
+    ident = lambda name, d: f"{name}:{sha256(json.dumps(d, sort_keys=True))[:16]}"  # noqa: E731
     return {
         "pass1": dict(
-            id="cs2-ff-frame/v2",
+            id=ident("cs2-ff-frame", p1),
             exposure="whole session in spoken order (by design); cover names; films in a "
             "per-session seeded order; no times, rows or scene ids",
-            system_sha256=sha256(PASS1_SYSTEM),
-            template_sha256=sha256(PASS1_TEMPLATE + "\n" + PASS1_UNIT),
-            retry_sha256=sha256(RETRY),
-            **common,
+            **p1, **common,
         ),
         "pass2": dict(
-            id="cs2-ff-local/v2",
+            id=ident("cs2-ff-local", dict(p2, window=WINDOW, batch=BATCH)),
+            arm=arm,
             exposure=f"content-local, window {WINDOW}; items pooled across sessions and films; no "
             "two items of one session within the window in a batch; per-call film order, row "
             "numbers and 8-hex scene labels; film-relative times; salted item ids; empty "
             "CONTEXT rendered uniformly",
-            window=WINDOW,
-            batch=BATCH,
-            system_sha256=sha256(PASS2_SYSTEM),
-            template_sha256=sha256(PASS2_TEMPLATE + "\n" + PASS2_ITEM),
-            retry_sha256=sha256(RETRY),
-            **common,
+            window=WINDOW, batch=BATCH, **p2, **common,
         ),
     }
 
@@ -439,8 +470,7 @@ def make_batches(items, seed, sample, batch=BATCH, window=WINDOW):
     if not items:
         return []
     rng = random.Random(f"{seed}:{sample}:pass2-batches")
-    nb = max(math.ceil(len(items) / batch), window + 1)
-    nb = min(nb, len(items))
+    nb = max(math.ceil(len(items) / batch), window + 1)  # empty batches are dropped below
     sessions = sorted({it["session_key"] for it in items})
     offset = {s: rng.randrange(nb) for s in sessions}
     out = [[] for _ in range(nb)]
@@ -667,6 +697,7 @@ def run(
     salt: str,
     sample: int,
     dry: bool = False,
+    arm: str = "coverage",
 ):
     """Both passes over `sessions` (development only), pass 2 pooled across them.
 
@@ -674,7 +705,7 @@ def run(
     comp = A.composition("JL")
     texts = A.unit_texts("JL")
     export, index = load_export(export_dir)
-    conds = conditions(seed, salt, sample)
+    conds = conditions(seed, salt, sample, arm, A.WORD_CLOCK_RECEIPT)
     log, ledger = (
         [],
         dict(
@@ -733,7 +764,7 @@ def run(
         units, frames = d["units"], d["frames"]
         for i, (u, f) in enumerate(zip(units, frames)):
             if dry or (f["kind"] == "content" and f["frame"]):
-                ctx = " ".join(x["text"] for x in units[max(0, i - WINDOW) : i])
+                ctx = context_of(units, i)
                 work = (
                     f["frame"][0][0] if f["frame"] else works[1]
                 )  # dry: placeholder film
@@ -768,7 +799,7 @@ def run(
         if not dry:
             got, retries = parse_with_retry(
                 prompt2,
-                PASS2_SYSTEM,
+                PASS2_ARMS[arm],
                 log,
                 f"pass2:call{bi}",
                 "items",

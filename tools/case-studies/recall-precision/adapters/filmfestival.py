@@ -53,6 +53,13 @@ CODES = (
     DATA / "study" / "filmfestival" / "llm-transfer-opus55-20261109" / "scene-codes.tsv"
 )
 WORD_CLOCK = "filmfestival-recall-word-onset-seconds"
+# The word clock's provenance: onsets are interpolated within the authors' utterances.
+WORD_CLOCK_RECEIPT = dict(
+    clock=WORD_CLOCK,
+    wordOnsetsAreMeasured=False,
+    withinUtteranceTiming="linear-interpolation",
+    receipt="data/filmfestival/derived/recall.receipt.json",
+)
 RUNS = ("run-01", "run-02")
 EXCERPTS = ("catch_me_if_you_can", "the_prisoner")
 CARTOON = "cartoon_introduction"
@@ -323,6 +330,65 @@ def gold_ledger(participants) -> dict:
     return tot
 
 
+EVENTS = FF / "recall_events"
+GOLD_END_SHORTFALL_S = 1.0  # measured: every development gold row ends exactly 1.0 s early
+GOLD_START_OFFSET_MAX_S = 0.05
+
+
+def utterance_spans(events) -> list:
+    """Each utterance's span on the recall-word clock, by the word clock's own rule
+    (recall.receipt.json: '[onset, next onset), shortened by duration when duration is shorter')."""
+    out = []
+    for i, (onset, dur) in enumerate(events):
+        nxt = events[i + 1][0] if i + 1 < len(events) else float("inf")
+        hi = nxt if dur is None else min(nxt, onset + dur)
+        out.append((onset, hi))
+    return out
+
+
+def align_gold(gold, events):
+    """Declared rule: a gold row's bin is its source utterance's span on the word clock.
+
+    `gold` is [(start_s, end_s)] in row order and `events` [(onset, duration or None)] from the
+    session's recall events.tsv. The rule is refused unless the rows and utterances correspond
+    one to one: start_s - onset is one constant c per session (within 1 ms, |c| <= 0.05 s), and
+    end_s = start_s + duration - 1.0 s wherever a duration is given. Returns (spans, receipt)."""
+    if len(gold) != len(events):
+        raise SourceError(f"{len(gold)} gold rows vs {len(events)} utterances")
+    offs = [g[0] - e[0] for g, e in zip(gold, events)]
+    c = sorted(offs)[len(offs) // 2]
+    if abs(c) > GOLD_START_OFFSET_MAX_S or any(abs(o - c) > 1e-3 for o in offs):
+        raise SourceError("gold starts are not one constant offset from the utterance onsets")
+    checked = 0
+    for (gs, ge), (_, dur) in zip(gold, events):
+        if dur is None:
+            continue
+        checked += 1
+        if abs((ge - gs) - (dur - GOLD_END_SHORTFALL_S)) > 1e-6:
+            raise SourceError("a gold end is not its utterance end minus 1.0 s")
+    return utterance_spans(events), dict(
+        rows=len(gold), start_offset_s=round(c, 6), end_shortfall_s=GOLD_END_SHORTFALL_S,
+        ends_checked=checked, rule="bin = source utterance span on the recall-word clock")
+
+
+_CLOCK: dict = {}
+
+
+def _recall_events(participant, session):
+    rows = _read_tsv(EVENTS / f"{participant}_task-recall_{session}_events.tsv")
+    return [(float(r["onset"]), None if r["duration"] in ("", "n/a") else float(r["duration"]))
+            for r in rows]
+
+
+def gold_clock_receipt(participants) -> dict:
+    """Per development session: the measured gold/utterance offset and the checks passed."""
+    out = {}
+    for p in participants:
+        gold_rows(p)
+        out.update({f"{p}:{s}": v for (q, s), v in _CLOCK.items() if q == p})
+    return out
+
+
 def gold_rows(participant: str, session: str | None = None, allow_frozen: bool = False):
     """Author-utterance rows (no text) for one participant, in session and row order."""
     guard(participant, allow_frozen)
@@ -381,6 +447,15 @@ def gold_rows(participant: str, session: str | None = None, allow_frozen: bool =
             )
         )
     out.sort(key=lambda g: (g.session, g.row))
+    aligned = []
+    for sess in sorted({g.session for g in out}):
+        rows = [g for g in out if g.session == sess]
+        spans, receipt = align_gold([(g.lo, g.hi) for g in rows],
+                                    _recall_events(participant, sess))
+        _CLOCK[(participant, sess)] = receipt
+        aligned += [GoldRow(g.participant, g.session, g.row, lo, hi, False, g.cls, g.work,
+                            g.scenes, g.nonfilm) for g, (lo, hi) in zip(rows, spans)]
+    out = aligned
     if session is None:
         _LEDGER[participant] = led
     return out

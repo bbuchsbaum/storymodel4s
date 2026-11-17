@@ -815,6 +815,43 @@ def test_batches_hold_no_window_neighbours():
     assert [[i["oid"] for i in x] for x in a] != [[i["oid"] for i in x] for x in b]
 
 
+def test_gold_bins_are_utterance_spans():
+    import adapters.filmfestival as F
+
+    events = [(10.0, 5.0), (16.0, None), (20.0, 3.0)]
+    gold = [(10.03, 14.03), (16.03, 18.0), (20.03, 22.03)]
+    spans, rec = F.align_gold(gold, events)
+    assert spans == [(10.0, 15.0), (16.0, 20.0), (20.0, 23.0)]
+    assert abs(rec["start_offset_s"] - 0.03) < 1e-9 and rec["ends_checked"] == 2
+    for g, e in (
+        ([(10.03, 14.03), (16.2, 18.0), (20.03, 22.03)], events),  # offset not constant
+        ([(10.03, 14.53), (16.03, 18.0), (20.03, 22.03)], events),  # end not duration - 1 s
+        (gold[:2], events),  # rows and utterances do not correspond
+        ([(10.1, 14.1), (16.1, 18.0), (20.1, 22.1)], events),  # offset above 0.05 s
+    ):
+        try:
+            F.align_gold(g, e)
+        except SourceError:
+            continue
+        raise AssertionError(f"misaligned gold accepted: {g}")
+
+
+def test_small_batches_respect_the_window():
+    P = _producer()
+    items = [dict(session_key=("P", "s"), k=k, oid=f"a{k}") for k in (0, 2)]  # 2 apart
+    rep = P.batch_report(P.make_batches(items, 3, 1, batch=40, window=2), window=2)
+    assert not rep["chaining_possible"] and rep["batches"] == 2
+
+
+def test_condition_ids_follow_prompt_digests():
+    P = _producer()
+    a = P.conditions(1, "s", 1, "coverage")
+    b = P.conditions(1, "s", 1, "pre-coverage")
+    assert a["pass1"]["id"] == b["pass1"]["id"]  # pass 1 is shared between the arms
+    assert a["pass2"]["id"] != b["pass2"]["id"] and a["pass2"]["system_sha256"] != b["pass2"]["system_sha256"]
+    assert a["pass2"]["renderer_sha256"] == P.renderer_sha256()
+
+
 # ---------------------------------------------------------------- runner
 
 

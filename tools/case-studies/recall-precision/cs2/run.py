@@ -54,7 +54,7 @@ def git_state():
         ["git", "rev-parse", "HEAD"], cwd=HERE, capture_output=True, text=True
     ).stdout.strip()
     dirty = subprocess.run(  # the harness and every module the producer imports
-        ["git", "status", "--porcelain", "--untracked-files=no", "--", ".",
+        ["git", "status", "--porcelain", "--untracked-files=all", "--", ".",
          str(HERE.parents[1] / "sherlock_mapper")],
         cwd=HERE,
         capture_output=True,
@@ -513,7 +513,7 @@ def cmd_ff_run(args):
     rest = []
     it = iter(args)
     for a in it:
-        if a in ("--export", "--seed", "--salt", "--sample", "--sessions"):
+        if a in ("--export", "--seed", "--salt", "--sample", "--sessions", "--arm"):
             opt[a[2:]] = next(it)
         elif a == "--dry":
             opt["dry"] = True
@@ -534,7 +534,8 @@ def cmd_ff_run(args):
             raise SystemExit(f"{p} is not a development participant")
     seed, sample = int(opt["seed"]), int(opt["sample"])
     acc, ledger, log, conds = P.run(A, sessions, Path(opt["export"]), out, seed, opt["salt"],
-                                    sample, dry=bool(opt.get("dry")))
+                                    sample, dry=bool(opt.get("dry")),
+                                    arm=opt.get("arm", "coverage"))
     calls = P.call_ledger(log)
     extra = dict(
         participants=sorted({p for p, _ in sessions}), sessions=[f"{p}:{s}" for p, s in sessions],
@@ -542,7 +543,9 @@ def cmd_ff_run(args):
                                                            "rendered_prompt_sha256")}
                                         for c in log],
         calls=calls, export_index_sha256=ledger["export_index_sha256"],
-        batches=ledger["batches"], dry=bool(opt.get("dry")),
+        batches=ledger["batches"], dry=bool(opt.get("dry")), arm=opt.get("arm", "coverage"),
+        word_clock=A.WORD_CLOCK_RECEIPT,
+        gold_clock=A.gold_clock_receipt(sorted({p for p, _ in sessions})),
     )
     inputs = [A.GOLD, A.CODES, A.PARTITION, A.FF / "derived" / "annotation-JL.tsv",
               Path(opt["export"]) / "index.json"]
