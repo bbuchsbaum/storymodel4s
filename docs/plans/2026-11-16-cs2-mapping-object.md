@@ -796,6 +796,82 @@ decoded, by the gold step from the previous scene-coded row of the same work:
 (`mutations/r4-20261117.json` at deb5364e0, 57 mutants, all caught). Five discriminate. M53
 (the backward message) is a regression guard, because the inferred-top test fails with it.
 
+### Hill-climbing round 5 (2026-11-17; free; rule recorded before the lever is scored)
+
+**Round 4, as accepted.** The coordinator accepted round 4 as reported.
+- The decoder is dropped by the recorded rule.
+- Independently of the rule, a forecast that degrades out-of-order recall is unfit as the
+  mapping object, because out-of-order recall is a quantity of interest.
+
+No model call is made in this round. The pre-registration draft is not edited.
+
+**Part A: descriptive scores, with no pass/fail bar.** Step 0 of round 4 showed that most
+misses are one scene from the gold, so scene identity alone understates the mapper. These are
+reported for `producer` and every comparison forecast, on FilmFestival samples 1 and 2 and the
+Sherlock part-order run, per participant with participant-cluster CIs.
+1. **Top scene within ±1.** The forecast's top scene in the gold work is at most one scene step
+   from a gold scene, counted over the work's valid scenes in order.
+2. **Film-time error, in seconds.**
+   - *Film clock.* Seconds from the start of an occurrence, its segments joined in order. A
+     work with several occurrences has no single clock; its rows are left out and counted.
+   - *A scene's stretch* runs from its first unit's start to its last unit's end.
+   - *The distribution.* The forecast's mass on the gold work's valid scenes, renormalised;
+     each scene's mass is spread evenly over the scene's stretch.
+   - *The row's value.* The expected distance from that distribution to the gold scene set:
+     0 inside a gold scene, otherwise the distance to the nearest gold scene's boundary.
+   - *Unlocated mass.* The all-mass version leaves it where the scorer's fallback puts it,
+     spread by duration within the work. The located-only version keeps only the producer's
+     scene-located and scene-set mass in the gold work, renormalised; a row with none has no
+     value and is counted. It exists only for producer forecasts.
+   - *Reported* as the mean and the median of a participant's rows, each averaged over
+     participants.
+3. **How far a distance-1 miss is from the gold.** For the producer's misses at distance 1,
+   the located span is the source units of its top scene that carry the row's located mass.
+   - Two distances to the gold scene set are given: the expected distance of that mass, each
+     unit's share spread evenly over the unit, and the gap from the span's nearest edge.
+   - The shares within 5 s, 10 s and 20 s are reported. A miss whose top scene holds no
+     unit-located mass has no span and is counted apart.
+4. **Gold-step strata.** A scene-scored row is typed by the step from the previous scene-coded
+   row of the same work: stay, forward 1, forward 2–3, forward 4 or more, backward, or first in
+   the work. A row's position is the last valid scene of its set.
+   - Top-scene accuracy, within-±1 accuracy and scene bits are reported per stratum.
+   - The step is a field of every scored row, and `by_gold_step` is a standing stratum of every
+     run summary and of `summary-both.json`.
+
+**Part B: `producer_order_fallback`.** Order may place only what the producer left unplaced.
+- **Principle.** An inferred location must never overrule an observed one. Round 4's decoder
+  let order outvote located content.
+- **Definition.** p′(s) = located(s) + u · q(s).
+  - The producer's located mass is unchanged: scene-located mass, in-work mass outside the
+    valid scenes, and claimed non-film mass.
+  - q is the decoder's posterior for the row from the other rows' evidence only (round 4's
+    posterior without the row's own evidence).
+  - Wherever the scorer today spreads mass by the duration prior, the order fallback spreads
+    it by q under the same restriction: unassigned mass within the frame film (with the same
+    frame floor), work-level mass within its work, scene-set mass within its set.
+  - A row with no frame takes q as it is, at the film, work and scene levels.
+- **Nothing new is fitted.** Transitions and α are round 4's: transitions LOPO, α as round 4
+  picked it (LOPO on the decoder's objective; on Sherlock the FilmFestival value).
+- **A null producer equals `order_prior_only` exactly.** A test and a mutant cover it.
+- **Each row records how much mass order placed,** split into unassigned mass and mass placed
+  within a work or set the producer named.
+
+**Rule for B.** It can be kept only as a secondary forecast, never as the mapping object, and
+only if all five hold. The primary run is FilmFestival sample 1.
+1. **FilmFestival, pooled over the ten participants:** the scene term improves with exact
+   two-sided sign-flip p ≤ 0.01 and by more than the band (0.041).
+2. **The work and film terms** are not worse beyond their bands (0.012 each).
+3. **Out-of-order rows** (backward, or forward 4 or more) are not worse than `producer`
+   beyond the band, on either corpus: the participant-paired difference in scene bits on those
+   rows is at most +0.041.
+4. **Top scene** is not lower than `producer`'s by more than 1 point, on either corpus.
+5. **Sherlock part-order run:** the scene term moves in the same direction, with one-sided
+   exact sign-flip p ≤ 0.05.
+
+**Caveat on condition 5.** Sherlock's development rows were used to diagnose round 4, so
+condition 5 is a check and not an independent confirmation. Confirmation can only come from
+sealed data, as a pre-registered secondary forecast.
+
 **Gaps for the vocabulary ADR.**
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the
