@@ -538,3 +538,20 @@ def test_source_identity_classes_keep_ids_after_pairing_another_document():
     )
     paired_result = resolve_text_identity(paired, paired_raw)
     assert source_result.referents[0].id == paired_result.referents[0].id
+
+
+def test_nonintroducing_type_metadata_is_not_silently_ignored():
+    value = fixture(
+        (("source", "source", "AA he"),),
+        (("source", "AA", ((0, 2),)), ("source", "he", ((3, 5),))),
+    )
+    first, pronoun = value.entities
+    base = annotation(first, value.documents[0], (0, 2), entity_type={"kind": "person"})
+    third = annotation(pronoun, value.documents[0], (3, 5), form="pronominal", person="third")
+    good = resolve_text_identity(value, raw(value, (base, third)))
+    assert outcomes(good)[pronoun.id].outcome == "resolved"
+    typed = third | {"entity_type": {"kind": "object"}}
+    refused = resolve_text_identity(value, raw(value, (base, typed)))
+    assert outcomes(refused)[pronoun.id].reason == "invalid-annotation"
+    assert outcomes(refused)[pronoun.id].referent is None
+    assert "only for introducing forms" in outcomes(refused)[pronoun.id].explanation

@@ -87,6 +87,8 @@ class MentionAnnotation(Model):
                 raise ValueError("provided annotation requires a form and exact quote")
             if (self.form == "pronominal") != (self.person is not None):
                 raise ValueError("grammatical person belongs exactly to pronominal forms")
+            if self.entity_type is not None and self.form not in ("name", "nominal"):
+                raise ValueError("entity type is supported only for introducing forms")
             if self.form != "pronominal" and self.number != "unknown":
                 raise ValueError("antecedent quantity evidence is not supported by this profile")
             if self.form == "other" and not self.reason:

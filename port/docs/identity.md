@@ -27,6 +27,7 @@ exact UTF-16 `quote` inside that occurrence's evidence. Form is `name`, `nominal
 or `other`. Pronouns explicitly carry grammatical `person` and `number`; an unrecognized form
 has a reason. Named/nominal forms may supply a typed entity family, including an explicitly
 namespaced custom type. Unknown type is absence, not a shared invented class.
+Entity type on a non-introducing form refuses rather than silently accepting unused metadata.
 
 These are recorded grammatical interpretations. Quote checking proves their location, **not
 their grammatical correctness**. Python labels do not contain Scala's checked chart concepts;
