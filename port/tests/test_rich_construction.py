@@ -290,3 +290,34 @@ def test_processing_accounting_forged_boundaries_and_non_bmp_utf16_quotes():
         ],
     }
     assert compile_rich_construction(non_bmp, canonical(raw)).resolutions[0].status == "admitted"
+
+
+@pytest.mark.parametrize("kind", ["state", "circumstance"])
+def test_rich_abstentions_keep_new_family_and_exact_evidence(kind):
+    value = request()
+    packet = {
+        "schema_version": "storymodel.rich-construction-proposal/v1",
+        "rows": [
+            {
+                "row": "row",
+                "status": "completed",
+                "unresolved": [
+                    {
+                        "key": "open",
+                        "kind": kind,
+                        "reason": "insufficient control evidence",
+                        "evidence": quote(value.document.text, 0, 2),
+                    }
+                ],
+            }
+        ],
+    }
+    result = compile_rich_construction(value, canonical(packet))
+    assert result.resolutions[0].status == "partial"
+    assert result.resolutions[0].unresolved[0].kind == kind
+    assert result.resolutions[0].unresolved[0].evidence.text == "AA"
+    assert not result.account.states and not result.account.circumstances
+    packet["rows"][0]["unresolved"][0]["evidence"]["text"] = "wrong"
+    rejected = compile_rich_construction(value, canonical(packet))
+    assert rejected.resolutions[0].status == "rejected"
+    assert "quoted evidence differs" in rejected.resolutions[0].reason

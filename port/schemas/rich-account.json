@@ -1359,7 +1359,7 @@
           "unresolved": {
             "default": [],
             "items": {
-              "$ref": "#/$defs/UnresolvedClaim"
+              "$ref": "#/$defs/RichUnresolvedClaim"
             },
             "title": "Unresolved",
             "type": "array"
@@ -1370,6 +1370,46 @@
           "status"
         ],
         "title": "RichRowProposal",
+        "type": "object"
+      },
+      "RichUnresolvedClaim": {
+        "additionalProperties": false,
+        "description": "Rich construction abstains about new families without widening legacy wire contracts.",
+        "properties": {
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "entity",
+              "event",
+              "state",
+              "circumstance",
+              "detail",
+              "context",
+              "role"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "reason": {
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "evidence": {
+            "$ref": "#/$defs/Quote"
+          }
+        },
+        "required": [
+          "key",
+          "kind",
+          "reason",
+          "evidence"
+        ],
+        "title": "RichUnresolvedClaim",
         "type": "object"
       },
       "RoleProposal": {
@@ -1489,44 +1529,6 @@
           "predicate"
         ],
         "title": "StateProposal",
-        "type": "object"
-      },
-      "UnresolvedClaim": {
-        "additionalProperties": false,
-        "description": "A provider abstention retained outside the accepted graph.",
-        "properties": {
-          "key": {
-            "minLength": 1,
-            "title": "Key",
-            "type": "string"
-          },
-          "kind": {
-            "enum": [
-              "entity",
-              "event",
-              "detail",
-              "context",
-              "role"
-            ],
-            "title": "Kind",
-            "type": "string"
-          },
-          "reason": {
-            "minLength": 1,
-            "title": "Reason",
-            "type": "string"
-          },
-          "evidence": {
-            "$ref": "#/$defs/Quote"
-          }
-        },
-        "required": [
-          "key",
-          "kind",
-          "reason",
-          "evidence"
-        ],
-        "title": "UnresolvedClaim",
         "type": "object"
       }
     },
@@ -2449,7 +2451,7 @@
           "unresolved": {
             "default": [],
             "items": {
-              "$ref": "#/$defs/UnresolvedClaim"
+              "$ref": "#/$defs/RichUnresolvedClaim"
             },
             "title": "Unresolved",
             "type": "array"
@@ -2461,6 +2463,46 @@
           "status"
         ],
         "title": "RichRowResolution",
+        "type": "object"
+      },
+      "RichUnresolvedClaim": {
+        "additionalProperties": false,
+        "description": "Rich construction abstains about new families without widening legacy wire contracts.",
+        "properties": {
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "entity",
+              "event",
+              "state",
+              "circumstance",
+              "detail",
+              "context",
+              "role"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "reason": {
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "evidence": {
+            "$ref": "#/$defs/Quote"
+          }
+        },
+        "required": [
+          "key",
+          "kind",
+          "reason",
+          "evidence"
+        ],
+        "title": "RichUnresolvedClaim",
         "type": "object"
       },
       "Span": {
@@ -2628,44 +2670,6 @@
           "support"
         ],
         "title": "Unit",
-        "type": "object"
-      },
-      "UnresolvedClaim": {
-        "additionalProperties": false,
-        "description": "A provider abstention retained outside the accepted graph.",
-        "properties": {
-          "key": {
-            "minLength": 1,
-            "title": "Key",
-            "type": "string"
-          },
-          "kind": {
-            "enum": [
-              "entity",
-              "event",
-              "detail",
-              "context",
-              "role"
-            ],
-            "title": "Kind",
-            "type": "string"
-          },
-          "reason": {
-            "minLength": 1,
-            "title": "Reason",
-            "type": "string"
-          },
-          "evidence": {
-            "$ref": "#/$defs/Quote"
-          }
-        },
-        "required": [
-          "key",
-          "kind",
-          "reason",
-          "evidence"
-        ],
-        "title": "UnresolvedClaim",
         "type": "object"
       }
     },

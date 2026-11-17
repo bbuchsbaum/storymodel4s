@@ -111,6 +111,15 @@ class UnresolvedClaim(Model):
     evidence: Quote
 
 
+class RichUnresolvedClaim(Model):
+    """Rich construction abstains about new families without widening legacy wire contracts."""
+
+    key: Name
+    kind: Literal["entity", "event", "state", "circumstance", "detail", "context", "role"]
+    reason: Name
+    evidence: Quote
+
+
 def _inside(child: Span, parent: Span) -> bool:
     return parent.start <= child.start and child.end <= parent.end
 
@@ -136,7 +145,7 @@ def admit_graph(
     context_proposals_input: tuple[ContextProposal, ...],
     entity_proposals_input: tuple[EntityProposal, ...],
     event_proposals_input: tuple[EventProposal, ...],
-    unresolved: tuple[UnresolvedClaim, ...],
+    unresolved: tuple[UnresolvedClaim | RichUnresolvedClaim, ...],
     extra_keys: tuple[str, ...] = (),
     state_proposals_input: tuple[StateProposal, ...] = (),
 ) -> AdmittedGraph:

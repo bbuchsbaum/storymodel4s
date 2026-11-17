@@ -13,8 +13,8 @@ from ._admission import (
     EntityProposal,
     EventProposal,
     Quote,
+    RichUnresolvedClaim,
     StateProposal,
-    UnresolvedClaim,
     admit_graph,
 )
 from .model import (
@@ -114,7 +114,7 @@ class RichRowProposal(Model):
     events: tuple[EventProposal, ...] = ()
     states: tuple[StateProposal, ...] = ()
     circumstances: tuple[CircumstanceProposal, ...] = ()
-    unresolved: tuple[UnresolvedClaim, ...] = ()
+    unresolved: tuple[RichUnresolvedClaim, ...] = ()
 
     @model_validator(mode="after")
     def completeness(self) -> Self:
@@ -152,7 +152,7 @@ class RichRowResolution(Model):
     status: Literal["admitted", "partial", "unsupported", "rejected", "not-attempted", "failed"]
     reason: str | None = None
     accepted: dict[str, str] = Field(default_factory=dict)
-    unresolved: tuple[UnresolvedClaim, ...] = ()
+    unresolved: tuple[RichUnresolvedClaim, ...] = ()
 
 
 class RichConstructionResult(Model):
