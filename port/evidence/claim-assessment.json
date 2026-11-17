@@ -1,0 +1,97 @@
+{
+  "source_commit": "fd7c4f6e869f4f93b68033eef2a9a17eb3ed3b1a",
+  "bead": "bd-01M7M0916GDS07X2Q0M0TCRQTK",
+  "scope": "Fixed-population attributed text claim assessment over a complete account snapshot; separate from reference and graded fidelity",
+  "checks": {
+    "pytest": {
+      "passed": 499,
+      "seconds": 6.82
+    },
+    "focused_claim_tests": 21,
+    "mypy_source_files": 36,
+    "ruff_check": "passed",
+    "ruff_format_files": 91,
+    "diff_check": "passed"
+  },
+  "contract": {
+    "population": "Exactly one submission per semantic question; duplicates, missing and foreign entries refuse",
+    "evidence": "Original UTF-16 spans, exact source-origin support union, recall review/claim containment; cross-target source citation origins permitted",
+    "states": [
+      "supported",
+      "contradicted",
+      "conflicted",
+      "unresolved",
+      "not-expressed",
+      "extraction-unresolved",
+      "reference-unresolved"
+    ],
+    "accounting": "7 total, 5 expressed, 2 resolved; evidence ablation preserves population and yields 0 resolved; no accuracy ratio",
+    "identity": "Adjacent citation spans have one identity while original span boundaries remain checked",
+    "verification": "Full account and ordered population bound; exact response bytes hashed; complete receipt recomputed"
+  },
+  "mutations": {
+    "method": "Each isolated source mutant compiled; baseline 3 passed, mutant 1 named failure and 2 passing controls",
+    "cases": [
+      {
+        "mutation": "duplicate-submission",
+        "failed_test": "test_complete_population_and_all_text_ownership_boundaries_refuse",
+        "baseline": "3 passed",
+        "mutant": "1 named failure, 2 passing controls",
+        "compiled": true
+      },
+      {
+        "mutation": "extraction-is-not-absence",
+        "failed_test": "test_all_statuses_have_fixed_denominator_and_evidence_ablation_preserves_population",
+        "baseline": "3 passed",
+        "mutant": "1 named failure, 2 passing controls",
+        "compiled": true
+      },
+      {
+        "mutation": "owned-source-support",
+        "failed_test": "test_citations_require_their_declared_source_but_can_cross_origin_targets",
+        "baseline": "3 passed",
+        "mutant": "1 named failure, 2 passing controls",
+        "compiled": true
+      },
+      {
+        "mutation": "original-utf16-boundaries",
+        "failed_test": "test_canonical_citation_identity_never_hides_original_utf16_split",
+        "baseline": "3 passed",
+        "mutant": "1 named failure, 2 passing controls",
+        "compiled": true
+      }
+    ]
+  },
+  "installed_artifact": {
+    "environment": "Python 3.12.11 wheel site-packages, temporary directory outside checkout, PYTHONPATH unset",
+    "example": "examples/claim_assessment_workflow.py",
+    "result": "Source reused unchanged for two recalls; 7 statuses each counted once; mapping unchanged",
+    "commands": [
+      "prepare-claim-assessment",
+      "assess-claims",
+      "verify-claims"
+    ],
+    "api_cli_exact": true,
+    "verify_valid": true
+  },
+  "independent_review": {
+    "commit": "fd7c4f6e869f4f93b68033eef2a9a17eb3ed3b1a",
+    "verdict": "no BLOCK found",
+    "focused_tests": 21,
+    "exhaustive_status_probe": {
+      "combinations": 2048,
+      "accepted": 416,
+      "refused": 1632,
+      "comparison": "All match inspected Scala availability/status rules"
+    },
+    "additional_probes": "Event/state citation origins accepted; nested typed forgeries, forged counts/statuses and changed-account replay refused"
+  },
+  "compatibility": "Existing mapping artifacts, hypotheses, grades and analysis policies unchanged; complete snapshot plan replaces duplicating method-specific MappingResult types",
+  "limits": [
+    "No executed Scala comparison or semantic accuracy evaluation",
+    "Assessor/procedure provenance is attribution, not authentication or proof of procedure execution",
+    "Text profile rejects unsupported chart/playback evidence; full ownership/provenance support remains owed",
+    "Automatic graded assessor execution and recurring-scene correspondence remain incomplete",
+    "Receipt shape alone is not certification; consumers must verify against original plan and reply"
+  ]
+}
