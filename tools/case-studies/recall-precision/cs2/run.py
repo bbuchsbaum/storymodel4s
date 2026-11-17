@@ -39,6 +39,7 @@ from cs2.account import (  # noqa: E402
     StateSample,
     Uncovered,
     WordCell,
+    WorkReference,
 )
 from cs2.projections import Bin, LocationDistribution, word_ledger  # noqa: E402
 
@@ -308,11 +309,10 @@ def cmd_baselines(corpus, out):
 
 # ---------------------------------------------------------------- Sherlock smoke
 
-TALK = {
-    "metamemory": "memory_search",
-    "commentary": "commentary",
-    "fragment": "fragment",
-}
+# Declared state mapping (owner, 2026-11-16), as for FilmFestival: a fragment is a ledger count;
+# metamemory and commentary are inside the one framed work (Sherlock has one work), so they are
+# work-level references to it.
+WORK_LEVEL_TALK = ("metamemory", "commentary")
 LIBRARY = D.OUT / "parity" / "library-v4"
 ANSWERS = D.OUT / "llm" / "llm-local-v2-a"
 
@@ -338,6 +338,7 @@ def hypotheses(form, alts):
 
 def sherlock_account(A, comp, names):
     refs, words, ledger = {}, {}, dict(converted=0, refused=0, forms={})
+    seen_work = set()
     for name in names:
         short = name.split("_")[0]
         rtab = list(
@@ -387,7 +388,20 @@ def sherlock_account(A, comp, names):
             uid = units[ui].id if ui >= 0 else ""
             s = x["sample"]
             if s.startswith("na:"):
-                sample = StateSample(uid, TALK[ans[uid]["talk"]])
+                talk = ans[uid]["talk"]
+                if talk in WORK_LEVEL_TALK:
+                    rid = f"{short}:{uid}:work"
+                    refs.setdefault(rid, WorkReference(rid, A.WORK, 1.0,
+                                                       condition="llm-local-v2-a/state-map"))
+                    sample = RefSample(rid)
+                    ledger["work_level_units"] = ledger.get("work_level_units", 0) + (
+                        rid not in seen_work)
+                    seen_work.add(rid)
+                elif talk == "fragment":
+                    sample = Uncovered(uid)
+                    ledger["fragment_words"] = ledger.get("fragment_words", 0) + 1
+                else:
+                    raise SystemExit(f"unmapped talk {talk!r}")
             elif s == "-1":
                 sample = Uncovered(uid)
             else:
@@ -457,7 +471,8 @@ def cmd_sherlock_smoke(out):
         conversion=conv,
         rows=SC.strata(named["producer"], comp, False)["rows"],
         no_sample_rows=no_sample,
-        words=tot,
+        words_total=tot,
+        words={f"{p}:recall": L for p, L in ledgers.items()},
         forecasts=fsum,
         producer_strata=SC.strata(named["producer"], comp, False),
         refused_metrics=sorted(SC.REFUSED),
@@ -469,6 +484,7 @@ def cmd_sherlock_smoke(out):
     )
     (out / "summary.json").write_text(json.dumps(summary, indent=1) + "\n")
     write_rows(out / "rows.tsv", named)
+    (out / "unit_measures.json").write_text(json.dumps(unit_measures(acc, comp), indent=0))
     inputs = [A.GOLD, A.RULE, LIBRARY / "manifest.json"]
     inputs += [ANSWERS / f"{n}.json" for n in names]
     inputs += [
