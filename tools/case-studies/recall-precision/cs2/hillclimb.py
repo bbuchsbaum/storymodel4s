@@ -435,7 +435,14 @@ def round3(out_json):
                lever="pass-1 v1b (search-for-next sentence), per-call sample 1, pass 2 reused "
                "per unit where the frame film is unchanged",
                producer_run=str(FF / "round3-20261117/v1b"),
-               reuse=runs["v1b"][1].get("pass2_reuse"), halves={})
+               reuse=runs["v1b"][1].get("pass2_reuse"), halves={},
+               producer_calls=json.loads((FF / "round3-20261117/v1b/summary.json").read_text())
+               ["calls"],
+               budget=dict(fresh_calls_allowed=100,
+                           note="cost_usd is the CLI's list-price estimate (notional); calls run "
+                           "on the owner's subscription through claude -p"),
+               deferred="(a) context window 3: projected about 144 calls with a prefix "
+               "reference on the report five; over the budget left after (b), not run")
     for half, parts in (("tune", TUNE), ("confirm", CONFIRM)):
         h = {}
         for t in names:
