@@ -745,3 +745,30 @@ scientific truth or audiovisual accuracy. [Contract](native-assessment.md).
   timing columns and lineage), FilmFestival/Friends, native timing-driven analysis from these
   annotation sidecars, interrupted-import recovery, and the remaining P2–P6 families. Keeping
   timing in a receipt is not proof of a timing-analysis consumer or complete corpus parity.
+
+
+## Retained Sherlock TSV and word-timestamp CSV intake (P2/P5)
+
+Source `43c2f7e13`, corrected by `ac9926c26`, consumes the actual retained file schemas
+through `prepare_sherlock_source`, `prepare_sherlock_recall` and prepared-construction/v2.
+The producer uses `SherlockAnnotations`, `TimebaseRepair`, `RecallDisclosure` and
+`RecallTimingIntake` as behavior references. Original bytes, repair/lineage declarations,
+part order, scenes, point/extent loci, lexical occurrences and selected missing/exact onsets
+survive into receipts. Prepared construction binds the full intake, then existing saved
+analysis consumes detail admission, reference mapping, conditional fidelity and views.
+One source is reused unchanged across two canonically equal, raw-distinct recall inputs.
+
+Python intentionally supports exact rational onsets outside Scala's 64-bit range, within
+the retained lexical length/exponent bounds. No origin, recording identity, duration or
+scanner equivalence is guessed. Source annotation text remains text evidence; its metadata
+does not certify observed audiovisual content. Default export permission remains denied.
+
+[Contract](sherlock-intake.md) and [evidence](../evidence/sherlock-intake.json) retain installed
+commands, 1,029 passing tests on the isolated corrected commit, 17 installed CLI comparisons,
+three schema comparisons and independent review. Four separately compiling guard removals
+each fail one named assertion with two controls passing. Review corrected actual-row boundary,
+scan-break continuity and mandatory provenance checks that an initial passing suite missed.
+
+Still owed: native composed-axis/evidence consumers, general recording/clock/scanner links,
+measured-time analysis, other study adapters, interrupted-import recovery and the full P2–P6
+exits. This is synthetic contract qualification, not extraction accuracy or scientific proof.

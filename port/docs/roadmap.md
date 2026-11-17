@@ -238,9 +238,9 @@ proof precedes scientific claims, but scientific qualification must not block un
 
 ## Next deliveries: execution order from the current branch
 
-Refreshed 2026-11-17 through Sherlock intake source `43c2f7e13`, following raw-input
-preparation `092228d86` and its qualification `512feab4f`. Sherlock's independent
-qualification is still pending; implementation is not counted as a completed phase.
+Refreshed 2026-11-17 through Sherlock intake source `43c2f7e13` and correction
+`ac9926c26`, following raw-input preparation `092228d86` and qualification `512feab4f`.
+Sherlock intake is locally qualified; the complete study and phase exits remain open.
 This is the next-work plan within P2–P6,
 not a second phase numbering system. Mote owns live status. Completed checkpoints move
 out of the future queue; capability obligations remain until their complete exit is met.
@@ -310,16 +310,17 @@ retaining separate recording provenance and admitted/pending fidelity outcomes.
 suite plus targeted additions, and three independently reviewed discriminating mutations.
 That generic slice does not implement the actual Sherlock TSV/word-CSV contracts or recovery.
 
-[Sherlock intake](sherlock-intake.md), source `43c2f7e13`, now implements the retained
+[Sherlock intake](sherlock-intake.md), source `43c2f7e13` plus correction `ac9926c26`, implements the retained
 annotation TSV and word-timestamp CSV formats through prepared construction and saved
-analysis. Retained local logs record 1,024 passing tests and 17 installed CLI checks.
-These were inspected for this planning refresh, not rerun. Independent review and a durable
-qualification receipt remain the immediate completion work. The implementation preserves
+analysis. [Qualification evidence](../evidence/sherlock-intake.json) records 1,029 passing
+tests on the isolated corrected commit, 17 installed CLI checks, cold review and four
+discriminating mutations. Review caught and corrected notebook-boundary and provenance
+omissions. The implementation preserves
 part-local source clocks and exact selected recall onsets, but does not yet supply composed
 source-time consumers, recording/scanner links or measured-time analysis.
 
-**Next action:** qualify the committed Sherlock slice, then implement explicit recovery of
-interrupted imported recordings. Follow with native source composition and measured recall
+**Next action:** implement explicit recovery of interrupted imported recordings.
+Follow with native source composition and measured recall
 timing consumed by analysis. Reuse the existing intake, execution and analysis code.
 
 ### Immediate work queue
@@ -330,7 +331,6 @@ do not wait for an entire phase to finish before putting its useful outputs into
 
 | Order | Work and researcher-visible result | Exit evidence |
 |---|---|---|
-| 1. Qualify the connected Sherlock workflow (P2/P3/P5) | Finish independent review of the committed TSV/CSV adapters and retain their checks. Reuse one unchanged source across two recalls through details, mapping, fidelity and views. | Installed API/CLI agreement; discriminating malformed-input and foreign-recording controls; independent review of repair arithmetic, raw-byte identity and recall token/timing correspondence. Synthetic engineering proof only; full Sherlock coverage stays open. |
 | 2. Recover interrupted work (P5) | Resume imported recordings against their exact prepared inputs, model/prompt profile and existing completed stages. Reuse the recording executor; keep recovery explicit. | Inject interruption before/after reply persistence and import publication; recovery agrees with an uninterrupted run, retains original replies and refuses changed inputs. No implicit provider call or overwrite of completed assessments. |
 | 3. Make timing computationally useful (P4/P5) | Compose native source parts while preserving native anchors and declared part order. Bind measured recall onsets only through explicit recording/clock relationships, then feed existing temporal allocation and feature/projection consumers. | A two-part reset-clock fixture and recalls with missing onsets produce independently calculated allocation/readouts. Unestablished links remain unavailable; no inferred origin, duration or scanner equivalence. Save outputs through API and CLI. |
 | 4. Expand computational parity (P2/P3/P4) | Add remaining graph/recall families and semantic evidence, duration/refinement and retained transport methods, then feature tracks and scientific summaries. Select the next family from actual Scala callers/tests and the preservation map. | Every family has a producer and executed consumer, independent small-case oracle, Scala comparison where executable, and explicit support/denominator/missingness semantics. Measure sparse resource use. The existing sequence kernel is not the full inference surface. |

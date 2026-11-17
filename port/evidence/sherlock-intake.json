@@ -1,0 +1,124 @@
+{
+  "scope": "Retained Sherlock annotation TSV and word-timestamp CSV through prepared construction and saved analysis",
+  "status": "Qualified local implementation; not merged, published, or full phase parity",
+  "source_commit": "43c2f7e137253a7e77135f149b9591a111585239",
+  "correction_commit": "ac9926c26b70d93cc74b1fdc491d62f1258375c7",
+  "tests": {
+    "command": "PYTHONPATH=src .venv/bin/pytest -q",
+    "passed": 1029,
+    "seconds": 27.69,
+    "scope": "isolated exact corrected commit with its own installed wheel environment and pinned Scala synthetic resources"
+  },
+  "typing": {
+    "command": ".venv/bin/mypy src/storymodel",
+    "source_files": 67,
+    "passed": true
+  },
+  "schemas": {
+    "compared_to_current_models": 3,
+    "match": true
+  },
+  "installed": {
+    "installed_package": "/Users/bbuchsbaum/code/scala/storymodel4s/port/data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "cli_checks": 17,
+    "commands": [
+      "prepare-sherlock-source",
+      "import-prepared-construction",
+      "replay-prepared-construction",
+      "prepare-sherlock-recall",
+      "import-prepared-construction",
+      "replay-prepared-construction",
+      "sherlock-recall-timing",
+      "sherlock-recall-timing",
+      "prepare-sherlock-recall",
+      "import-prepared-construction",
+      "replay-prepared-construction",
+      "sherlock-recall-timing",
+      "sherlock-recall-timing",
+      "replay-analysis",
+      "verify-analysis",
+      "replay-analysis",
+      "verify-analysis"
+    ],
+    "analysis_sha256": {
+      "1": "b22d8289dea2bfa7757ae55ce3614c438612dc96e9dbb1d66a09ff997e99c589",
+      "2": "5455adbe3b7b95c9d36ff514a3826e8b6c338f84ebd5785a03f1b4423f575375"
+    }
+  },
+  "wheel": {
+    "path": "data/sherlock-qualified-dist/storymodel_pilot-0.1.0-py3-none-any.whl",
+    "sha256": "0ccc5df414818c537a15d5c5d4b323a238f076b8496b7cf4ae81c2945b53c3dd",
+    "exact_source_match": true,
+    "python_files": 67
+  },
+  "review": {
+    "original_verdict": "BLOCK: four missing relational/provenance checks",
+    "corrected_verdict": "PASS; no remaining BLOCK in reviewed bounded scope",
+    "corrected_tests_passed": 62,
+    "independent_probes": 6,
+    "original_probe_results": "4 failed DID NOT RAISE, 2 controls passed",
+    "probe": "port/evidence/sherlock-intake-independent.py",
+    "mutation_driver": "port/evidence/sherlock-intake-mutations.py",
+    "parent_rerun": {
+      "review_sha": "ac9926c26",
+      "root": "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/storymodel-sherlock-mutations-nwxl23h7",
+      "mutants": [
+        {
+          "mutation": "ordinary_end",
+          "test": "tests/test_sherlock_source.py::test_notebook_offset_matches_actual_ordinary_end_not_only_other_declarations",
+          "compile_exit": 0,
+          "pytest_exit": 1,
+          "failed": 1,
+          "passed": 2,
+          "log": "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/storymodel-sherlock-mutations-nwxl23h7/ordinary_end.log"
+        },
+        {
+          "mutation": "break_continuity",
+          "test": "tests/test_cold_declarations.py::test_scan_break_must_start_at_ordinary_end",
+          "compile_exit": 0,
+          "pytest_exit": 1,
+          "failed": 1,
+          "passed": 2,
+          "log": "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/storymodel-sherlock-mutations-nwxl23h7/break_continuity.log"
+        },
+        {
+          "mutation": "edition_binding",
+          "test": "tests/test_cold_declarations.py::test_edition_binding_must_be_established",
+          "compile_exit": 0,
+          "pytest_exit": 1,
+          "failed": 1,
+          "passed": 2,
+          "log": "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/storymodel-sherlock-mutations-nwxl23h7/edition_binding.log"
+        },
+        {
+          "mutation": "notebook_provenance",
+          "test": "tests/test_cold_declarations.py::test_notebook_provenance_cannot_be_missing_on_both_sides",
+          "compile_exit": 0,
+          "pytest_exit": 1,
+          "failed": 1,
+          "passed": 2,
+          "log": "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/storymodel-sherlock-mutations-nwxl23h7/notebook_provenance.log"
+        }
+      ]
+    }
+  },
+  "corrections": [
+    "Notebook offset equals actual final ordinary-row end, not only another declaration.",
+    "Scan breaks continue from ordinary end without gaps/overlaps and finish at run end.",
+    "Experimental edition binding must be owner-declared-and-byte-identified.",
+    "Repair and notebook provenance IDs must be present, nonempty and equal."
+  ],
+  "compatibility": {
+    "generic_saved_artifacts_compared": 19,
+    "generic_artifacts_unchanged": true,
+    "sherlock_analysis_hashes_unchanged_after_correction": true,
+    "note": "Generic outputs compared before correction; correction only tightens invalid Sherlock declarations. Corrected installed Sherlock output hashes equal original installed outputs."
+  },
+  "environment_correction": "Initial archive omitted parent Scala fixtures and shared editable interpreter with concurrent recovery work: 10 failures,1019 passed. Rebuilt with own wheel environment and pinned parent fixtures:1029 passed. Initial attempt is inconclusive for product regression.",
+  "limits": [
+    "Synthetic local engineering evidence only; Scala contracts inspected, not executed in this slice.",
+    "Metadata checks do not establish media reachability or disclosure permission.",
+    "Native composed axes, recording/scanner links and downstream measured-time analysis remain owed.",
+    "Interrupted-import recovery, other studies and full P2-P6 capability coverage remain open."
+  ]
+}
