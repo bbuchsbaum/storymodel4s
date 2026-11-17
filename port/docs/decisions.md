@@ -400,3 +400,14 @@ widening v6/v7 assessment wires; inventing transcripts; parallel native graph/bi
 and removing modality guards without a real assessment/analysis consumer. Current mixed rich
 schemas expose v8; declared v7 remains frozen. This is an engineering compatibility choice,
 not an audiovisual accuracy claim. See [native assessment](native-assessment.md).
+
+## Recorded surface embedding integration (2026-11-17, provisional)
+
+Keep vectors in an explicit model/space/payload-bound sidecar and adapt bounded nominees plus
+half-cosine measurements to the existing local-evidence table and sequence kernel. Preserve
+lexical diagnostics and explicit target universes. Rejected alternatives: embedding-based graph
+identity, a second alignment engine, dense all-pairs costs, silent lexical substitution for a
+missing measurement, and an obligatory numerical/model dependency for recorded-vector use.
+Use max-scaled cosine and stable L2 validation to correct overflow and repeated-normalization
+failures rather than translating those weaknesses. Recorded model metadata remains a declaration;
+actual provider execution and privacy-aware caches remain owed. [Contract](semantic.md).

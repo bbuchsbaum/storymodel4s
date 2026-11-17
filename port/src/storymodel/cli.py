@@ -53,6 +53,7 @@ from .direct_workflow import (
     read_mapping_request,
     replay_mapping,
 )
+from .embedding import EmbeddingCache, EmbeddingPair
 from .execution import RecordedExecutionError
 from .extraction import prepare_extraction
 from .extraction_workflow import (
@@ -133,6 +134,18 @@ from .rich_account import (
 from .rich_construction import prepare_rich_construction
 from .rich_workflow import RichRecording, import_rich, read_rich_request, replay_rich, rich_prompt
 from .scenes import SceneGroup, group_source_rows
+from .semantic import (
+    SemanticResult,
+    prepare_semantic,
+    resolve_semantic,
+    semantic_prompt,
+)
+from .semantic_workflow import (
+    SemanticRecording,
+    import_semantic,
+    read_semantic_request,
+    replay_semantic,
+)
 from .sequence import infer_sequence, validate_sequence, verify_sequence
 from .source import SourceRow, prepare_source
 from .source_transitions import (
@@ -394,6 +407,42 @@ def main(argv: list[str] | None = None) -> int:
     source_replay.add_argument("--expected-import-sha256")
     source_replay.add_argument("--account-only", action="store_true")
     source_replay.add_argument("--output")
+    semantic_prepare = commands.add_parser(
+        "prepare-semantic", help="prepare bounded recorded surface-embedding inference"
+    )
+    semantic_prepare.add_argument("source")
+    semantic_prepare.add_argument("recall")
+    semantic_prepare.add_argument("spec")
+    semantic_prepare.add_argument("pair")
+    semantic_prepare.add_argument("--cache")
+    semantic_prepare.add_argument("--max-comparisons", type=int, default=4096)
+    semantic_prepare.add_argument("--max-semantic-candidates", type=int, default=32)
+    semantic_prepare.add_argument("--output")
+    semantic_contract = commands.add_parser(
+        "semantic-prompt", help="render the recorded surface-embedding request"
+    )
+    semantic_contract.add_argument("request")
+    semantic_contract.add_argument("--output")
+    semantic_import = commands.add_parser(
+        "import-semantic", help="record an exported surface-embedding reply"
+    )
+    semantic_import.add_argument("request")
+    semantic_import.add_argument("reply")
+    semantic_import.add_argument("recording")
+    semantic_replay = commands.add_parser(
+        "replay-semantic", help="resolve a recorded surface-embedding reply offline"
+    )
+    semantic_replay.add_argument("request")
+    semantic_replay.add_argument("recording")
+    semantic_replay.add_argument("--expected-import-sha256")
+    semantic_replay.add_argument("--output")
+    semantic_verify = commands.add_parser(
+        "verify-semantic", help="recompute a semantic result from a request and exact reply"
+    )
+    semantic_verify.add_argument("request")
+    semantic_verify.add_argument("reply")
+    semantic_verify.add_argument("result")
+    semantic_verify.add_argument("--output")
     relation_admit = commands.add_parser(
         "admit-relations", help="admit an input-bound recorded event or state relation batch"
     )
@@ -1501,6 +1550,75 @@ def main(argv: list[str] | None = None) -> int:
                 )
                 emit(
                     (compiled.account if args.account_only else compiled).model_dump(mode="json"),
+                    args.output,
+                )
+        elif args.command == "prepare-semantic":
+            semantic_source = read_supported_account(Path(args.source))
+            if semantic_source.export_permission != "allowed":
+                raise PermissionError("producer denies semantic embedding export")
+            semantic_recall = read_supported_account(Path(args.recall))
+            if semantic_recall.export_permission != "allowed":
+                raise PermissionError("producer denies semantic embedding export")
+            semantic_spec = LocalEvidenceSpec.model_validate_json(
+                canonical(strict_json(Path(args.spec).read_bytes()))
+            )
+            semantic_pair = EmbeddingPair.model_validate_json(
+                canonical(strict_json(Path(args.pair).read_bytes()))
+            )
+            semantic_cache = (
+                None
+                if args.cache is None
+                else EmbeddingCache.model_validate_json(
+                    canonical(strict_json(Path(args.cache).read_bytes()))
+                )
+            )
+            semantic_request = prepare_semantic(
+                semantic_source,
+                semantic_recall,
+                semantic_spec,
+                semantic_pair,
+                cache=semantic_cache,
+                max_comparisons=args.max_comparisons,
+                max_semantic_candidates=args.max_semantic_candidates,
+            )
+            emit(semantic_request.model_dump(mode="json"), args.output)
+        elif args.command in (
+            "semantic-prompt",
+            "import-semantic",
+            "replay-semantic",
+            "verify-semantic",
+        ):
+            semantic_request = read_semantic_request(Path(args.request))
+            if args.command in ("semantic-prompt", "import-semantic") and (
+                semantic_request.source.export_permission != "allowed"
+                or semantic_request.recall.export_permission != "allowed"
+            ):
+                raise PermissionError("producer denies semantic embedding export")
+            if args.command == "semantic-prompt":
+                emit(strict_json(semantic_prompt(semantic_request)), args.output)
+            elif args.command == "import-semantic":
+                semantic_recording = SemanticRecording.model_validate_json(
+                    canonical(strict_json(Path(args.reply).read_bytes()))
+                )
+                import_semantic(semantic_request, semantic_recording, Path(args.recording))
+                emit({"recording": args.recording, "imported": 1}, None)
+            elif args.command == "replay-semantic":
+                semantic_result = replay_semantic(
+                    semantic_request,
+                    Path(args.recording),
+                    expected_import_sha256=args.expected_import_sha256,
+                )
+                emit(semantic_result.model_dump(mode="json"), args.output)
+            else:
+                semantic_reply = Path(args.reply).read_bytes().decode("utf-8")
+                semantic_saved = SemanticResult.model_validate_json(
+                    canonical(strict_json(Path(args.result).read_bytes()))
+                )
+                semantic_result = resolve_semantic(semantic_request, semantic_reply)
+                if semantic_result != semantic_saved:
+                    raise ValueError("semantic result differs from recorded inputs")
+                emit(
+                    {"verified": True, "request_sha256": semantic_result.request_sha256},
                     args.output,
                 )
         elif args.command in ("extraction-prompt", "import-extraction", "replay-extraction"):

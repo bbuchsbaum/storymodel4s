@@ -52,6 +52,17 @@ from .detail_admission import admit_details, detail_prompt, prepare_details, ver
 from .detail_workflow import DetailRecording, import_details, replay_details
 from .direct_mapping import mapping_prompt, prepare_mapping, resolve_mapping, verify_mapping
 from .direct_workflow import MappingRecording, import_mapping, replay_mapping
+from .embedding import (
+    EmbeddingCache,
+    EmbeddingCacheEntry,
+    EmbeddingPair,
+    EmbeddingSpace,
+    EmbeddingValue,
+    cosine_distance,
+    embedding_key,
+    half_cosine_distance,
+    validate_embedding,
+)
 from .extraction import prepare_extraction, resolve_extraction
 from .extraction_workflow import ExtractionRecording, import_extraction, replay_extraction
 from .fidelity import (
@@ -137,6 +148,24 @@ from .rich_account import (
 from .rich_construction import compile_rich_construction, prepare_rich_construction
 from .rich_workflow import RichRecording, import_rich, replay_rich
 from .scenes import SceneGroup, group_source_rows, verify_scene_grouping
+from .semantic import (
+    EmbeddingInput,
+    EmbeddingOutcome,
+    EmbeddingReply,
+    EmbeddingReplyRow,
+    SemanticNomination,
+    SemanticRequest,
+    SemanticResult,
+    SemanticRetrieval,
+    embedding_inputs,
+    prepare_semantic,
+    resolve_semantic,
+    semantic_prompt,
+    semantic_request_digest,
+    validate_semantic_request,
+    verify_semantic,
+)
+from .semantic_workflow import SemanticRecording, import_semantic, replay_semantic
 from .sequence import SequenceRequest, SequenceResult, infer_sequence, verify_sequence
 from .source import SourceRow, compile_source, prepare_source, verify_source
 from .source_transitions import (
@@ -326,4 +355,31 @@ __all__ = [
     "verify_mapping",
     "verify_details",
     "verify_sequence",
+    "EmbeddingCache",
+    "EmbeddingCacheEntry",
+    "EmbeddingPair",
+    "EmbeddingSpace",
+    "EmbeddingValue",
+    "cosine_distance",
+    "embedding_key",
+    "half_cosine_distance",
+    "validate_embedding",
+    "EmbeddingInput",
+    "EmbeddingOutcome",
+    "EmbeddingReply",
+    "EmbeddingReplyRow",
+    "SemanticNomination",
+    "SemanticRecording",
+    "SemanticRequest",
+    "SemanticResult",
+    "SemanticRetrieval",
+    "embedding_inputs",
+    "import_semantic",
+    "prepare_semantic",
+    "replay_semantic",
+    "resolve_semantic",
+    "semantic_prompt",
+    "semantic_request_digest",
+    "validate_semantic_request",
+    "verify_semantic",
 ]

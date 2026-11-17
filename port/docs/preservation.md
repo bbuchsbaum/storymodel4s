@@ -668,3 +668,29 @@ Remaining: native recall details; native holder/identity-dependent assessment; n
 inference; actual perception/acquisition; complete semantic, feature, study and inspection
 coverage. Supplied observations and scripted grades establish engineering contracts, not
 scientific truth or audiovisual accuracy. [Contract](native-assessment.md).
+
+## Recorded surface semantic evidence (P3/P4)
+
+- **Scala reference:** `embed-core/.../identity.scala` (spaces and GeometryPair), `vector.scala`
+  (validated values, raw cosine), `cache.scala` and `receipt.scala` (observed cache/material
+  identity); `align/.../embeddingmetric.scala` (explicit half-cosine), `surfaceembedding.scala`
+  (endpoint pairing/outcomes), and generic semantic candidate/cost consumers in `candidates.scala`
+  and `cost.scala`. Strict production ONNX profiles are a separate retained capability.
+- **Python entry points:** `prepare_semantic`, `semantic_prompt`, `resolve_semantic`,
+  `import_semantic`, `replay_semantic`, `verify_semantic`; `embedding.py` contains space, pair,
+  vector and cache contracts. [Contract](semantic.md); [connected example](../examples/semantic_inference.py).
+- **Actual consumer:** bounded semantic nominations supplement lexical nominations and produce
+  `LocalEvidenceSpec` semantic cells; unchanged `infer_accounts` applies gates/costs and the
+  sequence kernel. Source and recall occurrence identity and explicit target universes survive.
+- **Intentional improvements:** scale-safe cosine for huge/subnormal coordinates; stable L2
+  cache validation; one indexed cache pass instead of repeated per-item validation/scanning;
+  explicit per-unit comparison budget, cutoff and undefined-distance diagnostics. These are
+  versioned recorded-surface semantics, not a claim of complete Scala strict-profile parity.
+- **Evidence:** independent equal/orthogonal/opposite vector expectations, extreme-scale and
+  cache-roundtrip controls, explicit-universe-before-budget checks, source immutability,
+  malformed/missing/ineligible/failed outcomes, gate preservation and recorded replay. The
+  qualification receipt is [semantic.json](../evidence/semantic.json).
+- **Still owed:** real provider/model execution, ONNX/WL/chart channels and all retained semantic
+  profiles, privacy/HMAC cache policy, complete upstream material/truncation contracts, broader
+  scalable retrieval, native numerical consumers and scientific evaluation. This slice is
+  recorded text-surface integration, not full embedding-module parity.

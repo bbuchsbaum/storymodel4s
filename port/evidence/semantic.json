@@ -1,0 +1,122 @@
+{
+  "scope": "recorded surface semantic evidence through existing account inference",
+  "status": "local checks complete; cold review pending",
+  "tests": {
+    "command": ".venv/bin/pytest -q",
+    "passed": 927,
+    "seconds": 16.82
+  },
+  "typing": {
+    "command": ".venv/bin/mypy src/storymodel",
+    "source_files": 62,
+    "passed": true
+  },
+  "lint": {
+    "command": "ruff check changed source/tests/example/evidence; ruff format --check",
+    "passed": true
+  },
+  "installed": {
+    "resources": [
+      {
+        "source_rows": 32,
+        "source_anchors": 64,
+        "recall_units": 8,
+        "dimension": 2,
+        "vector_comparisons": 128,
+        "retained_semantic_candidates": 32,
+        "seconds_with_tracemalloc": 0.9176452499959851,
+        "python_peak_bytes": 4971618
+      },
+      {
+        "source_rows": 128,
+        "source_anchors": 256,
+        "recall_units": 8,
+        "dimension": 2,
+        "vector_comparisons": 128,
+        "retained_semantic_candidates": 32,
+        "seconds_with_tracemalloc": 2.35739587500575,
+        "python_peak_bytes": 10574940
+      }
+    ],
+    "import_path": "/Users/bbuchsbaum/code/scala/storymodel4s/port/data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "cli_checks": 14,
+    "workflow": {
+      "recalls": [
+        {
+          "recall": 1,
+          "units": 3,
+          "imported": 4,
+          "reused": 0,
+          "comparisons": 12
+        },
+        {
+          "recall": 2,
+          "units": 2,
+          "imported": 1,
+          "reused": 3,
+          "comparisons": 8
+        }
+      ],
+      "cache_entries": 5,
+      "source_unchanged": true
+    },
+    "legacy_baseline": "49ca5d414",
+    "legacy_files": 10,
+    "legacy_bytes": 482091,
+    "legacy_identical": true
+  },
+  "wheel": {
+    "sha256": "c6de760d98e9a8a4d1212167d26b9b107668a5a19c7ae1211698b88bf1080931",
+    "source_files": 67,
+    "exact_source_match": true
+  },
+  "mutations": [
+    {
+      "mutation": "half-cosine",
+      "file": "semantic.py",
+      "old": "value=measured[target] / 2",
+      "new": "value=measured[target] / 4",
+      "test": "test_semantic.py::test_distances_reach_local_costs_and_actual_inference_without_account_changes",
+      "controls": [
+        "test_semantic.py::test_provider_outcomes_remain_distinct_and_only_observed_values_enter_cache[missing]",
+        "test_semantic.py::test_reply_binding_refuses_misattributed_batch[foreign-request]"
+      ],
+      "baseline": "3 passed in 0.33s",
+      "mutant": "1 failed, 2 passed in 0.33s",
+      "compiled": true
+    },
+    {
+      "mutation": "explicit-universe-before-budget",
+      "file": "semantic.py",
+      "old": "if selected.targets is None\n            else [",
+      "new": "if True\n            else [",
+      "test": "test_semantic.py::test_explicit_universe_is_filtered_before_budget_and_never_widened",
+      "controls": [
+        "test_semantic.py::test_provider_outcomes_remain_distinct_and_only_observed_values_enter_cache[missing]",
+        "test_semantic.py::test_reply_binding_refuses_misattributed_batch[foreign-request]"
+      ],
+      "baseline": "3 passed in 0.31s",
+      "mutant": "1 failed, 2 passed in 0.34s",
+      "compiled": true
+    },
+    {
+      "mutation": "scale-safe-cosine",
+      "file": "embedding.py",
+      "old": "    query_norm = math.hypot",
+      "new": "    query_scale = document_scale = 1.0\n    query_norm = math.hypot",
+      "test": "test_embedding.py::test_cosine_distance_preserves_huge_and_subnormal_four_dimensional_orientations",
+      "controls": [
+        "test_semantic.py::test_provider_outcomes_remain_distinct_and_only_observed_values_enter_cache[missing]",
+        "test_semantic.py::test_reply_binding_refuses_misattributed_batch[foreign-request]"
+      ],
+      "baseline": "3 passed in 0.31s",
+      "mutant": "1 failed, 2 passed in 0.34s",
+      "compiled": true
+    }
+  ],
+  "limits": [
+    "Scripted vectors prove integration, not model execution or semantic accuracy.",
+    "Resource figures include Python tracing overhead; no Scala speed comparison.",
+    "No full P3/P4/P5 parity, native inference, ONNX/WL providers or HMAC cache claim."
+  ]
+}
