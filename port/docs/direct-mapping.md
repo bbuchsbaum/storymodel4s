@@ -58,7 +58,9 @@ Tests move an identical unit across neighboring text, including a non-BMP prefix
 account collections: prompt bytes stay identical while private occurrence IDs change. This is an
 input-condition audit, not evidence that an external model has no priors, nor a claim that detail
 selection itself was performed independently of neighboring recall. Only contiguous recall units
-are supported in this profile; discontinuous detail and source evidence remains exact.
+are supported in this profile; discontinuous detail and source evidence remains exact. Multiple
+requested details with identical visible kind and quote spans are refused: hidden normalized
+content cannot make aliases distinguishable to the mapper. Different visible kinds remain valid.
 
 ## Decisions and refusal
 

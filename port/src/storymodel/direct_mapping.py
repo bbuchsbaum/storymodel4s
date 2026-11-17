@@ -49,8 +49,14 @@ class MappingRequest(Model):
             raise ValueError("unit-only v1 requires contiguous recall unit support")
         if not any(u.kind != "recall" for u in self.account.units):
             raise ValueError("mapping requires a source target catalog")
-        if not _details(self):
+        details = _details(self)
+        if not details:
             raise ValueError("mapping requires an unbound detail in this interpretation")
+        visible = [(d.kind, tuple((s.start, s.end) for s in d.support.spans)) for d in details]
+        if len(set(visible)) != len(visible):
+            raise ValueError(
+                "unit-only mapping cannot distinguish details with identical kind/quotes"
+            )
         return self
 
 
@@ -63,7 +69,7 @@ def _details(request: MappingRequest) -> tuple[Detail, ...]:
     return tuple(
         sorted(
             (d for d in request.account.details if d.unit == request.unit and d.id not in occupied),
-            key=lambda d: (tuple((s.start, s.end) for s in d.support.spans), d.kind, d.content),
+            key=lambda d: (tuple((s.start, s.end) for s in d.support.spans), d.kind),
         )
     )
 

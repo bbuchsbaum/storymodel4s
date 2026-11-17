@@ -403,3 +403,43 @@ def test_external_hypothesis_cannot_receive_source_fidelity():
     result = resolve_mapping(request, raw(request, proposal))
     assert result.decisions[0].status == "rejected"
     assert "cannot receive source fidelity" in result.decisions[0].reason
+
+
+def test_hidden_content_cannot_disambiguate_identical_visible_details():
+    request, _, _ = fixture()
+    first = request.account.details[0]
+    for content in ("aaa-hidden", "zzz-hidden"):
+        for reverse in (False, True):
+            second = Detail(
+                unit=first.unit,
+                kind=first.kind,
+                content=content,
+                support=first.support,
+                address=first.address,
+            )
+            details = (second, first) if reverse else (first, second)
+            account = validate_account(request.account.model_copy(update={"details": details}))
+            with pytest.raises(ValueError, match="cannot distinguish"):
+                prepare_mapping(account, request.unit)
+
+    # Kind is visible, so same-quote event and attribute details remain distinct.
+    attribute = Detail(
+        unit=first.unit,
+        kind="attribute",
+        content="hidden-attribute",
+        support=first.support,
+        address=first.address,
+    )
+    account = validate_account(request.account.model_copy(update={"details": (first, attribute)}))
+    distinct = prepare_mapping(account, request.unit)
+    visible = json.loads(mapping_prompt(distinct))["recall"]["details"]
+    assert [d["kind"] for d in visible] == ["attribute", "event"]
+    changed = Detail(
+        unit=first.unit,
+        kind=first.kind,
+        content="changed-hidden",
+        support=first.support,
+        address=first.address,
+    )
+    account = validate_account(request.account.model_copy(update={"details": (attribute, changed)}))
+    assert mapping_prompt(prepare_mapping(account, request.unit)) == mapping_prompt(distinct)
