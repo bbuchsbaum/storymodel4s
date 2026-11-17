@@ -615,6 +615,10 @@ producer's top scene to the nearest gold scene. A neighbour is the previous or n
 An *isolated jump* is a miss whose neighbours bracket a gold scene while its own top scene lies
 outside the neighbours' range.
 
+**Amended before any decoder was scored** (same day): the jump is uniform over the work's
+other scenes, not only earlier ones; entry gained a uniform part; and non-film states take the
+work's ratio. The first draft of this section, at 78b771e6b, had none of the three.
+
 **Reading, recorded before the decoder is scored.**
 - Most misses are one scene away from the gold, and that is where a sequence prior has least to
   say: staying and stepping are both likely there.
@@ -644,17 +648,25 @@ estimands (ADR 0031 §4). Module `cs2/decoder.py`.
 - **Evidence.** A row's likelihood for a cell is (q / D)^α, where q is the producer's
   content-local row distribution and D is the participant's duration forecast on the same
   cells. A producer that abstains everywhere has q = D, so its evidence is flat.
-- **Transitions.** Corpus-neutral parameters, fitted leave-one-participant-out by smoothed
-  counts (α 0.5 per outcome) on the other participants' gold sequences.
+  - A non-film state at a position inside a work also takes that work's ratio,
+    q(work | film) / D(work | film). A non-film row keeps its frame, so the frame is evidence
+    about the position and not about the mode. Without this, a framed row that abstains would
+    count ten to one against non-film through normalisation alone.
+- **Transitions.** Corpus-neutral parameters, fitted leave-one-participant-out on the other
+  participants' gold sequences, with additive smoothing 0.5 per outcome (`lopo_alpha`).
   - *Mode:* a 3×3 matrix between consecutive rows, and the first row's mode.
   - *Work,* on entering a film row: same work, next work in presentation order, or any other
     work (uniform). Rates are fitted separately after a film row, after a search row, after an
     other row, and from START. An outcome that does not exist is dropped and the rest
     renormalized.
-  - *Scene,* within a work: stay, a forward step that is geometric in scene steps, or a
-    backward jump that is uniform over earlier scenes. Forward mass at the last scene and
-    backward mass at the first scene go to stay.
-  - *Entry,* on entering a work: geometric in scene steps from the work's first scene.
+  - *Scene,* within a work: stay; a forward step, geometric in scene steps; or a jump, uniform
+    over the work's other scenes. Forward mass at the last scene goes to stay.
+  - *Entry,* on entering a work: a mixture of a geometric in scene steps from the work's first
+    scene and a uniform draw over the work's scenes.
+  - A forward move may be a step or a jump, so the scene and entry rates are fitted by EM (100
+    iterations from equal rates and a geometric parameter of 0.5). The other rates are counts.
+  - The uniform parts keep every cell reachable in one row, so one skipped stretch cannot
+    cost an unbounded number of bits.
   - A gold row's position is the last valid scene of its set, as `hmm_tfidf` takes it.
 - **α.** Grid 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.25, 1.5. Each participant's α
   minimises the mean of the scene, work and film terms over the other nine. A pick at the
