@@ -1,0 +1,122 @@
+{
+  "scope": "raw-input-bound generic source/recall preparation into rich construction and saved analysis",
+  "status": "qualified local implementation; cold review passed; not merged or published",
+  "source_commit": "092228d86edc5dc76753bde3ae3946a330c9b362",
+  "tests": {
+    "full_command": "cd port && .venv/bin/pytest -q",
+    "full_passed": 967,
+    "full_seconds": 29.2,
+    "subsequent_targeted_command": ".venv/bin/pytest -q tests/test_source_preparation.py",
+    "subsequent_targeted_passed": 13,
+    "additional_new_tests_after_full_run": 6,
+    "note": "The six new source controls were added after the full run; all thirteen source tests passed. No production behavior changed after the full run."
+  },
+  "typing": {
+    "command": "cd port && .venv/bin/mypy src/storymodel",
+    "source_files": 65,
+    "passed": true
+  },
+  "lint": {
+    "changed_files_passed": true,
+    "evidence_drivers_passed": true
+  },
+  "installed": {
+    "installed_package": "/Users/bbuchsbaum/code/scala/storymodel4s/port/data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "cli_checks": 19,
+    "commands": [
+      "prepare-construction",
+      "prepared-construction-prompt",
+      "import-prepared-construction",
+      "replay-prepared-construction",
+      "verify-prepared-construction",
+      "prepare-construction",
+      "prepared-construction-prompt",
+      "import-prepared-construction",
+      "replay-prepared-construction",
+      "verify-prepared-construction",
+      "prepare-construction",
+      "prepared-construction-prompt",
+      "import-prepared-construction",
+      "replay-prepared-construction",
+      "verify-prepared-construction",
+      "replay-analysis",
+      "verify-analysis",
+      "replay-analysis",
+      "verify-analysis"
+    ],
+    "analysis_sha256": {
+      "1": "56746da062ce6c046013cf9494780a6608dd990a3b22c7e9baddc2b1be17201d",
+      "2": "53ade0eb245598d90f37010606dfe8bc9bfca20ed7894c3ada87ccfd90b8bd9c"
+    }
+  },
+  "wheel": {
+    "path": "data/prepared-dist/storymodel_pilot-0.1.0-py3-none-any.whl",
+    "sha256": "259251fb7cc7f872d89e7672152ee4daec945db11c2dcd35582a6fa3e4cbff76",
+    "source_files": 65,
+    "exact_source_match": true
+  },
+  "review": {
+    "verdict": "PASS; no BLOCK for bounded preparation/analysis slice",
+    "source_commit": "092228d86edc5dc76753bde3ae3946a330c9b362",
+    "focused_repository_tests": 46,
+    "independent_probes": 3,
+    "probe": "port/evidence/prepared-construction-independent.py",
+    "mutation_driver": "port/evidence/prepared-construction-mutations.py",
+    "parent_reexecuted": {
+      "revision": "092228d86edc5dc76753bde3ae3946a330c9b362",
+      "runs": {
+        "baseline": {
+          "exit": 0,
+          "last_line": "3 passed in 0.26s"
+        },
+        "raw-binding": {
+          "exit": 1,
+          "last_line": "1 failed, 2 passed in 0.26s"
+        },
+        "import-binding": {
+          "exit": 1,
+          "last_line": "1 failed, 2 passed in 0.28s"
+        },
+        "native-time-order": {
+          "exit": 1,
+          "last_line": "1 failed, 2 passed in 0.27s"
+        }
+      }
+    },
+    "mutations": "Each compiles; exactly one named assertion fails while two sibling probes pass. Raw annotation relation, foreign raw recording admission, declared order versus clock sorting.",
+    "limits": "Reviewer did not independently rerun full suite or installed wheel checks."
+  },
+  "branches": [
+    {
+      "recall": 1,
+      "source_unchanged": true,
+      "stages": 3,
+      "fidelity": "completed",
+      "coverage": [
+        "present",
+        "absent"
+      ]
+    },
+    {
+      "recall": 2,
+      "source_unchanged": true,
+      "stages": 3,
+      "fidelity": "pending",
+      "coverage": [
+        "not-assessable",
+        "absent"
+      ]
+    }
+  ],
+  "fixture_corrections": [
+    "Existing segmenter retains sentence-ending punctuation; corrected initial independent span expectations.",
+    "Text mapping uses proposal/v1; corrected example mistakenly selecting native proposal/v2.",
+    "Denied-request fixture writes a distinct artifact because publication refuses overwrites."
+  ],
+  "limits": [
+    "Generic annotation JSON is not yet retained Sherlock annotation TSV or word-timestamp CSV coverage.",
+    "Native timing sidecar is preserved; this slice does not add native timing-driven analysis.",
+    "Interrupted-import recovery remains owed.",
+    "Synthetic offline contract evidence, not semantic accuracy, scientific qualification, or full P2-P6 parity."
+  ]
+}

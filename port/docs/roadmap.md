@@ -301,8 +301,17 @@ records 950 tests, installed CLI agreement and independent snapshot/grant mutati
 Stage receipts and processing gaps remain inspectable. This is saved workflow replay; it does
 not supply new observation acquisition, interrupted-import recovery or full phase parity.
 
-**Next implementation action:** synthetic study intake into the account workflow, followed by
-explicit recovery of interrupted imported recordings. Reuse the existing intake/execution code.
+[Raw-input-bound preparation](prepared-construction.md), source `092228d86`, now connects
+generic ordered source annotations and exact raw recall to rich construction and saved analysis.
+The installed example reuses one source across two canonically equal but raw-distinct recalls,
+retaining separate recording provenance and admitted/pending fidelity outcomes.
+[Evidence](../evidence/prepared-construction.json) records the installed CLI checks, existing
+suite plus targeted additions, and three independently reviewed discriminating mutations.
+This does not yet implement the actual Sherlock TSV/word-CSV contracts or recovery.
+
+**Next implementation action:** retained Sherlock annotation TSV and word-timestamp CSV
+adapters into this prepared account workflow, followed by explicit recovery of interrupted
+imported recordings. Reuse the existing intake/execution code.
 
 ### Immediate work queue
 
@@ -318,14 +327,17 @@ recovery and remaining capability families still keep their full phases open.
 | 3. Complete computational families (P2/P4) | Extend that workflow with remaining graph/recall families, duration/refinement and retained transport methods, then feature tracks, clock maps and measured-time readouts. Port each method into the existing interfaces as its inputs become stable. | Per-family producer and consumer; independent small-case oracle; executable Scala comparison where available; support/denominator/missingness contract; measured sparse resource use. No claim that the existing sequence kernel is the entire Scala inference surface. |
 | 4. Close operational and inspection coverage (P5/P6) | Expand to FilmFestival/Friends, retained providers, media, proposition/AMR, embedding backends and interview workflows. Add React inspection of actual artifacts, then saved investigations and exports. | Capability-by-capability executed workflow coverage, compatibility/recovery checks and a clear disposition for every retained Scala/Atlas behavior. Visual polish follows useful inspection. |
 
-**The next three implementation beads:** adapt synthetic study inputs to the connected account
-workflow; add input-bound recovery for interrupted imported recordings; complete the next retained
+**The next three implementation beads:** implement the retained Sherlock input formats against
+synthetic fixtures; add input-bound recovery for interrupted imported recordings; complete the next retained
 graph/target family needed by that journey. Reuse existing intake, execution, examples and
 recordings. If a workflow bead needs a missing graph family, implement that bounded dependency
 first.
 Do not wait for every graph family or numerical method before exercising a complete workflow.
 
-### First implementation slice: checked intake into saved analysis
+### Checked intake foundation and study-format follow-through
+
+The generic prepared-intake foundation below is implemented at `092228d86`. The actual
+study-format adapters in the final paragraph remain the immediate next slice.
 
 Start with admitted synthetic fixtures. Preserve raw UTF-8 recall input and the existing
 checked canonicalization/segmentation receipt. For source rows, retain declared part and row

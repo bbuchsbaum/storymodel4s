@@ -715,3 +715,33 @@ scientific truth or audiovisual accuracy. [Contract](native-assessment.md).
 - **Still owed:** study-specific intake, interrupted-import recovery, live providers, remaining
   graph/algorithm families and Atlas interaction. The manifest consumes saved construction
   requests/replies; it does not claim automatic raw observation production or scientific accuracy.
+
+## Raw-input-bound study preparation (P2/P5)
+
+- **Reference behaviors:** the existing Python `recall_intake.py` preserves the retained Scala
+  text canonicalization/segmentation distinction. `SherlockAnnotations.scala` and
+  `SherlockSourceAtlas.scala` establish source row identity, native part-qualified support and
+  presentation order; `RecallDisclosure.scala` and `AgentMappingRecord.scala` establish the
+  separate word-CSV receipt and segmentation path. The new generic annotation profile is an
+  integration boundary, not yet those complete study-specific parsers.
+- **Python entry points:** `prepare_source_utf8`, `prepare_construction`,
+  `compile_prepared_construction`, `import_prepared_construction`,
+  `replay_prepared_construction`, `verify_prepared_construction` and their CLI commands.
+  [Contract](prepared-construction.md), [connected example](../examples/prepared_workflow.py).
+- **Retained distinctions:** exact raw bytes versus canonical document; original recall
+  occurrence spans versus separator coverage; declared part/row order versus native clock
+  values; unknown duration versus explicit point; source annotation metadata versus admitted
+  graph claims. Raw source JSON order remains inspectable while declared order determines text.
+- **Deliberate design:** derive the existing rich request from checked intake. Keep its result
+  untouched, then bind the prepared input and inner result in the downstream account recipe.
+  Analysis-plan/v2 explicitly consumes that account. Same canonical content does not authorize
+  recording reuse across different raw inputs. Rich v1/v2 replay remains available unchanged.
+- **Consumer/evidence:** one independently built source feeds two raw-distinct/canonically equal
+  recalls through actual detail, mapping, conditional fidelity and view production. One grade
+  is admitted; a mismatched citation is refused and leaves grading pending. Receipt recomputation,
+  UTF-16 supports, part order, clock bounds and legacy recording refusal have executable controls.
+  [Qualification](../evidence/prepared-construction.json).
+- **Still owed:** actual Sherlock annotation TSV and word-timestamp CSV adapters (including all
+  timing columns and lineage), FilmFestival/Friends, native timing-driven analysis from these
+  annotation sidecars, interrupted-import recovery, and the remaining P2–P6 families. Keeping
+  timing in a receipt is not proof of a timing-analysis consumer or complete corpus parity.
