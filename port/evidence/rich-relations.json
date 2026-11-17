@@ -1,0 +1,44 @@
+{
+  "source_commit": "552b7e2c3d6aa2be05a398c9d02ab3d02b559400",
+  "bead": "bd-01M7KYDXPJ4ZE61RWENP3GTWYG",
+  "scope": "Existing atomic relation admission, verification and inspection extended to rich v4 event/state accounts through explicit v2 proposal/result profiles",
+  "checks": {
+    "pytest": {"passed": 451, "seconds": 5.22},
+    "mypy_source_files": 35,
+    "ruff_check": "passed",
+    "ruff_format_files": 84,
+    "diff_check": "passed",
+    "rich_cases": "All four bounded kinds across source/recall and event-state, state-event, state-state endpoints; nonempty details/bindings/circumstances and analysis values preserved"
+  },
+  "compatibility": {
+    "baseline_commit": "6b1544e28",
+    "frozen_hashes": "Three legacy schemas and one deterministic complete result/table case remain unchanged",
+    "versions": "Legacy v1 proposals require legacy accounts; rich v2 proposals require v4 accounts",
+    "unchanged_fields": "Every account field except relations and recipe; relation tables explicitly distinguish event and state kinds"
+  },
+  "mutation": {
+    "change": "Replace admission situation lookup with events only in an isolated source copy",
+    "compiled": true,
+    "baseline": "3 passed",
+    "mutant": "1 failed, 2 passed",
+    "failed": "test_rich_admission_preserves_nonempty_details_bindings_and_analysis",
+    "controls": ["test_admits_existing_four_kinds_and_flattens_exact_discontinuous_evidence", "test_rich_schema_file_and_legacy_frozen_values"]
+  },
+  "installed_artifact": {
+    "environment": "Wheel installed into site-packages; probe outside checkout with PYTHONPATH unset",
+    "example": "examples/rich_relation_workflow.py",
+    "result": "Source and recall construction proposals -> event/state relation admission -> artifact readback; exact API/CLI result and table agreement passed",
+    "example_correction": "Save the exact raw proposal bytes used by the API; adding a newline changes response provenance even when parsed claims are identical"
+  },
+  "independent_review": {
+    "commit": "552b7e2c3d6aa2be05a398c9d02ab3d02b559400",
+    "verdict": "no BLOCK found",
+    "focused_tests": 97,
+    "additional_refusal_probes": 27,
+    "processing_status_controls": 3,
+    "legacy_comparison": "Loaded parent implementation directly; three schemas and five complete receipt/table cases identical",
+    "response_provenance": "Whitespace/CRLF changes alter response hash and invalidate previous receipt while preserving relation identities",
+    "limits": "Reviewer did not repeat full suite, wheel installation or mutation experiment"
+  },
+  "remaining": ["Rich identity and structured candidate consumers", "Full temporal algebra and causal/reference families", "State-change and entity relations", "Narrative segment hierarchy; pilot situation part_of is not its replacement", "Scientific accuracy and full-port parity are not established"]
+}
