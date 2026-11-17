@@ -131,3 +131,35 @@ Independent witnesses: explicit endpoint/context/evidence tables, all existing f
 source and recall, exact discontinuous quotes, atomic cycle/duplicate-identity refusals, preserved input
 IDs, foreign recording and changed result refusal, offline CLI/API agreement and installed token
 graph example. No causal/temporal truth or scientific validity is inferred from quoted text.
+
+## P2.3 first text identity slice
+
+Bead `bd-01M7KKFRRB3PRM7GK9QE9F6M4Z`: `resolve_text_identity` consumes account-bound,
+quoted form annotations; `identity_role_table` verifies and consumes its sidecar while retaining
+original event, role, mention and context IDs. Open mentions receive no canonical referent.
+
+Scala source evidence: `document/coreference.scala` `EntityIdentity.resolve` and
+`EntityIdentitySuite` implement introducing-label/type, unique preceding number-compatible
+antecedents and a second holder pass. `mentionform.scala` infers a nominal only after receiving
+a checked entity-like chart concept; Python labels alone do not supply that proof. `coref.scala`
+derives canonical identity from member sets. ADR 0012 records why nearest-antecedent selection
+and singleton referents for unresolved pronouns were rejected. ADRs 0024–0028 distinguish
+licensed cross-modal identity, source construction, speech promotion and recall assessment.
+
+Compatibility/improvement: retain local Python entity occurrences and put canonical text classes
+in a versioned sidecar, rather than changing existing Account/recording schemas. Explicit form
+and optional entity-type annotations replace unavailable checked-chart metadata. No automatic
+nominal fallback or invented shared unknown type; missing earlier metadata blocks manufactured
+uniqueness. Source and recall documents resolve separately. Exact supports establish discourse
+order conservatively, including overlap refusal, instead of relying on ID/array order.
+
+Checks use independently stated expected membership and open outcomes: repeated introducing
+labels versus repeated pronouns, zero/one/several antecedents, unknown/missing input, no future
+resolution, Unicode supports, document separation, unchanged contexts/IDs, source class stability
+after pairing, forgery refusal and a saved installed CLI/role-table consumer. These are engineering
+fixtures, not evidence of grammatical accuracy or empirical coreference performance.
+
+Remaining capabilities: chart/quantity-based number, form acquisition, accepted context holders
+and the full two-pass speech rule, cross-modal sufficient/distinctness licences, ambiguous source
+identity classes, canonical graph projection and richer study consumers. The current identity
+sidecar does not replace those working Scala paths; they remain explicit P2/P5 obligations.

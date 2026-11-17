@@ -6,6 +6,7 @@ from .analysis import Analysis, project
 from .artifacts import export_account, read_account
 from .extraction import prepare_extraction, resolve_extraction
 from .extraction_workflow import ExtractionRecording, import_extraction, replay_extraction
+from .identity import identity_role_table, resolve_text_identity, verify_identity
 from .model import Account, account_digest, validate_account
 from .relations import admit_relations, relation_table, verify_relations
 from .source import SourceRow, compile_source, prepare_source, verify_source
@@ -33,12 +34,15 @@ __all__ = [
     "resolve_extraction",
     "import_extraction",
     "import_source",
+    "identity_role_table",
     "replay_extraction",
     "replay_source",
+    "resolve_text_identity",
     "read_account",
     "relation_table",
     "validate_account",
     "verify_alignment",
     "verify_source",
     "verify_relations",
+    "verify_identity",
 ]

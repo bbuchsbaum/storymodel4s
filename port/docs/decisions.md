@@ -122,3 +122,11 @@ when a proposed batch contains a cycle. Atomic batch rejection keeps contradicti
 The separate profile is a graph-enrichment operation, not a second account hierarchy or a
 provider engine. Richer Scala interval/entity/hierarchy/causal semantics require a later explicit
 version boundary; the current four kinds are not advertised as replacements for them.
+
+P2.3 first text identity slice (2026-11-16): consume explicit form/type annotations in an
+account-bound sidecar and expose verified identity through role rows. Rejected alternatives:
+renaming local mentions in place, treating every non-pronoun label as a nominal without Scala's
+checked chart classification, or treating omitted antecedent metadata as evidence of uniqueness.
+Unknown types introduce separate singletons; unresolved mentions mint no referent. Identity is
+within a document and does not move events between contexts. Number acquisition and accepted
+holder inputs remain separate required extensions; this profile makes their absence explicit.

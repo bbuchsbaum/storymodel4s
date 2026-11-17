@@ -18,6 +18,7 @@ from .extraction_workflow import (
     read_extraction_request,
     replay_extraction,
 )
+from .identity import IdentityResult, identity_role_table, resolve_text_identity
 from .intake_workflow import prepare_time_study_files
 from .model import Account, canonical
 from .relations import admit_relations, relation_table
@@ -154,6 +155,21 @@ def main(argv: list[str] | None = None) -> int:
     relation_inspect.add_argument("account")
     relation_inspect.add_argument("--expected-sha256")
     relation_inspect.add_argument("--output")
+    identity_resolve = commands.add_parser(
+        "resolve-identity", help="resolve document-local identity from recorded form annotations"
+    )
+    identity_resolve.add_argument("account")
+    identity_resolve.add_argument("annotations")
+    identity_resolve.add_argument("--expected-sha256")
+    identity_resolve.add_argument("--output")
+    identity_inspect = commands.add_parser(
+        "identity-roles", help="inspect event roles through a verified identity sidecar"
+    )
+    identity_inspect.add_argument("account")
+    identity_inspect.add_argument("annotations")
+    identity_inspect.add_argument("result")
+    identity_inspect.add_argument("--expected-sha256")
+    identity_inspect.add_argument("--output")
     align = commands.add_parser(
         "align", help="generate sparse candidates and partial references offline"
     )
@@ -183,6 +199,29 @@ def main(argv: list[str] | None = None) -> int:
                 (alignment.account if args.account_only else alignment).model_dump(mode="json"),
                 args.output,
             )
+        elif args.command in ("resolve-identity", "identity-roles"):
+            identity_account = read_account(
+                Path(args.account), expected_sha256=args.expected_sha256
+            )
+            if identity_account.export_permission != "allowed":
+                raise PermissionError("producer denies identity export")
+            annotations = Path(args.annotations).read_bytes().decode("utf-8")
+            if args.command == "resolve-identity":
+                emit(
+                    resolve_text_identity(identity_account, annotations).model_dump(mode="json"),
+                    args.output,
+                )
+            else:
+                identities = IdentityResult.model_validate_json(
+                    canonical(strict_json(Path(args.result).read_bytes()))
+                )
+                emit(
+                    [
+                        row.model_dump(mode="json")
+                        for row in identity_role_table(identity_account, annotations, identities)
+                    ],
+                    args.output,
+                )
         elif args.command in ("admit-relations", "relation-table"):
             relation_account = read_account(
                 Path(args.account), expected_sha256=args.expected_sha256
