@@ -21,7 +21,7 @@ from .local_evidence import (
     verify_account_inference,
 )
 from .model import Digest, Model, Name, _validate_instance
-from .rich_account import SupportedAccount, validate_supported_account
+from .rich_account import SupportedAccount, require_text_account
 from .sequence import SequenceState
 from .serialization import digest
 from .source_transitions import SourceProjection, SourceProjectionPolicy, project_source
@@ -147,7 +147,7 @@ class AccountReconstructionResult(Model):
 
 
 def _snapshot(account: SupportedAccount, side: str) -> SupportedAccount:
-    checked = validate_supported_account(account)
+    checked = require_text_account(account)
     if not checked.documents or any(d.side != side for d in checked.documents):
         raise ValueError(f"reconstruction requires an independent {side}-only account")
     return checked

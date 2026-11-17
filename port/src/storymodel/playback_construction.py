@@ -259,11 +259,13 @@ def _graph(
             within(context_proposal.scope)
             if context_proposal.parent != "narrated":
                 enclosing = scopes[context_proposal.parent].scope
-                if not contains_playback(context_proposal.scope, enclosing) or contains_playback(
-                    enclosing, context_proposal.scope
+                if (
+                    not contains_playback(context_proposal.cue, enclosing)
+                    or not contains_playback(context_proposal.scope, enclosing)
+                    or contains_playback(enclosing, context_proposal.scope)
                 ):
                     raise ValueError(
-                        "nested playback scope must be strictly narrower than its parent"
+                        "nested playback cue and strictly narrower scope must lie within parent"
                     )
             ancestry[key] = (*ancestry[context_proposal.parent], context_proposal.parent)
             if context_proposal.kind in ("reported", "believed", "intended"):

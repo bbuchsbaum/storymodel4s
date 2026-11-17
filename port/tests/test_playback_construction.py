@@ -10,13 +10,14 @@ from storymodel import align_account, pair_rich_accounts
 from storymodel.analysis import project
 from storymodel.artifacts import export_supported_account, read_supported_account
 from storymodel.model import Account, PlaybackSupport, text_support
-from storymodel.playback import TickInterval
+from storymodel.playback import MediaSource, TickInterval
 from storymodel.playback_construction import (
     PlaybackObservation,
     PlaybackResult,
     compile_playback,
     prepare_playback,
     situation_playback,
+    validate_playback_request,
     verify_playback,
 )
 from storymodel.rich_account import account_schema, situation_table, validate_rich_account
@@ -157,6 +158,43 @@ def test_same_native_source_pairs_with_two_text_recalls_without_identity_or_supp
             project(paired)
 
 
+@pytest.mark.parametrize("side", ("source", "recall"))
+@pytest.mark.parametrize(
+    "kind",
+    (
+        "reported",
+        "believed",
+        "intended",
+        "desire",
+        "memory",
+        "imagination",
+        "hypothetical",
+        "counterfactual",
+    ),
+)
+def test_native_context_vocabulary_on_both_independent_sides(side, kind):
+    request, packet = fixture()
+    native = MediaSource.model_validate(request.source.model_copy(update={"id": "", "side": side}))
+    # The test deliberately changes every occurrence of the actual source identity,
+    # rather than assuming source and recall coordinates are interchangeable.
+    raw_request = json.loads(request.model_dump_json().replace(request.source.id, native.id))
+    raw_request["source"] = native.model_dump(mode="json")
+    packet = json.loads(canonical(packet).replace(request.source.id, native.id))
+    request = validate_playback_request(canonical(raw_request))
+    packet["request_sha256"] = digest(request.model_dump(mode="json"))
+    packet["observations"][0]["contexts"][0]["kind"] = kind
+    result = compile_playback(request, canonical(packet))
+    assert result.resolutions[0].status == "admitted"
+    assert result.account.documents == ()
+    assert all(c.side == side for c in result.account.contexts)
+    for event in (*result.account.events, *result.account.states):
+        readout = situation_playback(result.account, event.id, native.id)
+        assert readout.context.kind == kind and event.side == side
+    assert [i.status for i in result.account.inventories] == (
+        ["not-attempted"] if side == "recall" else []
+    )
+
+
 @pytest.mark.parametrize(
     "mutation", ("gap", "point-duration", "role", "root", "scope", "foreign-source")
 )
@@ -210,6 +248,88 @@ def test_rejected_observation_does_not_erase_valid_neighbor_or_provenance_bindin
     )
     with pytest.raises(ValueError, match="foreign request"):
         compile_playback(changed, canonical(packet))
+
+
+@pytest.mark.parametrize("cue,expected", ((3, "admitted"), (29, "rejected")))
+def test_nested_context_cue_must_belong_to_parent_scope(cue, expected):
+    request, packet = fixture()
+    row = packet["observations"][0]
+    row["contexts"].append(
+        {
+            "key": "child",
+            "kind": "memory",
+            "parent": "held",
+            "cue": support(request.source, points=[cue]).model_dump(mode="json"),
+            "scope": support(request.source, [(3, 5), (22, 25)]).model_dump(mode="json"),
+        }
+    )
+    for situation in row["situations"]:
+        situation["context"] = "child"
+    result = compile_playback(request, canonical(packet))
+    assert result.resolutions[0].status == expected
+    if expected == "rejected":
+        assert len(result.account.contexts) == 1 and not result.account.events
+    else:
+        assert (
+            situation_playback(
+                result.account, result.account.events[0].id, request.source.id
+            ).context.kind
+            == "memory"
+        )
+
+
+@pytest.mark.parametrize("hidden_side", ("source", "recall"))
+@pytest.mark.parametrize("consumer", ("organization", "reconstruction"))
+def test_numerical_consumers_refuse_native_side_hidden_by_text_documents(hidden_side, consumer):
+    from test_organization import _accounts
+
+    from storymodel.organization import OrganizationSpec, organization_readout
+    from storymodel.reconstruction import ReconstructionSpec, reconstruct_rows
+    from storymodel.rich_account import upgrade_account
+
+    text_source, text_recall, _, _ = _accounts()
+    media = source(side=hidden_side)
+    request = prepare_playback(
+        media,
+        (
+            PlaybackObservation(
+                key="media",
+                support=support(media, [(0, 10)]),
+                origin="abstract-control",
+                procedure="supplied/v1",
+                input_sha256=("b" * 64,),
+            ),
+        ),
+    )
+    native = compile_playback(
+        request,
+        canonical(
+            {
+                "schema_version": "storymodel.playback-proposals/v1",
+                "request_sha256": digest(request.model_dump(mode="json")),
+                "observations": [],
+            }
+        ),
+    ).account
+    if hidden_side == "source":
+        source_input = text_source
+        recall_input = pair_rich_accounts(native, upgrade_account(text_recall))
+    else:
+        source_input = pair_rich_accounts(upgrade_account(text_source), native)
+        recall_input = text_recall
+
+    def consume(source_account, recall_account):
+        if consumer == "organization":
+            return organization_readout(
+                source_account,
+                recall_account,
+                OrganizationSpec(rows=(), dependence="independent-rows"),
+            )
+        return reconstruct_rows(source_account, recall_account, (), ReconstructionSpec(roots={}))
+
+    consume(text_source, text_recall)  # Positive: the supported input remains usable.
+    with pytest.raises(ValueError, match="unsupported modality"):
+        consume(source_input, recall_input)
 
 
 @pytest.mark.parametrize("version", ("v4", "v5"))

@@ -20,7 +20,7 @@ from .local_evidence import (
     verify_account_inference,
 )
 from .model import Digest, Model, Name, _validate_instance
-from .rich_account import SupportedAccount, validate_supported_account
+from .rich_account import SupportedAccount, require_text_account
 from .sequence import External, Finite, SequenceState
 from .serialization import digest
 
@@ -197,7 +197,7 @@ class AccountOrganizationResult(Model):
 
 
 def _side(value: SupportedAccount, side: str) -> SupportedAccount:
-    value = validate_supported_account(value)
+    value = require_text_account(value)
     if not value.documents or any(d.side != side for d in value.documents):
         raise ValueError(f"organization requires an independent {side}-only account")
     return value
