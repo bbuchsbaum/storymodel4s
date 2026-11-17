@@ -501,6 +501,44 @@ def cmd_sherlock_smoke(out):
     )
 
 
+def unit_measures(acc, comp):
+    """Per recall unit, for between-sample reliability (declared):
+    - top_scene: argmax scene of the unit's own words (one closed bin over their onsets), or
+      null when no scene mass;
+    - alternatives: any reference sampled in the unit has two or more members;
+    - log10_extent: mean over the unit's moment references of the weight-averaged seconds of
+      their members' support (null without one)."""
+    from cs2.account import Hypothesis, Reference, RefSample
+
+    out = {}
+    for key, cells in acc.words.items():
+        by = {}
+        for c in cells:
+            if c.unit:
+                by.setdefault(c.unit, []).append(c)
+        for uid, cs in by.items():
+            ons = [c.onset for c in cs if c.onset is not None]
+            ld = LocationDistribution.from_words(acc, cs, [Bin(min(ons), max(ons), True)])
+            row = ld.marginal("scene").rows[0]
+            sc = {k[2]: v for k, v in row.mass.items() if k[0] == "at"}
+            refs = {c.sample.ref for c in cs if isinstance(c.sample, RefSample)}
+            moment = [acc.references[r] for r in refs if isinstance(acc.references[r], Reference)]
+            ext = []
+            for r in moment:
+                ws = [(m.weight, sum(comp.unit[u].duration for u in m.target.support))
+                      for m in r.members if isinstance(m.target, Hypothesis)]
+                if ws and sum(w for w, _ in ws) > 0:
+                    e = sum(w * x for w, x in ws) / sum(w for w, _ in ws)
+                    if e > 0:
+                        ext.append(math.log10(e))
+            out[uid] = dict(
+                top_scene=max(sorted(sc), key=lambda k: sc[k]) if sc else None,
+                alternatives=any(len(r.members) >= 2 for r in moment),
+                log10_extent=sum(ext) / len(ext) if ext else None,
+            )
+    return out
+
+
 def cmd_ff_run(args):
     """Two-level producer on selected development sessions, pooled; then the yardstick.
 
@@ -593,6 +631,7 @@ def cmd_ff_run(args):
     )
     (out / "summary.json").write_text(json.dumps(summary, indent=1, default=str) + "\n")
     write_rows(out / "rows.tsv", named)
+    (out / "unit_measures.json").write_text(json.dumps(unit_measures(acc, comp), indent=0))
     manifest(out, "ff-run", SC.CONFIG, inputs, dict(extra, producer=acc.condition), state,
              calls["model_calls"])
 
