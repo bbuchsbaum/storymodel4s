@@ -1,5 +1,9 @@
 # Stage 1: preserve a complete workflow and test a simpler implementation
 
+**Continuation:** [Port roadmap](roadmap.md) is the current execution direction after the
+computational foundation. This document retains the initial pilot acceptance criteria;
+unfinished inspection and qualification obligations carry forward rather than disappear.
+
 **Planning date:** 2026-11-16. **Scope:** one Python package and a narrow React/TypeScript
 workbench under `port/`. **Planning bead:** `bd-01M7K75VHV71V6GGAXEDD8QNFY`.
 

@@ -25,6 +25,9 @@ analysis views while leaving unattempted source matching and unresolved identity
 inspectable reference decisions. It preserves alternatives, unresolved and search-limited
 outcomes, existing external references, and unassessed fidelity.
 
+The [port roadmap](docs/roadmap.md) defines the next phases toward full working capability;
+its immediate next slice is source-account construction.
+
 ## Run it
 
 For the idiomatic Python entry points and independent source/recall construction, start with
