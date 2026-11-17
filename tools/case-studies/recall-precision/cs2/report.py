@@ -120,6 +120,19 @@ def _shares(rowmap):
     }
 
 
+def _attribution(pooled, work_applicable):
+    lines = ["the scoring rules were revised on 2026-11-17 after seeing development results "
+             "(ML, linguistics and visualization critiques; one correction after seeing the "
+             "film term)"]
+    p1 = pooled["skill"].get("pass1_only", {}).get("work_bits") if work_applicable else None
+    if p1:
+        lines.append(
+            f"work-term skill over pass1_only is {p1['skill']} (row-weighted "
+            f"{p1.get('row_weighted')}): most of the work gain comes from the pass-1 frames "
+            "routed through fallback A (frame film first), not from pass-2 references")
+    return lines
+
+
 def corpus_report(corpus, producer, dirs, work_applicable):
     samples = [_rows(d) for d in dirs]
     terms = TERMS if work_applicable else ("film_bits", "scene_bits", "total_bits")
@@ -176,7 +189,8 @@ def corpus_report(corpus, producer, dirs, work_applicable):
     # term is left out where the corpus has no non-film gold rows (Sherlock)
     head_terms = [t for t in terms if t != "total_bits"
                   and (work_applicable or t != "film_bits")]
-    headline = {t: pooled["skill"]["duration"][t] for t in head_terms}
+    headline = {t: dict(bits=pooled[t]["mean"], ci95=pooled[t]["ci95"],
+                        skill_vs_duration=pooled["skill"]["duration"][t]) for t in head_terms}
 
     def share(key):
         vals = []
@@ -249,6 +263,9 @@ def corpus_report(corpus, producer, dirs, work_applicable):
                 },
                 words=tot,
                 conversion=conv,
+                checks=sm.get("checks"),
+                switch_f1={k: v.get("film_switch_f1") for k, v in
+                           dict(producer=st, **(sm.get("baseline_strata") or {})).items()},
                 rules=sm.get("rules"),
                 epsilon=sm.get("epsilon"),
             )
@@ -312,8 +329,12 @@ def corpus_report(corpus, producer, dirs, work_applicable):
                 "film-transition strata and film-switch F1 (one work)",
             ]
         ),
-        headline=dict(note="compare corpora only by skill over the duration prior, per term",
-                      skill_vs_duration=headline),
+        headline=dict(note="compare corpora only by skill over the duration prior, per term "
+                      "(film, work and scene; no total)", terms=headline),
+        attribution=_attribution(pooled, work_applicable),
+        switch_f1_note=("switch F1 compares consecutive top works; a forecast that lags the gold "
+                        "by one row (e.g. the gold-context ceiling, which copies the previous "
+                        "row) is penalised at exact matching but scores well at +-1 row"),
         pooled=pooled,
         participants=per,
         per_sample=per_sample,
@@ -333,12 +354,17 @@ def main(argv):
         corpora=[],
         old_rules=dict(note="the same producers rescored under the previous rules "
                             "(scorer-config old_rules), for comparison only", corpora=[]),
+        sensitivity_windows=dict(note="gold-blind windowing: the same forecasts rescored on "
+                                      "fixed windows (median gold-row duration) labelled by the "
+                                      "gold row they overlap most", corpora=[]),
     )
     for spec in argv[1:]:
-        old = spec.startswith("old:")
-        corpus, producer, dirs = spec.removeprefix("old:").split("=", 2)
+        tag = spec.split(":", 1)[0] if spec.split(":", 1)[0] in ("old", "win") else ""
+        corpus, producer, dirs = spec.removeprefix(tag + ":" if tag else "").split("=", 2)
         r = corpus_report(corpus, producer, dirs.split(","), corpus != "sherlock")
-        (rep["old_rules"]["corpora"] if old else rep["corpora"]).append(r)
+        dest = {"old": rep["old_rules"]["corpora"], "win": rep["sensitivity_windows"]["corpora"],
+                "": rep["corpora"]}[tag]
+        dest.append(r)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(rep, indent=1) + "\n")
     print(out)

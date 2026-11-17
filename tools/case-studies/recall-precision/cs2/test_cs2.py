@@ -1116,6 +1116,31 @@ def test_non_film_states_are_destinations_not_talk():
     assert row.mass == {("nonfilm", "memory_search"): 1.0}
 
 
+def test_frame_weights_above_one_are_normalised():
+    comp = fixture()
+    dur = B.duration_prior(comp, CFG)
+    fb = B.frame_fallback(dur, {"B": 0.8, "C": 0.6})
+    close(fb.p_work("B"), 0.8 / 1.4)
+    close(fb.p_work("C"), 0.6 / 1.4)
+    close(fb.p_work("A"), 0.0)
+    close(math.fsum(fb.work.values()), 1.0)
+
+
+def test_title_only_scene_set_is_the_work_node():
+    # a scene set holding only title-only scenes (scene 5 of B, and here a pseudo-set {5}) has
+    # no valid target: its mass is spread over the work's valid scenes by the fallback
+    comp = fixture()
+    dur = B.duration_prior(comp, CFG)
+    from cs2.projections import Row
+
+    row = Row(Bin(0, 1), "sampled", {("scene_set", "B", (5,)): 1.0}, ("x",), {}, 1)
+    f = SC.producer_forecast(row, comp, dur, CFG["epsilon"])
+    e = CFG["epsilon"]
+    close(f.p_set_and_work({6}, "B"),
+          (1 - e) * dur.scene["B"][6] + f.u * dur.p_work("B") * dur.scene["B"][6])
+    close(f.p_work("B"), (1 - e) + f.u * dur.p_work("B"))
+
+
 # ---------------------------------------------------------------- runner
 
 

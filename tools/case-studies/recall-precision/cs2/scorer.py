@@ -115,6 +115,8 @@ class ProducerForecast:
             if sw != w:
                 continue
             fq = math.fsum(fs.get(x, 0.0) for x in q)
+            # declared: a set with no valid target scene (title-only scenes only) is the work
+            # node, spread over the work's valid scenes by the fallback
             set_part += m * (math.fsum(fs.get(x, 0.0) for x in q if x in scenes) / fq
                              if fq > 0 else f_set)
         return (1 - self.eps) * (own + self.spread.get(w, 0.0) * f_set + set_part) + self.u * (

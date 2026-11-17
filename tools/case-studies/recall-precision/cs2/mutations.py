@@ -350,6 +350,22 @@ MUTANTS = [
         test="test_non_film_states_are_destinations_not_talk",
     ),
     dict(
+        id="M40",
+        guard="frame weights summing above 1 are normalised",
+        file="cs2/baselines.py",
+        edits=[("    if total > 1:  # declared: frame weights summing above 1 are normalised to sum to 1\n",
+                "    if False:\n")],
+        test="test_frame_weights_above_one_are_normalised",
+    ),
+    dict(
+        id="M41",
+        guard="a title-only scene set spreads as the work node",
+        file="cs2/scorer.py",
+        edits=[("                             if fq > 0 else f_set)\n",
+                "                             if fq > 0 else 0.0)\n")],
+        test="test_title_only_scene_set_is_the_work_node",
+    ),
+    dict(
         id="M16",
         guard="the part marginal places a unit's mass on the unit's own part",
         file="cs2/projections.py",

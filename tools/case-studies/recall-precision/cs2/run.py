@@ -144,9 +144,43 @@ def row_frame_mixes(acc, key, rows):
     return out
 
 
-def score_corpus(A, comp, acc, sessions, dev, cfg, rules, wa):
-    """The yardstick for one producer account: baselines, producer and pass-1-only forecasts."""
+def window_length(all_gold):
+    """Declared gold-blind window: the median gold-row duration of the corpus's development gold."""
+    d = sorted(g.hi - g.lo for rs in all_gold.values() for g in rs)
+    return d[len(d) // 2]
+
+
+def windowed_gold(A, all_gold, length):
+    """Fixed windows of `length` seconds over each coded session's words (first to last onset).
+    Each window takes the label of the gold row it overlaps most; windows overlapping no gold
+    row are dropped. The windows, not the gold spans, are the bins."""
+    out = {}
+    from cs2.source import GoldRow
+
+    for p, rows in all_gold.items():
+        for s, rs in by_session(rows).items():
+            ons = [w.onset for w in A.session_words(p, s) if w.onset is not None]
+            lo, k = min(ons), 0
+            while lo <= max(ons):
+                hi = lo + length
+                best = max(rs, key=lambda g: min(hi, g.hi) - max(lo, g.lo))
+                if min(hi, best.hi) - max(lo, best.lo) > 0:
+                    out.setdefault(p, []).append(GoldRow(p, s, k, lo, hi, False, best.cls,
+                                                         best.work, best.scenes, best.nonfilm))
+                    k += 1
+                lo = hi
+    return out
+
+
+def score_corpus(A, comp, acc, sessions, dev, cfg, rules, wa, windows=None):
+    """The yardstick for one producer account: baselines, producer and pass-1-only forecasts.
+    windows: None (gold-row spans) or a window length in seconds ('median' = declared median
+    gold-row duration), the gold-blind windowing sensitivity check."""
     all_gold = gold_by_participant(A, dev)
+    if windows is not None:
+        length = window_length(all_gold) if windows == "median" else float(windows)
+        all_gold = windowed_gold(A, all_gold, length)
+        cfg = dict(cfg, window_seconds=length)
     gold = {}
     for p, s in sessions:
         rows = [g for g in all_gold.get(p, []) if g.session == s]
@@ -172,7 +206,31 @@ def score_corpus(A, comp, acc, sessions, dev, cfg, rules, wa):
     words = {f"{p}:{s}": word_ledger(acc.words[(p, s)],
                                      bins_of([g for g in gold[p] if g.session == s]))
              for p, s in keys}
-    return named, words
+    # null-producer check through the same path (frame fallback included): no references and
+    # no frames must score the duration forecast exactly on every term
+    null = Account(comp, {}, {k: [WordCell(c.index, c.onset, c.unit, Uncovered(c.unit))
+                                  for c in acc.words[k]] for k in keys})
+    nmap = {}
+    for p, s in keys:
+        rows = [g for g in gold[p] if g.session == s]
+        ld = LocationDistribution.from_words(null, null.words[(p, s)], bins_of(rows),
+                                             cfg["allocation"], rules["cross_scene_broad"])
+        fbs = [B.frame_fallback(durs[p], m) for m in row_frame_mixes(null, (p, s), rows)]
+        nmap[(p, s)] = SC.producer_forecasts(
+            ld, durs[p], cfg, fbs if rules["fallback"] == "frame-film" else None)
+    nsc = score_map(comp, gold, nmap, cfg, wa)
+    diff = 0.0
+    for a, b in zip(nsc, named["duration"]):
+        for t in ("film_bits", "work_bits", "scene_bits", "total_bits"):
+            x, y = getattr(a, t), getattr(b, t)
+            if (x is None) != (y is None):
+                raise SystemExit("null-producer check: scored terms differ")
+            if x is not None:
+                diff = max(diff, abs(x - y))
+    checks = dict(null_producer=dict(rows=len(nsc), max_abs_bits_difference=diff,
+                                     fallback=rules["fallback"]),
+                  window_seconds=cfg.get("window_seconds"))
+    return named, words, checks
 
 
 def score_map(comp, gold, fmap, cfg, work_applicable):
@@ -498,7 +556,7 @@ def sherlock_account(A, comp, names, rules=None):
     ), ledger
 
 
-def cmd_sherlock_smoke(out, which="new", eps=None, overrides=None):
+def cmd_sherlock_smoke(out, which="new", eps=None, overrides=None, windows=None):
     """Score the CS1 recorded answers (no calls) under the given rules."""
     out.mkdir(parents=True, exist_ok=True)
     cfg = SC.load_config()
@@ -510,10 +568,10 @@ def cmd_sherlock_smoke(out, which="new", eps=None, overrides=None):
     names = [n for n in A.development()
              if (LIBRARY / f"{n.split('_')[0]}_ledger.json").exists()]
     acc, conv = sherlock_account(A, comp, names, rules)
-    named, words = score_corpus(A, comp, acc, [(n, "recall") for n in names], names, cfg,
-                                rules, False)
+    named, words, checks = score_corpus(A, comp, acc, [(n, "recall") for n in names], names,
+                                        cfg, rules, False, windows)
     write_summary(out, "sherlock", named, words, comp, cfg, rules, False, conv,
-                  extra=dict(producer=acc.condition))
+                  extra=dict(producer=acc.condition, checks=checks))
     unit_measures_out(out, acc, comp, rules)
     inputs = [A.GOLD, A.RULE, LIBRARY / "manifest.json"]
     inputs += [ANSWERS / f"{n}.json" for n in names]
@@ -609,7 +667,8 @@ def cmd_ff_run(args):
     it = iter(args)
     for a in it:
         if a in ("--export", "--seed", "--salt", "--sample", "--sessions", "--arm", "--jobs",
-                 "--corpus", "--rules", "--talk-work-variant", "--outline-order", "--epsilon"):
+                 "--corpus", "--rules", "--talk-work-variant", "--outline-order", "--epsilon",
+                 "--windows"):
             opt[a[2:].replace("-", "_")] = next(it)
         elif a == "--dry":
             opt["dry"] = True
@@ -660,6 +719,9 @@ def cmd_ff_run(args):
                     if hasattr(A, "gold_clock_receipt") else None),
         corpus=corpus, rules=rules, epsilon=cfg["epsilon"],
         outline_order=opt.get("outline_order", "part-order"),
+        condition_id_note="condition ids changed at f98d2297a only because the renderer digest "
+        "covers film_outline's source, which gained the outline_order rule; the rendered "
+        "FilmFestival prompts are byte-identical (cache-only replays reproduce every row)",
     )
     if corpus == "filmfestival":
         inputs = [A.GOLD, A.CODES, A.PARTITION, A.FF / "derived" / "annotation-JL.tsv",
@@ -674,9 +736,11 @@ def cmd_ff_run(args):
                               sessions=ledger["sessions"]), indent=1, default=str))
         return
     comp = A.producer_composition()
-    named, words = score_corpus(A, comp, acc, sessions, dev, cfg, rules, wa)
+    named, words, checks = score_corpus(A, comp, acc, sessions, dev, cfg, rules, wa,
+                                        opt.get("windows"))
     write_summary(out, corpus, named, words, comp, cfg, rules, wa, ledger["conversion"],
-                  extra=dict(sessions=extra["sessions"], ledger=ledger, calls=calls))
+                  extra=dict(sessions=extra["sessions"], ledger=ledger, calls=calls,
+                             checks=checks))
     unit_measures_out(out, acc, comp, rules)
     manifest(out, "ff-run", SC.CONFIG, inputs, dict(extra, producer=acc.condition), state,
              calls["model_calls"])
@@ -691,7 +755,8 @@ def main(argv):
         a = argv[1:]
         which = a[a.index("--rules") + 1] if "--rules" in a else "new"
         eps = float(a[a.index("--epsilon") + 1]) if "--epsilon" in a else None
-        cmd_sherlock_smoke(Path(a[0]), which, eps)
+        win = a[a.index("--windows") + 1] if "--windows" in a else None
+        cmd_sherlock_smoke(Path(a[0]), which, eps, None, win)
     else:
         print(__doc__, file=sys.stderr)
         return 2

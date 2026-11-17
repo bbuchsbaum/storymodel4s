@@ -207,7 +207,10 @@ def frame_fallback(dur: Forecast, mix: dict) -> Forecast:
     An empty mix is the duration prior itself (the same object, so a null producer is exact)."""
     if not mix:
         return dur
-    rest = 1 - math.fsum(mix.values())
+    total = math.fsum(mix.values())
+    if total > 1:  # declared: frame weights summing above 1 are normalised to sum to 1
+        mix = {w: v / total for w, v in mix.items()}
+    rest = max(0.0, 1 - math.fsum(mix.values()))
     work = {w: mix.get(w, 0.0) + rest * p for w, p in dur.work.items()}
     return Forecast(work, dur.scene, dur.nonfilm)
 

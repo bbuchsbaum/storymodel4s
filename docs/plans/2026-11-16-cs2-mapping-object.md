@@ -276,6 +276,18 @@ Each rule below is switched in `scorer-config.json` (`rules`, with the previous 
   - `hmm_tfidf` is a sequential non-oracle forecast: an HMM over scenes in presentation order
     with TF-IDF emissions `exp(8 cos)`, filtered on recall words only.
   - `pass1_only` is the frame film, then duration within it.
+- **`hmm_tfidf` rates are fitted leave-one-participant-out.** The stay and next-scene rates
+  are counted on the other participants' gold scene sequences, consecutive specific rows only,
+  and then frozen.
+- **Frame weights above 1 are normalised.** A row's frame mix whose weights sum above 1 is
+  rescaled to sum to 1.
+- **A scene set with no valid scene is the work node.** A set made only of title-only scenes is
+  spread over the work's valid scenes by the fallback.
+- **Gold-blind windowing is a sensitivity check.** Every forecast is also rescored on fixed
+  windows of the median gold-row duration, each labelled by the gold row it overlaps most.
+- **Attribution.** These rules were revised after seeing development results. Most of the
+  FilmFestival work-term gain comes from the pass-1 frames routed through the frame-film
+  fallback: the work-term skill over `pass1_only` is about 0.39–0.40.
 - **The two-level outline renders an occurrence's parts in order** (`part-order`). The first
   Sherlock two-level run used `start-only`, which sorted rows by seconds only and so interleaved
   Sherlock's two parts. It is kept for exact replay. The two orders agree whenever each
