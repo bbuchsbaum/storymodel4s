@@ -302,3 +302,14 @@ identity material, picking one readable candidate while ignoring unresolved comp
 using raw mention count as distinct-holder count, or fabricating no-candidate results for
 unattempted work. The sidecar is a derived result over the existing account, not a second graph
 hierarchy. See [attribution](attribution.md) for the remaining retained capabilities.
+
+## Holder-dependent identity (P2, 2026-11-17)
+
+Provisional implementation choice: one explicit second-pass result retains the existing
+identity/attribution artifact and adds final membership with a base-class mapping. Use the
+original first pass for every holder, preserving Scala's nonrecursive rule. Reject treating
+unknown number as singular, choosing between competing context placements, or merging
+document-local identities through a foreign holder. Rejected alternatives: changing old
+identity schema semantics, mutating account entity IDs, leaving candidate references pointed
+at obsolete classes, recursively bootstrapping first-person holders, and inventing addressees
+or speaker-group membership. [Contract](held-identity.md).

@@ -52,6 +52,12 @@ from .fidelity_workflow import (
     read_fidelity_request,
     replay_fidelity,
 )
+from .held_identity import (
+    AttributedIdentityResult,
+    attributed_identity_roles,
+    resolve_attributed_identity,
+    verify_attributed_identity,
+)
 from .identity import IdentityResult, identity_role_table, resolve_text_identity
 from .intake_workflow import prepare_time_study_files
 from .local_evidence import (
@@ -369,15 +375,22 @@ def main(argv: list[str] | None = None) -> int:
     identity_inspect.add_argument("result")
     identity_inspect.add_argument("--expected-sha256")
     identity_inspect.add_argument("--output")
-    for name in ("resolve-holders", "verify-attribution", "attribution-table"):
+    for name in (
+        "resolve-holders",
+        "verify-attribution",
+        "attribution-table",
+        "resolve-attributed-identity",
+        "verify-attributed-identity",
+        "attributed-identity-roles",
+    ):
         attribution = commands.add_parser(name, help="checked context holder attribution")
         attribution.add_argument("account")
         attribution.add_argument("annotations")
         attribution.add_argument("proposals")
-        if name != "resolve-holders":
+        if name not in ("resolve-holders", "resolve-attributed-identity"):
             attribution.add_argument("result")
         attribution.add_argument("--expected-sha256")
-        if name != "verify-attribution":
+        if name not in ("verify-attribution", "verify-attributed-identity"):
             attribution.add_argument("--output")
     align = commands.add_parser(
         "align", help="generate sparse candidates and partial references offline"
@@ -905,18 +918,60 @@ def main(argv: list[str] | None = None) -> int:
                     ),
                     args.output,
                 )
-        elif args.command in ("resolve-holders", "verify-attribution", "attribution-table"):
+        elif args.command in (
+            "resolve-holders",
+            "verify-attribution",
+            "attribution-table",
+            "resolve-attributed-identity",
+            "verify-attributed-identity",
+            "attributed-identity-roles",
+        ):
             attribution_account = read_supported_account(
                 Path(args.account), expected_sha256=args.expected_sha256
             )
             if (
-                args.command != "verify-attribution"
+                args.command not in ("verify-attribution", "verify-attributed-identity")
                 and attribution_account.export_permission != "allowed"
             ):
                 raise PermissionError("producer denies attribution export")
             form_annotations = Path(args.annotations).read_bytes().decode("utf-8")
             holder_proposals = Path(args.proposals).read_bytes().decode("utf-8")
-            if args.command == "resolve-holders":
+            if args.command == "resolve-attributed-identity":
+                emit(
+                    resolve_attributed_identity(
+                        attribution_account, form_annotations, holder_proposals
+                    ).model_dump(mode="json"),
+                    args.output,
+                )
+            elif args.command in ("verify-attributed-identity", "attributed-identity-roles"):
+                saved_identity = AttributedIdentityResult.model_validate_json(
+                    canonical(strict_json(Path(args.result).read_bytes()))
+                )
+                if args.command == "verify-attributed-identity":
+                    verified_identity = verify_attributed_identity(
+                        attribution_account, form_annotations, holder_proposals, saved_identity
+                    )
+                    emit(
+                        {
+                            "verified": True,
+                            "account_sha256": verified_identity.attribution.account_sha256,
+                        },
+                        None,
+                    )
+                else:
+                    emit(
+                        [
+                            row.model_dump(mode="json")
+                            for row in attributed_identity_roles(
+                                attribution_account,
+                                form_annotations,
+                                holder_proposals,
+                                saved_identity,
+                            )
+                        ],
+                        args.output,
+                    )
+            elif args.command == "resolve-holders":
                 emit(
                     resolve_context_holders(
                         attribution_account, form_annotations, holder_proposals

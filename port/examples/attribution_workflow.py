@@ -9,11 +9,14 @@ from pathlib import Path
 
 from storymodel import (
     SourceRow,
+    attributed_identity_roles,
     attribution_table,
     compile_rich_construction,
     export_supported_account,
     prepare_rich_construction,
+    resolve_attributed_identity,
     resolve_context_holders,
+    verify_attributed_identity,
     verify_attribution,
 )
 from storymodel.artifacts import publish_json
@@ -117,6 +120,13 @@ table = attribution_table(account, raw_forms, raw_holders, result)
 assert table[-1].holder.status == "named"
 assert len(table[-1].holder.candidates) == 2
 assert table[-1].context.id == account.states[0].context
+identified = resolve_attributed_identity(account, raw_forms, raw_holders, attribution=result)
+verify_attributed_identity(account, raw_forms, raw_holders, identified)
+roles = attributed_identity_roles(account, raw_forms, raw_holders, identified)
+assert identified.attribution == result
+assert len(identified.referents) == 1
+assert set(identified.referents[0].members) == {e.id for e in account.entities}
+assert roles[-1].identity.rule == "speech-holder/v1"
 assert account.model_dump_json() == before
 for name, data in (
     ("construction-request", request.model_dump(mode="json")),
@@ -126,6 +136,8 @@ for name, data in (
     ("holder-proposals", proposals),
     ("attribution", result.model_dump(mode="json")),
     ("situations", [r.model_dump(mode="json") for r in table]),
+    ("attributed-identity", identified.model_dump(mode="json")),
+    ("attributed-identity-roles", [r.model_dump(mode="json") for r in roles]),
 ):
     publish_json(destination / f"{name}.json", data)
 export_supported_account(destination / "account.json", account)

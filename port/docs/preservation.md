@@ -471,3 +471,19 @@ adds explicit omitted/unattempted/failed/unsupported outcomes and input-bound re
 No nearest speaker or source-to-recall identity inference is introduced. Old construction
 recordings remain readable. Full context vocabulary, automatic candidate acquisition,
 first-person/addressee identity rules, playback and assessment consumption remain owed.
+
+## P2 holder-dependent identity (2026-11-17)
+
+Reference: `document/coreference.scala` (`EntityIdentity.resolve`, passOne, holderClusterOf,
+SpeechHolderRule), `EntityIdentitySuite` first-/second-person and holder-pronoun controls.
+Python `held_identity.py` implements the second pass over unchanged verified attribution.
+Explicitly singular first-person mentions join the holder class; plural speakers and addressees
+remain open with holder candidates. All final classes retain their base-class mapping, and
+all final references/candidates address the new classes. Event/state role inspection and the
+extended construction example consume the result. Mote: `bd-01M7MD01FMK3AFJK1M78BRYZHN`.
+
+Preserve two-pass (nonrecursive) derivation, original occurrence/context identities and every
+upstream result. Deliberate correction: unknown number remains open rather than being treated
+as singular. Ambiguous placements and cross-document holder identity refuse attachment.
+[Contract](held-identity.md). Addressee/group inference, richer number acquisition and
+third-person compatibility, full context vocabulary, playback and assessment remain owed.

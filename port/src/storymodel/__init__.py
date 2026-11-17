@@ -38,6 +38,11 @@ from .fidelity import (
     verify_fidelity,
 )
 from .fidelity_workflow import FidelityRecording, import_fidelity, replay_fidelity
+from .held_identity import (
+    attributed_identity_roles,
+    resolve_attributed_identity,
+    verify_attributed_identity,
+)
 from .identity import identity_role_table, resolve_text_identity, verify_identity
 from .local_evidence import (
     LocalEvidenceSpec,
@@ -95,6 +100,9 @@ from .source_workflow import SourceRecording, import_source, replay_source
 __version__ = "0.1.0"
 
 __all__ = [
+    "attributed_identity_roles",
+    "resolve_attributed_identity",
+    "verify_attributed_identity",
     "AttributionResult",
     "ContextHolder",
     "HolderProposal",

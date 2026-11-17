@@ -62,8 +62,8 @@ This profile supports the existing `reported`, `believed` and `intended` text co
 accounts v1–v4, using the existing identity resolver's capabilities and limits. It does not
 silently widen old construction prompts or wire schemas. Additional Scala context families
 (desire, memory, imagination, hypothetical and counterfactual), playback attribution,
-automatic chart/quotation candidate discovery, first-person/addressee identity consumption,
-and attribution-aware assessment remain required work. In particular, the example's declared
-first-person mention remains open in the base identity result; this slice provides its holder
-input but does not yet apply a new identity rule. No claims are promoted to narrated-world
+automatic chart/quotation candidate discovery and attribution-aware assessment remain required
+work. [Attributed identity](held-identity.md) now consumes holders in a separate second pass;
+the example saves it alongside the unchanged base result, where first-person identity remains
+open. Addressee and plural-group inference are still unavailable. No claims are promoted to narrated-world
 truth, and no extraction accuracy or executed Scala runtime parity is claimed.
