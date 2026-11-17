@@ -1259,7 +1259,7 @@ def test_frame_mismatch_switch_rules():
     assert ("P", "s", "P:s:u0") not in framing and conv["mismatch_words"] == 2
     _, _, _, _, _, framing2 = _v2_session(replies, ans, items,
                                           dict(mismatch_rule="incoming-frame"))
-    assert framing2[("P", "s", "P:s:u0")] == (("C", 1.0),)
+    assert framing2.get(("P", "s", "P:s:u0")) == (("C", 1.0),)
     _, _, _, _, _, framing3 = _v2_session(replies, ans, items, dict(mismatch_rule="none"))
     assert framing3[("P", "s", "P:s:u0")] == (("B", 1.0),)
 
@@ -1267,12 +1267,11 @@ def test_frame_mismatch_switch_rules():
 def test_switch_timing_early_and_late():
     comp = fixture()
     mk = lambda i, w, top: SC.RowScore("P", "s", i, "film_only", w, 0.0, None, top_work=top)  # noqa: E731
-    # gold switches B->C at 2->3 and C->A at 5->6; predicted switches one row early, one late
-    gold = ["B", "B", "B", "C", "C", "C", "A", "A"]
-    pred = ["B", "B", "C", "C", "C", "C", "C", "A"]
+    gold = ["B", "B", "B", "C", "C", "C", "A", "A", "C", "C"]  # switches after rows 2, 5, 7
+    pred = ["B", "B", "C", "C", "C", "A", "A", "A", "A", "C"]  # after rows 1, 4 (early), 8 (late)
     st = SC.strata([mk(i, g, q) for i, (g, q) in enumerate(zip(gold, pred))], comp, True)
     t = st["film_switch_f1"]["matched_timing"]
-    assert t == dict(exact=0, early=1, late=1), t
+    assert t == dict(exact=0, early=2, late=1), t
     assert st["film_switch_f1"]["f1"] == 0.0 and st["film_switch_f1"]["f1_tolerance_1_row"] == 1.0
 
 
