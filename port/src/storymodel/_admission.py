@@ -5,7 +5,19 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-from .model import Context, Document, Entity, Event, Model, Name, Participation, Span, Support, Unit
+from .model import (
+    Context,
+    Document,
+    Entity,
+    Event,
+    Model,
+    Name,
+    Participation,
+    Span,
+    State,
+    Support,
+    Unit,
+)
 
 ROOT = "narrated"
 
@@ -52,6 +64,23 @@ class EventProposal(Model):
     participants: tuple[RoleProposal, ...] = ()
 
 
+class StateProposal(EventProposal):
+    """A contextual state preserves explicit unknown polarity and modality."""
+
+    polarity: Literal["positive", "negative", "unknown"] = "unknown"
+    modality: Literal[
+        "asserted",
+        "possible",
+        "probable",
+        "necessary",
+        "intended",
+        "desired",
+        "counterfactual",
+        "reported",
+        "unknown",
+    ] = "unknown"
+
+
 class DetailProposal(Model):
     """An expressed detail, attached to an event without a source-address judgment."""
 
@@ -96,6 +125,7 @@ class AdmittedGraph:
     entities: tuple[Entity, ...]
     events: tuple[Event, ...]
     accepted: dict[str, str]
+    states: tuple[State, ...] = ()
 
 
 def admit_graph(
@@ -108,6 +138,7 @@ def admit_graph(
     event_proposals_input: tuple[EventProposal, ...],
     unresolved: tuple[UnresolvedClaim, ...],
     extra_keys: tuple[str, ...] = (),
+    state_proposals_input: tuple[StateProposal, ...] = (),
 ) -> AdmittedGraph:
     """Admit one row/unit's local graph with exact evidence and declared attribution scopes."""
     unit_span = unit.support.spans[0]
@@ -125,6 +156,7 @@ def admit_graph(
             context_proposals_input,
             entity_proposals_input,
             event_proposals_input,
+            state_proposals_input,
             extra_keys,
             unresolved,
         )
@@ -184,8 +216,8 @@ def admit_graph(
         )
         for e in entity_proposals_input
     }
-    events: dict[str, Event] = {}
-    for e in event_proposals_input:
+
+    def situation(e: EventProposal) -> tuple[Support, tuple[Participation, ...]]:
         support = evidence(e.evidence)
         evidence(e.predicate, e.evidence.span)
         if e.context not in contexts or context_for(e.evidence.span) != e.context:
@@ -201,15 +233,35 @@ def admit_graph(
             participants.append(
                 Participation(entity=entities[p.entity].id, role=p.role, evidence=(role_support,))
             )
+        return support, tuple(participants)
+
+    events: dict[str, Event] = {}
+    for e in event_proposals_input:
+        support, participants = situation(e)
         events[e.key] = Event(
             side=document.side,
             context=contexts[e.context].id,
             predicate=e.predicate.text,
             evidence=(support,),
-            participants=tuple(participants),
+            participants=participants,
+        )
+    states: dict[str, State] = {}
+    for s in state_proposals_input:
+        support, participants = situation(s)
+        states[s.key] = State(
+            side=document.side,
+            context=contexts[s.context].id,
+            predicate=s.predicate.text,
+            evidence=(support,),
+            participants=participants,
+            polarity=s.polarity,
+            modality=s.modality,
         )
     accepted = {
-        k: v.id for group in (contexts, entities, events) for k, v in group.items() if k != ROOT
+        k: v.id
+        for group in (contexts, entities, events, states)
+        for k, v in group.items()
+        if k != ROOT
     }
     if len(set(accepted.values())) != len(accepted):
         raise ValueError("duplicate semantic proposal")
@@ -218,4 +270,5 @@ def admit_graph(
         tuple(entities.values()),
         tuple(events.values()),
         accepted,
+        tuple(states.values()),
     )

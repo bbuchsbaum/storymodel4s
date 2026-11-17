@@ -185,3 +185,22 @@ readback. They establish deterministic admission and input conditions, not model
 
 Still owed: recurring-scene semantic validation, embedding channels, event/episode targets,
 the fixed-question claim receipt and full P3 exit demonstration. This first route does not close P3.
+
+## P2.4 first state and circumstance slice
+
+Bead `bd-01M7KQ3022CTAA6M5AH1ZVCESA`: [v4 rich construction](rich-accounts.md) preserves states,
+location roles and literal time/manner circumstances through independent recorded source/recall
+construction, complete row receipts, pairing and a situation-table consumer. Shared validation
+also permits state endpoints in the current relation and detail contracts. Legacy wire records
+and prompts stay stable; old consumers reject v4 until explicitly upgraded.
+
+Scala source: `story/nodes.scala` distinguishes events/states, polarity/modality and context-scoped
+situations. Location is an entity type rather than a separate place node. `story/relations.scala`
+models time/manner circumstances as supported phrases, not numeric clocks. Python preserves
+those distinctions in this bounded profile; full typed entities and event qualifiers remain owed.
+
+Evidence includes frozen pre-refactor legacy schema/request/prompt/result hashes, source reuse
+across two recalls, exact state/role/context/circumstance refusals, recorded raw readback and a
+consumer of every added collection. Recall inventories remain not-attempted because this graph
+constructor does not extract details. This is not full P2, nor full Scala `TypedSupport` parity:
+playback, richer contexts/relations/hierarchy, rich recall details and consumer integration remain.

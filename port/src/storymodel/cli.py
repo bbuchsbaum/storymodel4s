@@ -29,6 +29,9 @@ from .identity import IdentityResult, identity_role_table, resolve_text_identity
 from .intake_workflow import prepare_time_study_files
 from .model import Account, canonical
 from .relations import admit_relations, relation_table
+from .rich_account import situation_table, validate_rich_account
+from .rich_construction import prepare_rich_construction
+from .rich_workflow import RichRecording, import_rich, read_rich_request, replay_rich, rich_prompt
 from .source import SourceRow, prepare_source
 from .source_workflow import (
     SourceRecording,
@@ -100,6 +103,35 @@ def main(argv: list[str] | None = None) -> int:
     mapping_replay.add_argument("--expected-import-sha256")
     mapping_replay.add_argument("--account-only", action="store_true")
     mapping_replay.add_argument("--output")
+    rich_prepare = commands.add_parser(
+        "prepare-rich", help="prepare anchored v4 graph construction"
+    )
+    rich_prepare.add_argument("text")
+    rich_prepare.add_argument("rows")
+    rich_prepare.add_argument("--document-key", required=True)
+    rich_prepare.add_argument("--side", required=True, choices=("source", "recall"))
+    rich_prepare.add_argument("--allow-export", action="store_true")
+    rich_prepare.add_argument("--output")
+    rich_contract = commands.add_parser("rich-prompt", help="render the v4 construction contract")
+    rich_contract.add_argument("request")
+    rich_contract.add_argument("--output")
+    rich_import = commands.add_parser(
+        "import-rich", help="record an exported v4 construction reply"
+    )
+    rich_import.add_argument("request")
+    rich_import.add_argument("reply")
+    rich_import.add_argument("recording")
+    rich_replay = commands.add_parser("replay-rich", help="construct a v4 account offline")
+    rich_replay.add_argument("request")
+    rich_replay.add_argument("recording")
+    rich_replay.add_argument("--expected-import-sha256")
+    rich_replay.add_argument("--account-only", action="store_true")
+    rich_replay.add_argument("--output")
+    situations = commands.add_parser(
+        "situation-table", help="inspect v4 events, states and circumstances"
+    )
+    situations.add_argument("account")
+    situations.add_argument("--output")
     imported = commands.add_parser(
         "import-time-recording", help="import exported time-study replies offline"
     )
@@ -233,6 +265,52 @@ def main(argv: list[str] | None = None) -> int:
                 (alignment.account if args.account_only else alignment).model_dump(mode="json"),
                 args.output,
             )
+        elif args.command == "prepare-rich":
+            row_values = strict_json(Path(args.rows).read_bytes())
+            if not isinstance(row_values, list):
+                raise ValueError("rich construction rows must be a JSON array")
+            rich_request = prepare_rich_construction(
+                args.document_key,
+                args.side,
+                Path(args.text).read_bytes().decode("utf-8"),
+                tuple(SourceRow.model_validate_json(canonical(row)) for row in row_values),
+                export_permission="allowed" if args.allow_export else "denied",
+            )
+            emit(rich_request.model_dump(mode="json"), args.output)
+        elif args.command == "situation-table":
+            rich_account = validate_rich_account(Path(args.account).read_bytes())
+            if rich_account.export_permission != "allowed":
+                raise PermissionError("producer denies situation export")
+            emit(
+                [row.model_dump(mode="json") for row in situation_table(rich_account)], args.output
+            )
+        elif args.command in ("rich-prompt", "import-rich", "replay-rich"):
+            rich_request = read_rich_request(Path(args.request))
+            if rich_request.export_permission != "allowed":
+                raise PermissionError("producer denies rich construction export")
+            if args.command == "rich-prompt":
+                emit(strict_json(rich_prompt(rich_request)), args.output)
+            elif args.command == "import-rich":
+                rich_recording = RichRecording.model_validate_json(
+                    canonical(strict_json(Path(args.reply).read_bytes()))
+                )
+                import_rich(rich_request, rich_recording, Path(args.recording))
+            else:
+                rich_result = replay_rich(
+                    rich_request,
+                    Path(args.recording),
+                    expected_import_sha256=args.expected_import_sha256,
+                )
+                if args.account_only and any(
+                    r.status != "admitted" for r in rich_result.resolutions
+                ):
+                    raise ValueError("account-only export would hide incomplete rich construction")
+                emit(
+                    (rich_result.account if args.account_only else rich_result).model_dump(
+                        mode="json"
+                    ),
+                    args.output,
+                )
         elif args.command == "prepare-mapping":
             mapping_account = read_account(Path(args.account), expected_sha256=args.expected_sha256)
             if mapping_account.export_permission != "allowed":

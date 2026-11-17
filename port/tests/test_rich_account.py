@@ -188,7 +188,7 @@ def test_state_and_circumstance_relational_forgery_refuses(mutation):
         changed = altered_state(participants=(*state.participants, *state.participants))
     else:
         changed = state
-    circumstances = rich.circumstances
+    circumstances = ()  # Do not let stale links mask a missing state-specific guard.
     if mutation == "foreign-circumstance":
         circumstances = (
             Circumstance(situation="foreign", kind="time", label="BB", evidence=state.evidence),
@@ -206,7 +206,15 @@ def test_state_and_circumstance_relational_forgery_refuses(mutation):
                 evidence=rich.circumstances[0].evidence,
             ),
         )
-    with pytest.raises(ValueError):
+    reason = {
+        "context": "event requires a context",
+        "foreign-place": "foreign event participant",
+        "role-outside": "participant role evidence lies outside",
+        "duplicate-role": "duplicate participant",
+        "foreign-circumstance": "circumstance requires an existing situation",
+        "circumstance-outside": "circumstance evidence lies outside",
+    }[mutation]
+    with pytest.raises(ValueError, match=reason):
         validate_rich_account(
             rich.model_copy(
                 update={"states": (changed,), "relations": (), "circumstances": circumstances}

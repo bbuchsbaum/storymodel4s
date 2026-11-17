@@ -130,3 +130,16 @@ checked chart classification, or treating omitted antecedent metadata as evidenc
 Unknown types introduce separate singletons; unresolved mentions mint no referent. Identity is
 within a document and does not move events between contexts. Number acquisition and accepted
 holder inputs remain separate required extensions; this profile makes their absence explicit.
+
+P3.1 recorded direct mapping (2026-11-16): private account-bound recordings and a separately
+versioned unit-only prompt, with local detail aliases and conditional fidelity. Rejected alternatives:
+whole-recall/global-index prompt leakage, graph-required localization and a second execution engine.
+Indistinguishable visible details refuse rather than using hidden content to order their aliases.
+
+P2.4 first rich accounts (2026-11-16): a distinct v4 envelope shares flat fields and relational
+validation with v1–v3; explicit v3 upgrade preserves occurrence IDs. Rejected alternatives:
+conditional serialization of new fields into old versions, duplicated validation engines, silently
+dropping states in legacy consumers, or converting literal time phrases into plausible clocks.
+Locations remain entity roles; time/manner are situation circumstances. Existing consumers must
+explicitly support or refuse v4. This provisional migration boundary is not a permanent second
+scientific model or a claim that all rich consumers have already been ported.
