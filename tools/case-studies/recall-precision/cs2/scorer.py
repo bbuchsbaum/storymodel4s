@@ -173,6 +173,53 @@ def producer_forecast(row, comp, fallback, eps) -> ProducerForecast:
     )
 
 
+@dataclass
+class MixedForecast:
+    """Calibration (hill-climb lever 1): p' = (1 - lam) p + lam F on every term."""
+
+    base: object
+    fallback: object
+    lam: float
+
+    def p_work(self, w):
+        return (1 - self.lam) * self.base.p_work(w) + self.lam * self.fallback.p_work(w)
+
+    def p_set_and_work(self, scenes, w):
+        return ((1 - self.lam) * self.base.p_set_and_work(scenes, w)
+                + self.lam * self.fallback.p_set_and_work(scenes, w))
+
+    def p_nonfilm(self):
+        return (1 - self.lam) * self.base.p_nonfilm() + self.lam * self.fallback.p_nonfilm()
+
+
+@dataclass
+class EnsembleForecast:
+    """Two-sample ensembling (hill-climb lever 2): the members' probabilities averaged."""
+
+    members: list
+
+    def p_work(self, w):
+        return math.fsum(m.p_work(w) for m in self.members) / len(self.members)
+
+    def p_set_and_work(self, scenes, w):
+        return math.fsum(m.p_set_and_work(scenes, w) for m in self.members) / len(self.members)
+
+    def p_nonfilm(self):
+        return math.fsum(m.p_nonfilm() for m in self.members) / len(self.members)
+
+
+def temper_located(f, tau):
+    """Temperature on located scene mass (hill-climb lever 1b): loc_s proportional to
+    loc_s ** tau, the row's located total kept."""
+    if tau == 1 or not f.loc:
+        return f
+    tot = math.fsum(f.loc.values())
+    pw = {s_: v ** tau for s_, v in f.loc.items() if v > 0}
+    z = math.fsum(pw.values())
+    f.loc = {s_: tot * v / z for s_, v in pw.items()}
+    return f
+
+
 def producer_forecasts(ld: LocationDistribution, fallback, cfg, row_fallbacks=None) -> list:
     """One producer forecast per row. `row_fallbacks` (one Forecast per row) replaces the
     corpus fallback where given: the frame-film rule (rules.fallback = 'frame-film')."""
@@ -182,8 +229,14 @@ def producer_forecasts(ld: LocationDistribution, fallback, cfg, row_fallbacks=No
     fbs = row_fallbacks or [fallback] * len(scene.rows)
     if len(fbs) != len(scene.rows):
         raise ScoreError("one fallback per row is required")
-    return [producer_forecast(r, ld.composition, f, cfg["epsilon"])
-            for r, f in zip(scene.rows, fbs)]
+    out = [producer_forecast(r, ld.composition, f, cfg["epsilon"])
+           for r, f in zip(scene.rows, fbs)]
+    tau, lam = cfg.get("located_temperature", 1.0), cfg.get("calibration_lambda", 0.0)
+    if tau != 1:
+        out = [temper_located(f, tau) for f in out]
+    if lam:
+        out = [MixedForecast(f, fb, lam) for f, fb in zip(out, fbs)]
+    return out
 
 
 # ---------------------------------------------------------------- row scores
