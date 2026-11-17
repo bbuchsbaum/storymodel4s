@@ -373,6 +373,58 @@ PASS2_TEMPLATE = "FILM ANNOTATION\n{outline}\n\nITEMS (random order)\n\n{items}\
 PASS2_ITEM = "ITEM {oid}\nFILM: {film}\nCONTEXT: {ctx}\nTARGET: {target}"
 RETRY = "\n\nReply with strictly valid JSON only ({attempt})."
 
+# ---- layout 'prefix' (2026-11-17, token efficiency): the stable outline goes in the system
+# prompt, randomised once per sample; per-call content (units, items) goes last. Anchors are
+# word-number spans of the TARGET instead of quoted words.
+LAYOUTS = ("per-call", "prefix")
+PASS1_TEMPLATE_PREFIX = "RECALL UNITS (in spoken order)\n{units}\n\nReturn all {n} units."
+PASS2_TEMPLATE_PREFIX = "ITEMS (random order)\n\n{items}\n\nAnalyse all {n} items."
+PASS2_ITEM_PREFIX = "ITEM {oid}\nFILM: {film}\nCONTEXT: {ctx}\nTARGET: {target}"
+
+
+def _span_version(text):
+    pairs = [
+        ('  - "words": the exact contiguous words of the TARGET that carry it (copy them verbatim);',
+         '  - "span": [first, last], the numbers of the first and last TARGET words that carry it '
+         '(TARGET words are numbered [0], [1], ...);'),
+        ('"refs": [{"words": "...", ', '"refs": [{"span": [0, 3], '),
+    ]
+    for old, new in pairs:
+        if old not in text:
+            raise RuntimeError(f"span version: phrase missing: {old[:40]}")
+        text = text.replace(old, new)
+    return text.replace('the "words" of an item\'s references', "the spans of an item's references")
+
+
+PASS2_SPAN_ARMS = {k: _span_version(v) for k, v in PASS2_ARMS.items()}
+
+
+def numbered(text):
+    return " ".join(f"[{i}]{w}" for i, w in enumerate(text.split(" ")))
+
+
+def pass1_prompt_prefix(units_text):
+    body = "\n".join(PASS1_UNIT.format(i=i + 1, text=t) for i, t in enumerate(units_text))
+    return PASS1_TEMPLATE_PREFIX.format(units=body, n=len(units_text))
+
+
+def pass2_prompt_prefix(batch):
+    items = "\n\n".join(
+        PASS2_ITEM_PREFIX.format(oid=it["oid"], film=it["film_label"], ctx=it["ctx"],
+                                 target=numbered(it["target"]))
+        for it in batch)
+    return PASS2_TEMPLATE_PREFIX.format(items=items, n=len(batch))
+
+
+def make_film_batches(items, seed, sample, batch=BATCH, window=WINDOW):
+    """Batches grouped by framed film (so calls share a film's outline prefix); within each film
+    the no-chaining rule of make_batches holds unchanged."""
+    out = []
+    for w in sorted({it["work"] for it in items}):
+        out += make_batches([it for it in items if it["work"] == w], seed, f"{sample}:{w}",
+                            batch, window)
+    return out
+
 
 def context_of(units, i, window=WINDOW):
     """CONTEXT of unit i: the texts of up to `window` preceding units joined by single spaces
@@ -403,7 +455,8 @@ def renderer_sha256():
     import inspect
 
     src = "".join(inspect.getsource(f) for f in (
-        film_outline, _mmss, opaque, context_of, pass1_prompt, pass2_prompt))
+        film_outline, _mmss, opaque, context_of, pass1_prompt, pass2_prompt,
+        pass1_prompt_prefix, pass2_prompt_prefix, numbered, make_film_batches))
     return sha256(src)
 
 
@@ -421,7 +474,7 @@ def corpus_text(text, A, pass_no):
 
 
 def conditions(seed, salt, sample, arm="coverage", word_clock=None, systems=None,
-               segmenter=None):
+               segmenter=None, layout="per-call"):
     """The two passes' producer conditions (rendering identities), recorded separately. Each id
     is derived from its system prompt, template and renderer digests, so arms differ at the
     reference level."""
@@ -429,12 +482,18 @@ def conditions(seed, salt, sample, arm="coverage", word_clock=None, systems=None
                   segmenter=segmenter or SEGMENTER, word_clock=word_clock)
     sys1, sys2 = systems or (PASS1_SYSTEM, PASS2_ARMS[arm])
     rend = renderer_sha256()
+    t1 = PASS1_TEMPLATE_PREFIX if layout == "prefix" else PASS1_TEMPLATE
+    t2 = (PASS2_TEMPLATE_PREFIX + "\n" + PASS2_ITEM_PREFIX if layout == "prefix"
+          else PASS2_TEMPLATE + "\n" + PASS2_ITEM)
     p1 = dict(system_sha256=sha256(sys1),
-              template_sha256=sha256(PASS1_TEMPLATE + "\n" + PASS1_UNIT),
+              template_sha256=sha256(t1 + "\n" + PASS1_UNIT),
               renderer_sha256=rend, retry_sha256=sha256(RETRY))
     p2 = dict(system_sha256=sha256(sys2),
-              template_sha256=sha256(PASS2_TEMPLATE + "\n" + PASS2_ITEM),
+              template_sha256=sha256(t2),
               renderer_sha256=rend, retry_sha256=sha256(RETRY))
+    if layout == "prefix":
+        p1["layout"] = p2["layout"] = "prefix"
+        p2["anchors"] = "word-number spans"
     ident = lambda name, d: f"{name}:{sha256(json.dumps(d, sort_keys=True))[:16]}"  # noqa: E731
     return {
         "pass1": dict(
@@ -802,11 +861,23 @@ def convert_session(
                     utoks = [t for _, t in pairs]
                     best = {}
                     for ri, r in enumerate(x.get("refs") or []):
-                        anchor = toks(r.get("words") or "")
-                        j, why = match_anchor(utoks, anchor)
-                        if why:
-                            refuse(why)
-                            continue
+                        if "span" in r:  # layout 'prefix': word numbers of the TARGET
+                            try:
+                                a_, b_ = (int(v) for v in r["span"])
+                            except (TypeError, ValueError):
+                                refuse("span-invalid")
+                                continue
+                            if not (0 <= a_ <= b_ < len(wids)):
+                                refuse("span-invalid")
+                                continue
+                            covered_w = wids[a_:b_ + 1]
+                        else:
+                            anchor = toks(r.get("words") or "")
+                            j, why = match_anchor(utoks, anchor)
+                            if why:
+                                refuse(why)
+                                continue
+                            covered_w = sorted({pairs[t][0] for t in range(j, j + len(anchor))})
                         mem = members(r, rowmap, top[0], top[1], comp, refuse, conv)
                         if not mem:
                             continue
@@ -820,9 +891,9 @@ def convert_session(
                             refuse(e.reason)
                             continue
                         conv["references"] += 1
-                        for w in {pairs[t][0] for t in range(j, j + len(anchor))}:
-                            if w not in best or len(anchor) < best[w][0]:  # innermost wins
-                                best[w] = (len(anchor), rid)
+                        for w in covered_w:
+                            if w not in best or len(covered_w) < best[w][0]:  # innermost wins
+                                best[w] = (len(covered_w), rid)
                     for w, (_, rid) in best.items():
                         sample_of[w] = RefSample(rid)
         unit_talk[(p, s, uid)] = talk
@@ -853,6 +924,7 @@ def run(
     rules: dict | None = None,
     outline_order: str = "part-order",
     rendering: str = "plain",
+    layout: str = "per-call",
 ):
     """Both passes over `sessions` (development only), pass 2 pooled across them.
 
@@ -863,9 +935,12 @@ def run(
         export, index = None, A.PRODUCER_UNITS_RECEIPT
     else:
         export, index = load_export(export_dir)
-    sys1, sys2 = corpus_text(PASS1_SYSTEM, A, 1), corpus_text(PASS2_ARMS[arm], A, 2)
+    if layout not in LAYOUTS:
+        raise ValueError(f"unknown layout {layout!r}")
+    arms = PASS2_SPAN_ARMS if layout == "prefix" else PASS2_ARMS
+    sys1, sys2 = corpus_text(PASS1_SYSTEM, A, 1), corpus_text(arms[arm], A, 2)
     conds = conditions(seed, salt, sample, arm, A.WORD_CLOCK_RECEIPT, (sys1, sys2),
-                       getattr(A, "PRODUCER_SEGMENTER", None))
+                       getattr(A, "PRODUCER_SEGMENTER", None), layout)
     if rendering not in RENDERINGS:
         raise ValueError(f"unknown rendering {rendering!r}")
     extras = A.producer_scene_extras() if rendering == "cs1-extras" else None
@@ -884,6 +959,12 @@ def run(
     )
     works = [w.id for w in comp.works]
     data = {}
+    if layout == "prefix":  # one film order and label salt per sample, in the system prompt
+        outline1, _, order1s = film_outline(comp, texts, works,
+                                            random.Random(f"{seed}:{sample}:films"),
+                                            f"{salt}:{sample}", False, outline_order)
+        sys1_full = sys1 + "\n\nFILMS (arbitrary order)\n" + outline1
+        ledger["sample_film_order"] = order1s
     for p, s in sessions:
         words = A.session_words(p, s)  # refuses frozen participants
         spans = (A.producer_units(p, s, words) if export is None
@@ -898,11 +979,15 @@ def run(
             )
             for k, (a, b) in enumerate(spans)
         ]
-        rng = random.Random(f"{seed}:{sample}:pass1:{p}:{s}")
-        outline1, _, order1 = film_outline(
-            comp, texts, works, rng, f"{salt}:{sample}", False, outline_order
-        )
-        prompt1 = pass1_prompt([u["text"] for u in units], outline1)
+        if layout == "prefix":
+            order1 = order1s
+            prompt1 = pass1_prompt_prefix([u["text"] for u in units])
+        else:
+            rng = random.Random(f"{seed}:{sample}:pass1:{p}:{s}")
+            outline1, _, order1 = film_outline(
+                comp, texts, works, rng, f"{salt}:{sample}", False, outline_order
+            )
+            prompt1 = pass1_prompt([u["text"] for u in units], outline1)
         rec = dict(
             units=len(units),
             words=len(words),
@@ -913,7 +998,8 @@ def run(
         )
         data[(p, s)] = dict(words=words, units=units, prompt1=prompt1, rec=rec)
     if not dry:
-        prefetch([(d["prompt1"], sys1) for d in data.values()], jobs)
+        s1 = sys1_full if layout == "prefix" else sys1
+        prefetch([(d["prompt1"], s1) for d in data.values()], jobs)
     for (p, s), d in data.items():
         words, units, prompt1, rec = d["words"], d["units"], d["prompt1"], d["rec"]
         if dry:
@@ -921,7 +1007,7 @@ def run(
         else:
             p1, retries = parse_with_retry(
                 prompt1,
-                sys1,
+                sys1_full if layout == "prefix" else sys1,
                 log,
                 f"pass1:{p}:{s}",
                 "units",
@@ -956,31 +1042,45 @@ def run(
                         oid=opaque(f"{salt}:{sample}", f"{key[0]}:{key[1]}:{i}"),
                     )
                 )
-    batches = make_batches(items, seed, sample)
+    batches = (make_film_batches(items, seed, sample) if layout == "prefix"
+               else make_batches(items, seed, sample))
     ledger["batches"] = batch_report(batches)
     answers, p2_calls, rendered = {}, [], []
+    film_prefix = {}
     for bi, batch in enumerate(batches):
+        if layout == "prefix":
+            w = batch[0]["work"]
+            if w not in film_prefix:
+                o2, rmap, _ = film_outline(comp, texts, [w], random.Random(0), f"{salt}:{sample}",
+                                           True, outline_order, extras)
+                head = f"CAST\n{cast_line}\n\n" if cast_line else ""
+                film_prefix[w] = (sys2 + "\n\nFILM ANNOTATION\n" + head + o2, rmap)
+            sysw, rmap = film_prefix[w]
+            rendered.append((pass2_prompt_prefix(batch), rmap, [w], sysw))
+            continue
         rng = random.Random(f"{seed}:{sample}:pass2:call{bi}")
         bworks = sorted({it["work"] for it in batch})
         outline2, rowmap, order2 = film_outline(
             comp, texts, bworks, rng, f"{salt}:{sample}:call{bi}", True, outline_order, extras
         )
-        rendered.append((pass2_prompt(batch, outline2, cast_line), rowmap, order2))
+        rendered.append((pass2_prompt(batch, outline2, cast_line), rowmap, order2, sys2))
     if not dry:
-        prefetch([(r[0], sys2) for r in rendered], jobs)
-    for bi, (batch, (prompt2, rowmap, order2)) in enumerate(zip(batches, rendered)):
+        prefetch([(r[0], r[3]) for r in rendered], jobs)
+    for bi, (batch, (prompt2, rowmap, order2, sysb)) in enumerate(zip(batches, rendered)):
         rec = dict(
             call=bi,
             items=len(batch),
             films=order2,
             prompt_sha256=sha256(prompt2),
             prompt_chars=len(prompt2),
+            system_sha256=sha256(sysb),
+            system_chars=len(sysb),
             sessions=len({it["session_key"] for it in batch}),
         )
         if not dry:
             got, retries = parse_with_retry(
                 prompt2,
-                sys2,
+                sysb,
                 log,
                 f"pass2:call{bi}",
                 "items",

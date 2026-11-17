@@ -1158,6 +1158,39 @@ def test_cs1_extras_rendering_and_part_order():
     assert P.pass2_prompt([], "O") == P.PASS2_TEMPLATE.format(outline="O", items="", n=0)
 
 
+def test_film_batches_share_a_film_and_keep_the_window_rule():
+    P = _producer()
+    items = [dict(session_key=("P1", "s"), k=k, work="B" if k < 6 else "C", oid=f"a{k}")
+             for k in range(12)]
+    items += [dict(session_key=("P2", "s"), k=k, work="C", oid=f"b{k}") for k in range(5)]
+    batches = P.make_film_batches(items, 7, 1, batch=40, window=2)
+    assert all(len({it["work"] for it in b}) == 1 for b in batches)
+    rep = P.batch_report(batches, window=2)
+    assert not rep["chaining_possible"], rep
+    assert sorted(it["oid"] for b in batches for it in b) == sorted(it["oid"] for it in items)
+
+
+def test_span_anchors_convert_to_word_cells():
+    # layout 'prefix': a reference's span [1, 2] covers the item's 2nd and 3rd word cells
+    P = _producer()
+    from cs2.source import RecallWord
+
+    comp = fixture()
+    words = [RecallWord(i, f"w{i}", float(i)) for i in range(4)]
+    units = [dict(first=0, last=3)]
+    frames = [dict(kind="content", frame=[("B", 1.0)], position=None)]
+    answers = {"o0": (dict(talk="episodic", refs=[
+        dict(span=[1, 2], alts=[{"w": 1.0, "iv": [[1, 1]]}]),
+        dict(span=[2, 9], alts=[{"w": 1.0, "iv": [[1, 1]]}])]), {1: "b2"})}
+    refs, conv = {}, P.new_conv()
+    cells = P.convert_session(("P", "s"), words, units, frames, answers, {0: dict(oid="o0")},
+                              comp, P.conditions(1, "s", 1), refs, conv)
+    kinds = [type(c.sample).__name__ for c in cells]
+    assert kinds == ["Uncovered", "RefSample", "RefSample", "Uncovered"], kinds
+    assert conv["refused"] == {"span-invalid": 1}
+    assert P.numbered("he ran home") == "[0]he [1]ran [2]home"
+
+
 # ---------------------------------------------------------------- runner
 
 

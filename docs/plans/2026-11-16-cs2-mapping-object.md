@@ -293,6 +293,22 @@ Each rule below is switched in `scorer-config.json` (`rules`, with the previous 
   Sherlock's two parts. It is kept for exact replay. The two orders agree whenever each
   occurrence has one segment, which is the FilmFestival case.
 
+### Token efficiency (2026-11-17, stage 1)
+
+- **Layout `prefix`.** The stable film outline goes in the system prompt, ahead of all
+  per-call content; units and items go last. Film order, opaque scene labels and the label salt
+  are drawn once per sample (seeded and recorded), not per call. A per-sample order still says
+  nothing about viewing order.
+- **Batches are grouped by framed film**, so a film's calls share one outline prefix. Within
+  each film the no-chaining window rule is unchanged.
+- **Anchors are word-number spans.** A reference gives `span: [first, last]` over the TARGET's
+  words, which are shown numbered `[0] [1] ...`, instead of quoting them. The converter maps a
+  span to word cells directly; the rest of the conversion is unchanged.
+- **No reply field was removed.** The converter reads every field: `talk`, `refs`, `extent`,
+  `occurrence`, `mode`, `alts` and `frame_mismatch`.
+- **Cost is notional.** Calls run on the owner's subscription through `claude -p`, so
+  `cost_usd` is the CLI's list-price estimate. It is reported beside call and token counts.
+
 **Gaps for the vocabulary ADR.**
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the

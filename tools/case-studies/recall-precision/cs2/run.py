@@ -668,7 +668,7 @@ def cmd_ff_run(args):
     for a in it:
         if a in ("--export", "--seed", "--salt", "--sample", "--sessions", "--arm", "--jobs",
                  "--corpus", "--rules", "--talk-work-variant", "--outline-order", "--epsilon",
-                 "--windows", "--rendering"):
+                 "--windows", "--rendering", "--layout"):
             opt[a[2:].replace("-", "_")] = next(it)
         elif a == "--dry":
             opt["dry"] = True
@@ -705,7 +705,8 @@ def cmd_ff_run(args):
                                     arm=opt.get("arm", "coverage"),
                                     jobs=int(opt.get("jobs", 1)), rules=rules,
                                     outline_order=opt.get("outline_order", "part-order"),
-                                    rendering=opt.get("rendering", "plain"))
+                                    rendering=opt.get("rendering", "plain"),
+                                    layout=opt.get("layout", "per-call"))
     calls = P.call_ledger(log)
     extra = dict(
         participants=sorted({p for p, _ in sessions}), sessions=[f"{p}:{s}" for p, s in sessions],
@@ -720,7 +721,9 @@ def cmd_ff_run(args):
                     if hasattr(A, "gold_clock_receipt") else None),
         corpus=corpus, rules=rules, epsilon=cfg["epsilon"],
         outline_order=opt.get("outline_order", "part-order"),
-        rendering=opt.get("rendering", "plain"),
+        rendering=opt.get("rendering", "plain"), layout=opt.get("layout", "per-call"),
+        cost_note="cost_usd is the CLI's list-price estimate (notional); calls run on the owner's "
+        "subscription through claude -p",
         condition_id_note="condition ids changed at f98d2297a only because the renderer digest "
         "covers film_outline's source, which gained the outline_order rule; the rendered "
         "FilmFestival prompts are byte-identical (cache-only replays reproduce every row)",

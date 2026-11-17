@@ -366,6 +366,21 @@ MUTANTS = [
         test="test_title_only_scene_set_is_the_work_node",
     ),
     dict(
+        id="M42",
+        guard="film-grouped batches keep the no-chaining window rule",
+        file="cs2/ff_producer.py",
+        edits=[('                            batch, window)\n', '                            batch, 0)\n')],
+        test="test_film_batches_share_a_film_and_keep_the_window_rule",
+    ),
+    dict(
+        id="M43",
+        guard="a span [a, b] covers word cells a..b inclusive",
+        file="cs2/ff_producer.py",
+        edits=[("                            covered_w = wids[a_:b_ + 1]\n",
+                "                            covered_w = wids[a_:b_]\n")],
+        test="test_span_anchors_convert_to_word_cells",
+    ),
+    dict(
         id="M16",
         guard="the part marginal places a unit's mass on the unit's own part",
         file="cs2/projections.py",
