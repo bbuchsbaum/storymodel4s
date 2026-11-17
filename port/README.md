@@ -21,6 +21,10 @@ derivations, with no parallel mapper or UI dependency.
 into recall-local entities, contextual events and evidenced details. It feeds the existing
 analysis views while leaving unattempted source matching and unresolved identity explicit.
 
+[Partial alignment](docs/alignment-workflow.md) now adds sparse predicate/role candidates and
+inspectable reference decisions. It preserves alternatives, unresolved and search-limited
+outcomes, existing external references, and unassessed fidelity.
+
 ## Run it
 
 From this directory, with Python 3.12 and `uv`:

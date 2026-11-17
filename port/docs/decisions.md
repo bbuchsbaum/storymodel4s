@@ -85,3 +85,13 @@ renaming identity-bearing fields, or adding a parallel recall-entity class hiera
 V1 admission remains unchanged. Recall-origin entities must remain in their originating
 session's events; the extractor only accepts local mention references. Scope belongs in the
 extraction proposal/receipt, separately from the account context's attribution evidence.
+
+Partial alignment (2026-11-16): invert predicate/role indexes and admit only candidates with
+declared predicate, participant, root-context and unique-row support. Preserve every qualifying
+alternative; withhold resolution after retrieval overflow. Rejected alternatives: dense pair
+matrices, a confidence-looking weighted score, automatic synonyms, or top-one selection that
+hides ambiguity. Alias groups are explicit application inputs and not validated linguistic
+equivalences. The method is a named heuristic, not a calibrated inference engine.
+Reuse existing bindings and projections without changing address or fidelity; never infer
+external content from no-match. Preserve existing references rather than overwriting decisions.
+Keep event ambiguity unresolved when the row-level reference vocabulary cannot express it.

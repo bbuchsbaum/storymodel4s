@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from .alignment import align_account, validate_policy
 from .analysis import Analysis, Policy, project
 from .artifacts import publish_json, read_account
 from .demo import example_account
@@ -107,6 +108,14 @@ def main(argv: list[str] | None = None) -> int:
     extract_replay.add_argument("--expected-import-sha256")
     extract_replay.add_argument("--account-only", action="store_true")
     extract_replay.add_argument("--output")
+    align = commands.add_parser(
+        "align", help="generate sparse candidates and partial references offline"
+    )
+    align.add_argument("account")
+    align.add_argument("--expected-sha256")
+    align.add_argument("--policy-file")
+    align.add_argument("--account-only", action="store_true")
+    align.add_argument("--output")
     args = parser.parse_args(argv)
     try:
         if args.command == "example":
@@ -114,6 +123,18 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "schema":
             emit(
                 {"account": Account.model_json_schema(), "analysis": Analysis.model_json_schema()},
+                args.output,
+            )
+        elif args.command == "align":
+            account = read_account(Path(args.account), expected_sha256=args.expected_sha256)
+            if account.export_permission != "allowed":
+                raise PermissionError("producer denies alignment export")
+            alignment = align_account(
+                account,
+                validate_policy(Path(args.policy_file).read_bytes()) if args.policy_file else None,
+            )
+            emit(
+                (alignment.account if args.account_only else alignment).model_dump(mode="json"),
                 args.output,
             )
         elif args.command == "prepare-extraction":
