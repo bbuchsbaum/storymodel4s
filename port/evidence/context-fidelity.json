@@ -1,0 +1,226 @@
+{
+  "scope": "Context-aware hypothesis-conditional fidelity through checked identity and holder recordings",
+  "source_commit": "3e8e7367caea7c7e8af24573c4f705e2227fba53",
+  "corrected_commit": "5a98a3d5920923e02627eb780005b0ffa5400918",
+  "status": "locally qualified on task branch; not merged or pushed",
+  "information_condition": "Expanded linked-situation and context evidence; distinct from retained unit-only v1",
+  "tests": {
+    "command": ".venv/bin/pytest -q",
+    "passed": 877,
+    "failed": 0,
+    "seconds": 17.32
+  },
+  "typecheck": {
+    "command": ".venv/bin/mypy src/storymodel",
+    "source_files": 58,
+    "passed": true
+  },
+  "format_and_lint": {
+    "passed": true,
+    "scope": "src tests examples evidence/context-fidelity-{installed,mutations}.py",
+    "files_formatted": 146
+  },
+  "installed": {
+    "import_path": "/Users/bbuchsbaum/code/scala/storymodel4s/port/data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "example": {
+      "context_independent_grade": "admitted",
+      "named_holder_grade": "admitted",
+      "semantic_accuracy_claim": false,
+      "source_reused": 2,
+      "source_unchanged": true,
+      "unit_only_profile_retained": true,
+      "unresolved_holder_grade": "rejected"
+    },
+    "commands": [
+      "fidelity-prompt",
+      "import-fidelity",
+      "prepare-fidelity",
+      "replay-fidelity"
+    ],
+    "cli_invocations": 19,
+    "api_cli_equal": true,
+    "rejected_account_only_refused": true,
+    "crlf_recordings_retained_exactly": true,
+    "denied_before_extra_reads": true
+  },
+  "wheel": {
+    "sha256": "d911d00b141ce28bd3834f04fc7025410442eaae08823a8a2343bf4c406d3089",
+    "source_and_resource_files": 62,
+    "match_checkout": true
+  },
+  "legacy_compatibility": {
+    "reference": "4ce3ca536",
+    "artifacts": 33,
+    "bytes": 111959,
+    "byte_identical": true,
+    "v1_schema_byte_identical": true,
+    "excluded": "recording execution internals; compared saved request/prompt/reply/result/account/views"
+  },
+  "mutations": [
+    {
+      "mutation": "exact-recording-bytes",
+      "file": "cli.py",
+      "old": "holder_proposals=Path(args.holder_proposals).read_bytes().decode(\"utf-8\"),",
+      "new": "holder_proposals=Path(args.holder_proposals).read_text(encoding=\"utf-8\"),",
+      "test": "test_context_fidelity.py::test_cli_preserves_exact_crlf_context_recordings",
+      "controls": [
+        "test_fidelity.py::test_fidelity_only_changes_pending_grade_and_projected_coverage",
+        "test_context_fidelity.py::test_context_background_cannot_promote_root_or_replace_target_owned_quote"
+      ],
+      "baseline": "3 passed in 0.59s",
+      "mutant": "1 failed, 2 passed in 0.44s",
+      "compiled": true
+    },
+    {
+      "mutation": "required-dependency",
+      "file": "context_fidelity.py",
+      "old": "if unresolved and status == \"completed\" and grade != \"unverifiable\":",
+      "new": "if False and unresolved and status == \"completed\" and grade != \"unverifiable\":",
+      "test": "test_context_fidelity.py::test_unresolved_required_holder_blocks_grade_but_independent_answer_is_admitted",
+      "controls": [
+        "test_fidelity.py::test_fidelity_only_changes_pending_grade_and_projected_coverage",
+        "test_context_fidelity.py::test_context_background_cannot_promote_root_or_replace_target_owned_quote"
+      ],
+      "baseline": "3 passed in 0.41s",
+      "mutant": "1 failed, 2 passed in 0.42s",
+      "compiled": true
+    },
+    {
+      "mutation": "context-accounting",
+      "file": "context_fidelity.py",
+      "old": "if set(accounting.considered_contexts) != set(contexts):",
+      "new": "if False and set(accounting.considered_contexts) != set(contexts):",
+      "test": "test_context_fidelity.py::test_contextual_accounting_rejects_foreign_duplicate_and_missing_aliases",
+      "controls": [
+        "test_fidelity.py::test_fidelity_only_changes_pending_grade_and_projected_coverage",
+        "test_context_fidelity.py::test_context_background_cannot_promote_root_or_replace_target_owned_quote"
+      ],
+      "baseline": "3 passed in 0.41s",
+      "mutant": "1 failed, 2 passed in 0.41s",
+      "compiled": true
+    },
+    {
+      "mutation": "recall-closure",
+      "file": "context_fidelity.py",
+      "old": "recall = () if detail.event is None else (situations[detail.event],)",
+      "new": "recall = tuple(s for s in situations.values() if s.side == \"recall\" and any(e.document == detail.support.document for e in text_evidence(s.evidence)))",
+      "test": "test_context_fidelity.py::test_linked_recall_closure_exposes_only_local_excerpt_coordinates_and_no_private_state",
+      "controls": [
+        "test_fidelity.py::test_fidelity_only_changes_pending_grade_and_projected_coverage",
+        "test_context_fidelity.py::test_context_background_cannot_promote_root_or_replace_target_owned_quote"
+      ],
+      "baseline": "3 passed in 0.37s",
+      "mutant": "1 failed, 2 passed in 0.39s",
+      "compiled": true
+    },
+    {
+      "mutation": "holder-recording-binding",
+      "file": "attribution.py",
+      "old": "if supplied.account_sha256 != account_sha:",
+      "new": "if False and supplied.account_sha256 != account_sha:",
+      "test": "test_context_fidelity.py::test_context_recordings_remain_bound_to_the_post_mapping_account",
+      "controls": [
+        "test_fidelity.py::test_fidelity_only_changes_pending_grade_and_projected_coverage",
+        "test_context_fidelity.py::test_context_background_cannot_promote_root_or_replace_target_owned_quote"
+      ],
+      "baseline": "3 passed in 0.36s",
+      "mutant": "1 failed, 2 passed in 0.41s",
+      "compiled": true
+    }
+  ],
+  "cold_review": {
+    "reviewed_sha": "5a98a3d5920923e02627eb780005b0ffa5400918",
+    "verdict": "PASS; no remaining BLOCK or actionable follow-up in reviewed scope",
+    "initial_block": {
+      "commit": "3e8e7367caea7c7e8af24573c4f705e2227fba53",
+      "finding": "Path.read_text normalized exact identity/holder recording CRLF bytes",
+      "resolution": "Read bytes then decode UTF-8; regression checks actual API/CLI request equality and digest"
+    },
+    "initial_targeted_tests_passed": 38,
+    "corrected_targeted_tests_passed": 3,
+    "probes": {
+      "dependency_status_grade_matrix": 20,
+      "same_label_cross_document_identity_distinct": true,
+      "receipt_tamper_refused": true,
+      "raw_whitespace_bound_but_hidden_from_prompt": true,
+      "partial_source_overlap_excluded": true,
+      "CRLF_exact_recording": {
+        "identity_annotations": true,
+        "holder_proposals": true
+      },
+      "candidate": "5a98a3d59"
+    },
+    "legacy_comparison": {
+      "baseline": "4ce3ca536",
+      "candidate": "3e8e7367c",
+      "equal_bytes": 73948,
+      "scenarios": 2,
+      "schemas": 4,
+      "objects_per_scenario": [
+        "request",
+        "prompt",
+        "response",
+        "result",
+        "profile",
+        "recording"
+      ]
+    },
+    "reproducible_probe": "evidence/context-fidelity-independent.py",
+    "reviewer_limits": [
+      "Did not independently rerun full suite, installed wheel or all mutations",
+      "Scripted controls do not establish semantic accuracy or scientific validity"
+    ]
+  },
+  "retained_probe_rerun": {
+    "dependency_status_grade_matrix": 20,
+    "same_label_cross_document_identity_distinct": true,
+    "receipt_tamper_refused": true,
+    "raw_whitespace_bound_but_hidden_from_prompt": true,
+    "partial_source_overlap_excluded": true,
+    "CRLF_exact_recording": {
+      "identity_annotations": true,
+      "holder_proposals": true
+    },
+    "candidate": "5a98a3d5920923e02627eb780005b0ffa5400918"
+  },
+  "logs": {
+    "context-fidelity-full-tests.log": {
+      "bytes": 1061,
+      "sha256": "4689e339d20697226fe886ddcaf548c2f4d03ae47f97e33a24eac30230080857"
+    },
+    "context-fidelity-mypy.log": {
+      "bytes": 44,
+      "sha256": "8797c60315242ee16057cb107ea1ec62e2678d358c86bc2be797e23d87e87578"
+    },
+    "context-fidelity-ruff.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "context-fidelity-format.log": {
+      "bytes": 28,
+      "sha256": "203e93364cb1cadf2891085bdf0d28057864d4a8c3d6594de13ce367c1fc9272"
+    },
+    "context-fidelity-installed.log": {
+      "bytes": 851,
+      "sha256": "9791011028a1cd8441859543b23a1ad3fdc1f3d37724119cc8d151a16918c3ce"
+    },
+    "context-fidelity-mutations.log": {
+      "bytes": 241,
+      "sha256": "046be4471d95e5adc1161c0bb34b6f9321e9c21936b920faeecde45f51289490"
+    }
+  },
+  "reproduction": [
+    ".venv/bin/pytest -q tests/test_context_fidelity.py tests/test_fidelity.py tests/test_fidelity_workflow.py",
+    ".venv/bin/python evidence/context-fidelity-independent.py",
+    ".venv/bin/python evidence/context-fidelity-mutations.py",
+    "Build wheel into data/dist and install into data/wheel-env, then .venv/bin/python evidence/context-fidelity-installed.py"
+  ],
+  "remaining": [
+    "Native-source/text-recall mapping and assessment",
+    "Semantic relevance of declared dependencies is attributed, not deterministically certified",
+    "Native numerical inference",
+    "Retained graph, semantic, feature, study and inspection capabilities across P2-P6",
+    "Audit analogous raw-recording CLI readers before claiming byte preservation for them"
+  ],
+  "shared_memory_note": "b3c684d2-4144-43a5-90cc-ef86f916176d"
+}

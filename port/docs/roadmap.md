@@ -5,8 +5,8 @@ capabilities available in idiomatic Python, improving the implementation using l
 Small slices are delivery order, not scope cuts. Deferred work remains owed.
 
 This is the current **port** execution direction, refreshed on 2026-11-17 through
-the account-derived inference, reconstruction, organization, native playback and verified
-cross-unit construction workflows. The execution queue below was refreshed against the checkout on 2026-11-17.
+the account-derived inference, reconstruction, organization, native playback, chronology and
+context-aware fidelity workflows. The execution queue below was refreshed against the checkout on 2026-11-17.
 It extends [Stage 1](stage-1.md); it does not supersede the parent project's
 [VISION](../../VISION.md), scientific contracts or Scala roadmap. Mote holds live status.
 The [preservation map](preservation.md) remains the behavioral contract. Phase numbering starts
@@ -235,7 +235,8 @@ proof precedes scientific claims, but scientific qualification must not block un
 
 ## Next deliveries: execution order from the current branch
 
-Refreshed 2026-11-17 through chronology source `f2610fcb1` and its local qualification.
+Refreshed 2026-11-17 through contextual fidelity source `3e8e7367c`, corrective
+commit `5a98a3d59` and their local qualification.
 This is the next-work plan within P2–P6,
 not a second phase numbering system. Mote owns live status. Completed checkpoints move
 out of the future queue; capability obligations remain until their complete exit is met.
@@ -266,8 +267,17 @@ media construction and temporal queries also run. [Evidence](../evidence/tempora
 863 passing tests, five discriminating mutations, installed API/CLI agreement, byte-identical
 legacy workflows and cold review. These are local engineering results, not full Scala parity.
 
-**Next implementation action:** connect context/holder evidence to conditional assessment, then
-complete the native-source/text-recall mapping and assessment path. Preserve exact media evidence,
+[Context-aware fidelity](context-fidelity.md), source `3e8e7367c` plus correction `5a98a3d59`,
+now consumes verified context/holder and identity evidence through the existing assessment engine.
+Required unresolved dependencies block substantive grades; explicitly independent judgments
+remain possible. This is an expanded information condition, not the unit-only profile.
+[Evidence](../evidence/context-fidelity.json) records 877 passing tests, installed API/CLI
+agreement, five compiled mutations and cold review. Review found and closed a CRLF normalization
+defect; exact input recordings now survive CLI preparation. Legacy v1 artifacts remain identical.
+These checks establish admission and preservation behavior, not semantic grading accuracy.
+
+**Next implementation action:** complete the native-source/text-recall mapping and assessment
+path. Preserve exact media evidence,
 processing missingness and the existing unit-only input condition under named recipes. Do not
 remove text-only guards before implementing actual native evidence and downstream consumption.
 
@@ -275,11 +285,11 @@ remove text-only guards before implementing actual native evidence and downstrea
 
 These are the next bounded work units inside the deliveries below, not additional phases.
 
-1. **Connect evidence to useful assessment.** Extend the existing construction-to-analysis
-   example with context/holder-aware assessment, then a native-source/text-recall path. Keep
+1. **Connect native evidence to useful assessment.** Extend the checked context/holder-aware
+   construction-to-analysis example with a native-source/text-recall path. Keep
    narrative reference, referent reference and conditional fidelity separate. Reuse one source
    unchanged across two recalls and produce the same three analysis views through API and CLI.
-   This begins Delivery 2 immediately after chronology; it does not wait for every P2 graph
+   This continues Delivery 2 after contextual fidelity; it does not wait for every P2 graph
    family. Consolidate the public calls exposed by this journey before adding another wrapper.
 2. **Add one semantic channel with a real consumer.** Bind model/space/cache identity, nominate
    candidates sparsely, and retain channel-specific evidence and unavailable/search-limited
@@ -349,8 +359,9 @@ researcher journey: prepare observations → admit recorded construction → res
 attribution → admit details → map references → assess conditional fidelity → derive the three
 analysis views. Keep the lightweight annotation/direct route usable independently of rich graphs.
 
-First connect context/holder evidence to assessment. Then add native-evidence reference and
-assessment consumers, with explicit cross-modal identity/coordinate rules. Preserve unsupported
+Context/holder evidence is now connected to assessment under an explicit expanded condition.
+Next add native-evidence reference and assessment consumers, with explicit cross-modal
+identity/coordinate rules. Preserve unsupported
 modality and missing evidence until those paths exist. Complete event/episode target handling
 and retained identity/number rules in bounded slices as their consumers require them.
 
@@ -428,9 +439,10 @@ with a broken old implementation needs repair or replacement, not silent deletio
 
 ## Execution rules for these deliveries
 
-- **Next bead:** context/holder-aware conditional assessment from Delivery 2, followed by
-  native-source/text-recall mapping and assessment. Split at a saved-artifact boundary; the
-  larger connected-graph delivery remains incomplete. Chronology is a qualified local checkpoint.
+- **Next bead:** native-source/text-recall mapping and assessment from Delivery 2. Establish
+  actual media assessment evidence and its downstream consumer before lifting text-only guards.
+  Split at a saved-artifact boundary; the larger connected-graph delivery remains incomplete.
+  Chronology and contextual fidelity are qualified local checkpoints.
 - Use one bounded bead at a time, usually one session to one working day. Open subsequent
   beads when the input contract is clear; do not create a speculative ticket tree or assign
   an unsupported calendar estimate to full parity.
