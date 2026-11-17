@@ -278,3 +278,15 @@ cost calculation. Use one private context factory for all three wide-arithmetic 
 retaining each algorithm's precision. Explicit rounding/exponent/trap settings and context-free
 precision selection replace inheritance from caller Decimal settings. This is a determinism
 repair, not a method or wire-format change.
+
+## Conditional organization readout (P4, 2026-11-17)
+
+Provisional implementation choice: one checked numerical module handles explicitly independent
+rows or sparse adjacent joints, preserving original adjacency and whole-path ambiguity bounds.
+The account wrapper consumes actual joint flow and retains a model-conditional label. Use
+exact rational accumulation of binary64 products without storing all destination pairs;
+convert final readouts to finite binary64. Rejected alternatives: multiplying coupled row
+marginals, treating reconstructed choices as independent observations, splicing missing units,
+adding pairwise extrema, deriving chronology from scoring coordinates, or silently substituting
+product-space bounds for coupled bounds. Registered measurement eligibility and media order
+remain separate retained consumers. See [organization](organization.md).

@@ -1,0 +1,2409 @@
+{
+  "spec": {
+    "$defs": {
+      "DestinationMass": {
+        "additionalProperties": false,
+        "description": "A finite normalized-row weight, not an empirical calibration claim.",
+        "properties": {
+          "destination": {
+            "$ref": "#/$defs/OrganizationDestination"
+          },
+          "weight": {
+            "minimum": 0,
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "destination",
+          "weight"
+        ],
+        "title": "DestinationMass",
+        "type": "object"
+      },
+      "JointMass": {
+        "additionalProperties": false,
+        "description": "One sparse pair of destinations with its supplied adjacent joint weight.",
+        "properties": {
+          "left": {
+            "$ref": "#/$defs/OrganizationDestination"
+          },
+          "right": {
+            "$ref": "#/$defs/OrganizationDestination"
+          },
+          "weight": {
+            "minimum": 0,
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "left",
+          "right",
+          "weight"
+        ],
+        "title": "JointMass",
+        "type": "object"
+      },
+      "OrganizationDestination": {
+        "additionalProperties": false,
+        "description": "A target or explicit external destination; fidelity modes do not change target identity.",
+        "properties": {
+          "target": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Target"
+          },
+          "external": {
+            "anyOf": [
+              {
+                "enum": [
+                  "association",
+                  "commentary",
+                  "source-consistent-inference",
+                  "intrusion",
+                  "uninterpretable",
+                  "unranked"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "External"
+          }
+        },
+        "title": "OrganizationDestination",
+        "type": "object"
+      },
+      "OrganizationJoint": {
+        "additionalProperties": false,
+        "description": "A joint belongs to one original adjacency and must reproduce both actual marginals.",
+        "properties": {
+          "left_unit": {
+            "minLength": 1,
+            "title": "Left Unit",
+            "type": "string"
+          },
+          "right_unit": {
+            "minLength": 1,
+            "title": "Right Unit",
+            "type": "string"
+          },
+          "mass": {
+            "items": {
+              "$ref": "#/$defs/JointMass"
+            },
+            "title": "Mass",
+            "type": "array"
+          }
+        },
+        "required": [
+          "left_unit",
+          "right_unit",
+          "mass"
+        ],
+        "title": "OrganizationJoint",
+        "type": "object"
+      },
+      "OrganizationOrder": {
+        "additionalProperties": false,
+        "description": "Caller-declared comparable source ranks, separate from inference scoring coordinates.",
+        "properties": {
+          "axis": {
+            "default": "declared",
+            "enum": [
+              "declared",
+              "discourse",
+              "story-world"
+            ],
+            "title": "Axis",
+            "type": "string"
+          },
+          "positions": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "propertyNames": {
+              "minLength": 1
+            },
+            "title": "Positions",
+            "type": "object"
+          }
+        },
+        "title": "OrganizationOrder",
+        "type": "object"
+      },
+      "OrganizationRow": {
+        "additionalProperties": false,
+        "description": "Unavailable rows remain in their original position; admissibility is explicit.",
+        "properties": {
+          "unit": {
+            "minLength": 1,
+            "title": "Unit",
+            "type": "string"
+          },
+          "status": {
+            "default": "available",
+            "enum": [
+              "available",
+              "unresolved",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "mass": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/DestinationMass"
+            },
+            "title": "Mass",
+            "type": "array"
+          },
+          "admissible": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/$defs/OrganizationDestination"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Admissible"
+          }
+        },
+        "required": [
+          "unit"
+        ],
+        "title": "OrganizationRow",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Declare the row population, order, dependence and whether product-space bounds are wanted.",
+    "properties": {
+      "schema_version": {
+        "const": "storymodel.organization-spec/v1",
+        "default": "storymodel.organization-spec/v1",
+        "title": "Schema Version",
+        "type": "string"
+      },
+      "rows": {
+        "items": {
+          "$ref": "#/$defs/OrganizationRow"
+        },
+        "title": "Rows",
+        "type": "array"
+      },
+      "order": {
+        "$ref": "#/$defs/OrganizationOrder"
+      },
+      "dependence": {
+        "enum": [
+          "independent-rows",
+          "adjacent-joints"
+        ],
+        "title": "Dependence",
+        "type": "string"
+      },
+      "joints": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/OrganizationJoint"
+        },
+        "title": "Joints",
+        "type": "array"
+      },
+      "product_bounds": {
+        "default": true,
+        "title": "Product Bounds",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "rows",
+      "dependence"
+    ],
+    "title": "OrganizationSpec",
+    "type": "object"
+  },
+  "order": {
+    "additionalProperties": false,
+    "description": "Caller-declared comparable source ranks, separate from inference scoring coordinates.",
+    "properties": {
+      "axis": {
+        "default": "declared",
+        "enum": [
+          "declared",
+          "discourse",
+          "story-world"
+        ],
+        "title": "Axis",
+        "type": "string"
+      },
+      "positions": {
+        "additionalProperties": {
+          "type": "number"
+        },
+        "propertyNames": {
+          "minLength": 1
+        },
+        "title": "Positions",
+        "type": "object"
+      }
+    },
+    "title": "OrganizationOrder",
+    "type": "object"
+  },
+  "result": {
+    "$defs": {
+      "DestinationMass": {
+        "additionalProperties": false,
+        "description": "A finite normalized-row weight, not an empirical calibration claim.",
+        "properties": {
+          "destination": {
+            "$ref": "#/$defs/OrganizationDestination"
+          },
+          "weight": {
+            "minimum": 0,
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "destination",
+          "weight"
+        ],
+        "title": "DestinationMass",
+        "type": "object"
+      },
+      "JointMass": {
+        "additionalProperties": false,
+        "description": "One sparse pair of destinations with its supplied adjacent joint weight.",
+        "properties": {
+          "left": {
+            "$ref": "#/$defs/OrganizationDestination"
+          },
+          "right": {
+            "$ref": "#/$defs/OrganizationDestination"
+          },
+          "weight": {
+            "minimum": 0,
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "left",
+          "right",
+          "weight"
+        ],
+        "title": "JointMass",
+        "type": "object"
+      },
+      "OrganizationBounds": {
+        "additionalProperties": false,
+        "description": "Whole-path extrema share a coherent assignment at every intermediate unit.",
+        "properties": {
+          "minimum": {
+            "minimum": 0,
+            "title": "Minimum",
+            "type": "integer"
+          },
+          "maximum": {
+            "minimum": 0,
+            "title": "Maximum",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "minimum",
+          "maximum"
+        ],
+        "title": "OrganizationBounds",
+        "type": "object"
+      },
+      "OrganizationDestination": {
+        "additionalProperties": false,
+        "description": "A target or explicit external destination; fidelity modes do not change target identity.",
+        "properties": {
+          "target": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Target"
+          },
+          "external": {
+            "anyOf": [
+              {
+                "enum": [
+                  "association",
+                  "commentary",
+                  "source-consistent-inference",
+                  "intrusion",
+                  "uninterpretable",
+                  "unranked"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "External"
+          }
+        },
+        "title": "OrganizationDestination",
+        "type": "object"
+      },
+      "OrganizationJoint": {
+        "additionalProperties": false,
+        "description": "A joint belongs to one original adjacency and must reproduce both actual marginals.",
+        "properties": {
+          "left_unit": {
+            "minLength": 1,
+            "title": "Left Unit",
+            "type": "string"
+          },
+          "right_unit": {
+            "minLength": 1,
+            "title": "Right Unit",
+            "type": "string"
+          },
+          "mass": {
+            "items": {
+              "$ref": "#/$defs/JointMass"
+            },
+            "title": "Mass",
+            "type": "array"
+          }
+        },
+        "required": [
+          "left_unit",
+          "right_unit",
+          "mass"
+        ],
+        "title": "OrganizationJoint",
+        "type": "object"
+      },
+      "OrganizationOrder": {
+        "additionalProperties": false,
+        "description": "Caller-declared comparable source ranks, separate from inference scoring coordinates.",
+        "properties": {
+          "axis": {
+            "default": "declared",
+            "enum": [
+              "declared",
+              "discourse",
+              "story-world"
+            ],
+            "title": "Axis",
+            "type": "string"
+          },
+          "positions": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "propertyNames": {
+              "minLength": 1
+            },
+            "title": "Positions",
+            "type": "object"
+          }
+        },
+        "title": "OrganizationOrder",
+        "type": "object"
+      },
+      "OrganizationRow": {
+        "additionalProperties": false,
+        "description": "Unavailable rows remain in their original position; admissibility is explicit.",
+        "properties": {
+          "unit": {
+            "minLength": 1,
+            "title": "Unit",
+            "type": "string"
+          },
+          "status": {
+            "default": "available",
+            "enum": [
+              "available",
+              "unresolved",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "mass": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/DestinationMass"
+            },
+            "title": "Mass",
+            "type": "array"
+          },
+          "admissible": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/$defs/OrganizationDestination"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Admissible"
+          }
+        },
+        "required": [
+          "unit"
+        ],
+        "title": "OrganizationRow",
+        "type": "object"
+      },
+      "OrganizationSpec": {
+        "additionalProperties": false,
+        "description": "Declare the row population, order, dependence and whether product-space bounds are wanted.",
+        "properties": {
+          "schema_version": {
+            "const": "storymodel.organization-spec/v1",
+            "default": "storymodel.organization-spec/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/$defs/OrganizationRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "order": {
+            "$ref": "#/$defs/OrganizationOrder"
+          },
+          "dependence": {
+            "enum": [
+              "independent-rows",
+              "adjacent-joints"
+            ],
+            "title": "Dependence",
+            "type": "string"
+          },
+          "joints": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/OrganizationJoint"
+            },
+            "title": "Joints",
+            "type": "array"
+          },
+          "product_bounds": {
+            "default": true,
+            "title": "Product Bounds",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "rows",
+          "dependence"
+        ],
+        "title": "OrganizationSpec",
+        "type": "object"
+      },
+      "OrganizationTransition": {
+        "additionalProperties": false,
+        "description": "Expected category counts retain the two original unit identifiers.",
+        "properties": {
+          "left_unit": {
+            "minLength": 1,
+            "title": "Left Unit",
+            "type": "string"
+          },
+          "right_unit": {
+            "minLength": 1,
+            "title": "Right Unit",
+            "type": "string"
+          },
+          "counts": {
+            "additionalProperties": {
+              "minimum": 0,
+              "type": "number"
+            },
+            "propertyNames": {
+              "enum": [
+                "backward",
+                "forward",
+                "same-target",
+                "external",
+                "incomparable",
+                "unresolved",
+                "failed"
+              ]
+            },
+            "title": "Counts",
+            "type": "object"
+          }
+        },
+        "required": [
+          "left_unit",
+          "right_unit",
+          "counts"
+        ],
+        "title": "OrganizationTransition",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Conditional numerical readout; a source-bound receipt is not scientific qualification.",
+    "properties": {
+      "schema_version": {
+        "const": "storymodel.organization/v1",
+        "default": "storymodel.organization/v1",
+        "title": "Schema Version",
+        "type": "string"
+      },
+      "method": {
+        "const": "exact-product-sums-coherent-bounds/v1",
+        "default": "exact-product-sums-coherent-bounds/v1",
+        "title": "Method",
+        "type": "string"
+      },
+      "interpretation": {
+        "const": "conditional-numerical-readout",
+        "default": "conditional-numerical-readout",
+        "title": "Interpretation",
+        "type": "string"
+      },
+      "source_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Source Sha256",
+        "type": "string"
+      },
+      "recall_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Recall Sha256",
+        "type": "string"
+      },
+      "export_permission": {
+        "enum": [
+          "allowed",
+          "denied"
+        ],
+        "title": "Export Permission",
+        "type": "string"
+      },
+      "spec": {
+        "$ref": "#/$defs/OrganizationSpec"
+      },
+      "transitions": {
+        "items": {
+          "$ref": "#/$defs/OrganizationTransition"
+        },
+        "title": "Transitions",
+        "type": "array"
+      },
+      "counts": {
+        "additionalProperties": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "propertyNames": {
+          "enum": [
+            "backward",
+            "forward",
+            "same-target",
+            "external",
+            "incomparable",
+            "unresolved",
+            "failed"
+          ]
+        },
+        "title": "Counts",
+        "type": "object"
+      },
+      "adjacency_count": {
+        "minimum": 0,
+        "title": "Adjacency Count",
+        "type": "integer"
+      },
+      "comparable_mass": {
+        "minimum": 0,
+        "title": "Comparable Mass",
+        "type": "number"
+      },
+      "backward_rate": {
+        "anyOf": [
+          {
+            "minimum": 0,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Backward Rate"
+      },
+      "available_units": {
+        "minimum": 0,
+        "title": "Available Units",
+        "type": "integer"
+      },
+      "resolved_adjacencies": {
+        "minimum": 0,
+        "title": "Resolved Adjacencies",
+        "type": "integer"
+      },
+      "information": {
+        "enum": [
+          "uniform-rows",
+          "distinguished-rows",
+          "unavailable"
+        ],
+        "title": "Information",
+        "type": "string"
+      },
+      "bounds": {
+        "anyOf": [
+          {
+            "additionalProperties": {
+              "$ref": "#/$defs/OrganizationBounds"
+            },
+            "propertyNames": {
+              "enum": [
+                "backward",
+                "forward",
+                "same-target",
+                "external",
+                "incomparable",
+                "unresolved",
+                "failed"
+              ]
+            },
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Bounds"
+      },
+      "bounds_status": {
+        "enum": [
+          "product-space",
+          "not-requested",
+          "unavailable-rows"
+        ],
+        "title": "Bounds Status",
+        "type": "string"
+      }
+    },
+    "required": [
+      "source_sha256",
+      "recall_sha256",
+      "export_permission",
+      "spec",
+      "transitions",
+      "counts",
+      "adjacency_count",
+      "comparable_mass",
+      "backward_rate",
+      "available_units",
+      "resolved_adjacencies",
+      "information",
+      "bounds",
+      "bounds_status"
+    ],
+    "title": "OrganizationResult",
+    "type": "object"
+  },
+  "account_result": {
+    "$defs": {
+      "AccountInferenceResult": {
+        "additionalProperties": false,
+        "description": "Local evidence stays inspectable alongside model-conditional sequence posteriors.",
+        "properties": {
+          "schema_version": {
+            "const": "storymodel.account-inference/v1",
+            "default": "storymodel.account-inference/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "evidence": {
+            "$ref": "#/$defs/LocalEvidenceResult"
+          },
+          "inference": {
+            "$ref": "#/$defs/SequenceResult"
+          }
+        },
+        "required": [
+          "evidence",
+          "inference"
+        ],
+        "title": "AccountInferenceResult",
+        "type": "object"
+      },
+      "DestinationMass": {
+        "additionalProperties": false,
+        "description": "A finite normalized-row weight, not an empirical calibration claim.",
+        "properties": {
+          "destination": {
+            "$ref": "#/$defs/OrganizationDestination"
+          },
+          "weight": {
+            "minimum": 0,
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "destination",
+          "weight"
+        ],
+        "title": "DestinationMass",
+        "type": "object"
+      },
+      "FlowMass": {
+        "additionalProperties": false,
+        "description": "Posterior mass for one explicitly possible adjacent transition.",
+        "properties": {
+          "from_state": {
+            "minLength": 1,
+            "title": "From State",
+            "type": "string"
+          },
+          "to_state": {
+            "minLength": 1,
+            "title": "To State",
+            "type": "string"
+          },
+          "probability": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Probability",
+            "type": "number"
+          }
+        },
+        "required": [
+          "from_state",
+          "to_state",
+          "probability"
+        ],
+        "title": "FlowMass",
+        "type": "object"
+      },
+      "FlowStep": {
+        "additionalProperties": false,
+        "description": "Sparse pairwise posterior whose marginals match its neighboring rows.",
+        "properties": {
+          "from_unit": {
+            "minLength": 1,
+            "title": "From Unit",
+            "type": "string"
+          },
+          "to_unit": {
+            "minLength": 1,
+            "title": "To Unit",
+            "type": "string"
+          },
+          "mass": {
+            "items": {
+              "$ref": "#/$defs/FlowMass"
+            },
+            "title": "Mass",
+            "type": "array"
+          }
+        },
+        "required": [
+          "from_unit",
+          "to_unit",
+          "mass"
+        ],
+        "title": "FlowStep",
+        "type": "object"
+      },
+      "JointMass": {
+        "additionalProperties": false,
+        "description": "One sparse pair of destinations with its supplied adjacent joint weight.",
+        "properties": {
+          "left": {
+            "$ref": "#/$defs/OrganizationDestination"
+          },
+          "right": {
+            "$ref": "#/$defs/OrganizationDestination"
+          },
+          "weight": {
+            "minimum": 0,
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "left",
+          "right",
+          "weight"
+        ],
+        "title": "JointMass",
+        "type": "object"
+      },
+      "LocalCell": {
+        "additionalProperties": false,
+        "description": "A gated state with separate priced, measured, missing and eligible term populations.",
+        "properties": {
+          "unit": {
+            "minLength": 1,
+            "title": "Unit",
+            "type": "string"
+          },
+          "target": {
+            "minLength": 1,
+            "title": "Target",
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/$defs/SequenceState"
+          },
+          "gate_members": {
+            "items": {
+              "$ref": "#/$defs/MemberGate"
+            },
+            "title": "Gate Members",
+            "type": "array"
+          },
+          "terms": {
+            "additionalProperties": {
+              "minimum": 0,
+              "type": "number"
+            },
+            "propertyNames": {
+              "enum": [
+                "semantic",
+                "propositional",
+                "entity",
+                "sensory",
+                "granularity",
+                "distortion",
+                "chart",
+                "structural"
+              ]
+            },
+            "title": "Terms",
+            "type": "object"
+          },
+          "slot_defaults": {
+            "additionalProperties": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "propertyNames": {
+              "enum": [
+                "semantic",
+                "propositional",
+                "entity",
+                "sensory",
+                "granularity",
+                "distortion",
+                "chart",
+                "structural"
+              ]
+            },
+            "title": "Slot Defaults",
+            "type": "object"
+          },
+          "missing": {
+            "additionalProperties": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "propertyNames": {
+              "enum": [
+                "semantic",
+                "propositional",
+                "entity",
+                "sensory",
+                "granularity",
+                "distortion",
+                "chart",
+                "structural"
+              ]
+            },
+            "title": "Missing",
+            "type": "object"
+          },
+          "imputed": {
+            "additionalProperties": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "propertyNames": {
+              "enum": [
+                "semantic",
+                "propositional",
+                "entity",
+                "sensory",
+                "granularity",
+                "distortion",
+                "chart",
+                "structural"
+              ]
+            },
+            "title": "Imputed",
+            "type": "object"
+          },
+          "eligible": {
+            "items": {
+              "enum": [
+                "semantic",
+                "propositional",
+                "entity",
+                "sensory",
+                "granularity",
+                "distortion",
+                "chart",
+                "structural"
+              ],
+              "type": "string"
+            },
+            "title": "Eligible",
+            "type": "array"
+          },
+          "measured": {
+            "items": {
+              "enum": [
+                "semantic",
+                "propositional",
+                "entity",
+                "sensory",
+                "granularity",
+                "distortion",
+                "chart",
+                "structural"
+              ],
+              "type": "string"
+            },
+            "title": "Measured",
+            "type": "array"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "support_reason": {
+            "enum": [
+              "assessed",
+              "zero-eligible-weight"
+            ],
+            "title": "Support Reason",
+            "type": "string"
+          },
+          "excluded": {
+            "title": "Excluded",
+            "type": "boolean"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          }
+        },
+        "required": [
+          "unit",
+          "target",
+          "state",
+          "gate_members",
+          "terms",
+          "slot_defaults",
+          "missing",
+          "imputed",
+          "eligible",
+          "measured",
+          "support",
+          "support_reason",
+          "excluded",
+          "total"
+        ],
+        "title": "LocalCell",
+        "type": "object"
+      },
+      "LocalEvidenceResult": {
+        "additionalProperties": false,
+        "description": "Recomputable account-bound evidence and the resulting numerical sequence inputs.",
+        "properties": {
+          "schema_version": {
+            "const": "storymodel.local-evidence/v1",
+            "default": "storymodel.local-evidence/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Source Sha256",
+            "type": "string"
+          },
+          "recall_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Recall Sha256",
+            "type": "string"
+          },
+          "spec_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Spec Sha256",
+            "type": "string"
+          },
+          "retrieval": {
+            "items": {
+              "$ref": "#/$defs/RetrievalRow"
+            },
+            "title": "Retrieval",
+            "type": "array"
+          },
+          "cells": {
+            "items": {
+              "$ref": "#/$defs/LocalCell"
+            },
+            "title": "Cells",
+            "type": "array"
+          },
+          "sequence": {
+            "$ref": "#/$defs/SourceSequenceResult"
+          }
+        },
+        "required": [
+          "source_sha256",
+          "recall_sha256",
+          "spec_sha256",
+          "retrieval",
+          "cells",
+          "sequence"
+        ],
+        "title": "LocalEvidenceResult",
+        "type": "object"
+      },
+      "MemberGate": {
+        "additionalProperties": false,
+        "description": "Retain which actual leaves engaged a segment and why they contradicted recall.",
+        "properties": {
+          "target": {
+            "minLength": 1,
+            "title": "Target",
+            "type": "string"
+          },
+          "engaged": {
+            "title": "Engaged",
+            "type": "boolean"
+          },
+          "facets": {
+            "items": {
+              "enum": [
+                "actor",
+                "action",
+                "object",
+                "location",
+                "outcome",
+                "cause",
+                "context",
+                "role-reversal",
+                "polarity",
+                "modality"
+              ],
+              "type": "string"
+            },
+            "title": "Facets",
+            "type": "array"
+          }
+        },
+        "required": [
+          "target",
+          "engaged",
+          "facets"
+        ],
+        "title": "MemberGate",
+        "type": "object"
+      },
+      "Nomination": {
+        "additionalProperties": false,
+        "description": "A retrieval score selects candidates without becoming a cost or probability.",
+        "properties": {
+          "target": {
+            "minLength": 1,
+            "title": "Target",
+            "type": "string"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          }
+        },
+        "required": [
+          "target",
+          "score"
+        ],
+        "title": "Nomination",
+        "type": "object"
+      },
+      "OrganizationBounds": {
+        "additionalProperties": false,
+        "description": "Whole-path extrema share a coherent assignment at every intermediate unit.",
+        "properties": {
+          "minimum": {
+            "minimum": 0,
+            "title": "Minimum",
+            "type": "integer"
+          },
+          "maximum": {
+            "minimum": 0,
+            "title": "Maximum",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "minimum",
+          "maximum"
+        ],
+        "title": "OrganizationBounds",
+        "type": "object"
+      },
+      "OrganizationDestination": {
+        "additionalProperties": false,
+        "description": "A target or explicit external destination; fidelity modes do not change target identity.",
+        "properties": {
+          "target": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Target"
+          },
+          "external": {
+            "anyOf": [
+              {
+                "enum": [
+                  "association",
+                  "commentary",
+                  "source-consistent-inference",
+                  "intrusion",
+                  "uninterpretable",
+                  "unranked"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "External"
+          }
+        },
+        "title": "OrganizationDestination",
+        "type": "object"
+      },
+      "OrganizationJoint": {
+        "additionalProperties": false,
+        "description": "A joint belongs to one original adjacency and must reproduce both actual marginals.",
+        "properties": {
+          "left_unit": {
+            "minLength": 1,
+            "title": "Left Unit",
+            "type": "string"
+          },
+          "right_unit": {
+            "minLength": 1,
+            "title": "Right Unit",
+            "type": "string"
+          },
+          "mass": {
+            "items": {
+              "$ref": "#/$defs/JointMass"
+            },
+            "title": "Mass",
+            "type": "array"
+          }
+        },
+        "required": [
+          "left_unit",
+          "right_unit",
+          "mass"
+        ],
+        "title": "OrganizationJoint",
+        "type": "object"
+      },
+      "OrganizationOrder": {
+        "additionalProperties": false,
+        "description": "Caller-declared comparable source ranks, separate from inference scoring coordinates.",
+        "properties": {
+          "axis": {
+            "default": "declared",
+            "enum": [
+              "declared",
+              "discourse",
+              "story-world"
+            ],
+            "title": "Axis",
+            "type": "string"
+          },
+          "positions": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "propertyNames": {
+              "minLength": 1
+            },
+            "title": "Positions",
+            "type": "object"
+          }
+        },
+        "title": "OrganizationOrder",
+        "type": "object"
+      },
+      "OrganizationResult": {
+        "additionalProperties": false,
+        "description": "Conditional numerical readout; a source-bound receipt is not scientific qualification.",
+        "properties": {
+          "schema_version": {
+            "const": "storymodel.organization/v1",
+            "default": "storymodel.organization/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "method": {
+            "const": "exact-product-sums-coherent-bounds/v1",
+            "default": "exact-product-sums-coherent-bounds/v1",
+            "title": "Method",
+            "type": "string"
+          },
+          "interpretation": {
+            "const": "conditional-numerical-readout",
+            "default": "conditional-numerical-readout",
+            "title": "Interpretation",
+            "type": "string"
+          },
+          "source_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Source Sha256",
+            "type": "string"
+          },
+          "recall_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Recall Sha256",
+            "type": "string"
+          },
+          "export_permission": {
+            "enum": [
+              "allowed",
+              "denied"
+            ],
+            "title": "Export Permission",
+            "type": "string"
+          },
+          "spec": {
+            "$ref": "#/$defs/OrganizationSpec"
+          },
+          "transitions": {
+            "items": {
+              "$ref": "#/$defs/OrganizationTransition"
+            },
+            "title": "Transitions",
+            "type": "array"
+          },
+          "counts": {
+            "additionalProperties": {
+              "minimum": 0,
+              "type": "number"
+            },
+            "propertyNames": {
+              "enum": [
+                "backward",
+                "forward",
+                "same-target",
+                "external",
+                "incomparable",
+                "unresolved",
+                "failed"
+              ]
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "adjacency_count": {
+            "minimum": 0,
+            "title": "Adjacency Count",
+            "type": "integer"
+          },
+          "comparable_mass": {
+            "minimum": 0,
+            "title": "Comparable Mass",
+            "type": "number"
+          },
+          "backward_rate": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Backward Rate"
+          },
+          "available_units": {
+            "minimum": 0,
+            "title": "Available Units",
+            "type": "integer"
+          },
+          "resolved_adjacencies": {
+            "minimum": 0,
+            "title": "Resolved Adjacencies",
+            "type": "integer"
+          },
+          "information": {
+            "enum": [
+              "uniform-rows",
+              "distinguished-rows",
+              "unavailable"
+            ],
+            "title": "Information",
+            "type": "string"
+          },
+          "bounds": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/$defs/OrganizationBounds"
+                },
+                "propertyNames": {
+                  "enum": [
+                    "backward",
+                    "forward",
+                    "same-target",
+                    "external",
+                    "incomparable",
+                    "unresolved",
+                    "failed"
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bounds"
+          },
+          "bounds_status": {
+            "enum": [
+              "product-space",
+              "not-requested",
+              "unavailable-rows"
+            ],
+            "title": "Bounds Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_sha256",
+          "recall_sha256",
+          "export_permission",
+          "spec",
+          "transitions",
+          "counts",
+          "adjacency_count",
+          "comparable_mass",
+          "backward_rate",
+          "available_units",
+          "resolved_adjacencies",
+          "information",
+          "bounds",
+          "bounds_status"
+        ],
+        "title": "OrganizationResult",
+        "type": "object"
+      },
+      "OrganizationRow": {
+        "additionalProperties": false,
+        "description": "Unavailable rows remain in their original position; admissibility is explicit.",
+        "properties": {
+          "unit": {
+            "minLength": 1,
+            "title": "Unit",
+            "type": "string"
+          },
+          "status": {
+            "default": "available",
+            "enum": [
+              "available",
+              "unresolved",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "mass": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/DestinationMass"
+            },
+            "title": "Mass",
+            "type": "array"
+          },
+          "admissible": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/$defs/OrganizationDestination"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Admissible"
+          }
+        },
+        "required": [
+          "unit"
+        ],
+        "title": "OrganizationRow",
+        "type": "object"
+      },
+      "OrganizationSpec": {
+        "additionalProperties": false,
+        "description": "Declare the row population, order, dependence and whether product-space bounds are wanted.",
+        "properties": {
+          "schema_version": {
+            "const": "storymodel.organization-spec/v1",
+            "default": "storymodel.organization-spec/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/$defs/OrganizationRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "order": {
+            "$ref": "#/$defs/OrganizationOrder"
+          },
+          "dependence": {
+            "enum": [
+              "independent-rows",
+              "adjacent-joints"
+            ],
+            "title": "Dependence",
+            "type": "string"
+          },
+          "joints": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/OrganizationJoint"
+            },
+            "title": "Joints",
+            "type": "array"
+          },
+          "product_bounds": {
+            "default": true,
+            "title": "Product Bounds",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "rows",
+          "dependence"
+        ],
+        "title": "OrganizationSpec",
+        "type": "object"
+      },
+      "OrganizationTransition": {
+        "additionalProperties": false,
+        "description": "Expected category counts retain the two original unit identifiers.",
+        "properties": {
+          "left_unit": {
+            "minLength": 1,
+            "title": "Left Unit",
+            "type": "string"
+          },
+          "right_unit": {
+            "minLength": 1,
+            "title": "Right Unit",
+            "type": "string"
+          },
+          "counts": {
+            "additionalProperties": {
+              "minimum": 0,
+              "type": "number"
+            },
+            "propertyNames": {
+              "enum": [
+                "backward",
+                "forward",
+                "same-target",
+                "external",
+                "incomparable",
+                "unresolved",
+                "failed"
+              ]
+            },
+            "title": "Counts",
+            "type": "object"
+          }
+        },
+        "required": [
+          "left_unit",
+          "right_unit",
+          "counts"
+        ],
+        "title": "OrganizationTransition",
+        "type": "object"
+      },
+      "PosteriorRow": {
+        "additionalProperties": false,
+        "description": "Posterior over all declared states of one unit, including zero mass.",
+        "properties": {
+          "unit": {
+            "minLength": 1,
+            "title": "Unit",
+            "type": "string"
+          },
+          "mass": {
+            "items": {
+              "$ref": "#/$defs/StateMass"
+            },
+            "minItems": 1,
+            "title": "Mass",
+            "type": "array"
+          }
+        },
+        "required": [
+          "unit",
+          "mass"
+        ],
+        "title": "PosteriorRow",
+        "type": "object"
+      },
+      "RetrievalRow": {
+        "additionalProperties": false,
+        "description": "Distinguish supplied, complete, search-limited and abstained candidate populations.",
+        "properties": {
+          "unit": {
+            "minLength": 1,
+            "title": "Unit",
+            "type": "string"
+          },
+          "situation": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Situation"
+          },
+          "status": {
+            "enum": [
+              "supplied",
+              "ranked",
+              "empty",
+              "search-limited",
+              "abstained"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "nominations": {
+            "items": {
+              "$ref": "#/$defs/Nomination"
+            },
+            "title": "Nominations",
+            "type": "array"
+          },
+          "postings_read": {
+            "minimum": 0,
+            "title": "Postings Read",
+            "type": "integer"
+          },
+          "candidates_seen": {
+            "minimum": 0,
+            "title": "Candidates Seen",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "unit",
+          "situation",
+          "status",
+          "nominations",
+          "postings_read",
+          "candidates_seen"
+        ],
+        "title": "RetrievalRow",
+        "type": "object"
+      },
+      "SemanticLink": {
+        "additionalProperties": false,
+        "description": "An explicitly supplied similarity sidecar, not identity or calibrated probability.",
+        "properties": {
+          "source": {
+            "minLength": 1,
+            "title": "Source",
+            "type": "string"
+          },
+          "target": {
+            "minLength": 1,
+            "title": "Target",
+            "type": "string"
+          },
+          "weight": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "source",
+          "target",
+          "weight"
+        ],
+        "title": "SemanticLink",
+        "type": "object"
+      },
+      "SequenceRequest": {
+        "additionalProperties": false,
+        "description": "Checked numerical inputs, independently of a provider or account representation.",
+        "properties": {
+          "schema_version": {
+            "const": "storymodel.sequence-request/v1",
+            "default": "storymodel.sequence-request/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/$defs/SequenceRow"
+            },
+            "minItems": 1,
+            "title": "Rows",
+            "type": "array"
+          },
+          "transitions": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/SequenceTransition"
+            },
+            "title": "Transitions",
+            "type": "array"
+          },
+          "temperature": {
+            "default": 1.0,
+            "exclusiveMinimum": 0,
+            "title": "Temperature",
+            "type": "number"
+          },
+          "export_permission": {
+            "default": "denied",
+            "enum": [
+              "allowed",
+              "denied"
+            ],
+            "title": "Export Permission",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rows"
+        ],
+        "title": "SequenceRequest",
+        "type": "object"
+      },
+      "SequenceResult": {
+        "additionalProperties": false,
+        "description": "Numerical outputs bound to exact inputs; use verify_sequence on external results.",
+        "properties": {
+          "schema_version": {
+            "const": "storymodel.sequence-result/v1",
+            "default": "storymodel.sequence-result/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "method": {
+            "const": "sparse-forward-backward/v1",
+            "default": "sparse-forward-backward/v1",
+            "title": "Method",
+            "type": "string"
+          },
+          "request_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Request Sha256",
+            "type": "string"
+          },
+          "posterior": {
+            "items": {
+              "$ref": "#/$defs/PosteriorRow"
+            },
+            "minItems": 1,
+            "title": "Posterior",
+            "type": "array"
+          },
+          "flow": {
+            "items": {
+              "$ref": "#/$defs/FlowStep"
+            },
+            "title": "Flow",
+            "type": "array"
+          },
+          "best_path": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Best Path",
+            "type": "array"
+          },
+          "log_normalizer": {
+            "title": "Log Normalizer",
+            "type": "number"
+          },
+          "best_path_log_weight": {
+            "title": "Best Path Log Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "request_sha256",
+          "posterior",
+          "flow",
+          "best_path",
+          "log_normalizer",
+          "best_path_log_weight"
+        ],
+        "title": "SequenceResult",
+        "type": "object"
+      },
+      "SequenceRow": {
+        "additionalProperties": false,
+        "description": "One ordered unit's complete declared state population.",
+        "properties": {
+          "unit": {
+            "minLength": 1,
+            "title": "Unit",
+            "type": "string"
+          },
+          "costs": {
+            "items": {
+              "$ref": "#/$defs/StateCost"
+            },
+            "minItems": 1,
+            "title": "Costs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "unit",
+          "costs"
+        ],
+        "title": "SequenceRow",
+        "type": "object"
+      },
+      "SequenceState": {
+        "additionalProperties": false,
+        "description": "A declared anchored mode or explicit external destination, not an inferred claim.",
+        "properties": {
+          "kind": {
+            "enum": [
+              "source",
+              "distorted",
+              "external"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "anchor_kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "situation",
+                  "segment"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Anchor Kind"
+          },
+          "anchor": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Anchor"
+          },
+          "facets": {
+            "default": [],
+            "items": {
+              "enum": [
+                "actor",
+                "action",
+                "object",
+                "location",
+                "outcome",
+                "cause",
+                "context",
+                "role-reversal",
+                "polarity",
+                "modality"
+              ],
+              "type": "string"
+            },
+            "title": "Facets",
+            "type": "array"
+          },
+          "external": {
+            "anyOf": [
+              {
+                "enum": [
+                  "association",
+                  "commentary",
+                  "source-consistent-inference",
+                  "intrusion",
+                  "uninterpretable",
+                  "unranked"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "External"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "SequenceState",
+        "type": "object"
+      },
+      "SequenceTransition": {
+        "additionalProperties": false,
+        "description": "Sparse stochastic edges between two named adjacent units.",
+        "properties": {
+          "from_unit": {
+            "minLength": 1,
+            "title": "From Unit",
+            "type": "string"
+          },
+          "to_unit": {
+            "minLength": 1,
+            "title": "To Unit",
+            "type": "string"
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/$defs/TransitionEdge"
+            },
+            "title": "Edges",
+            "type": "array"
+          }
+        },
+        "required": [
+          "from_unit",
+          "to_unit",
+          "edges"
+        ],
+        "title": "SequenceTransition",
+        "type": "object"
+      },
+      "SourceLayerEdge": {
+        "additionalProperties": false,
+        "description": "A sparse directed edge keeps its scientific relation layer explicit.",
+        "properties": {
+          "source": {
+            "minLength": 1,
+            "title": "Source",
+            "type": "string"
+          },
+          "target": {
+            "minLength": 1,
+            "title": "Target",
+            "type": "string"
+          },
+          "weight": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Weight",
+            "type": "number"
+          },
+          "layer": {
+            "enum": [
+              "discourse",
+              "world-time",
+              "causal",
+              "entity",
+              "hierarchy",
+              "semantic",
+              "reference"
+            ],
+            "title": "Layer",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "target",
+          "weight",
+          "layer"
+        ],
+        "title": "SourceLayerEdge",
+        "type": "object"
+      },
+      "SourceNode": {
+        "additionalProperties": false,
+        "description": "A source anchor retains actual parentage and optional document-local text coordinates.",
+        "properties": {
+          "anchor": {
+            "minLength": 1,
+            "title": "Anchor",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "situation",
+              "segment"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "level": {
+            "minimum": 0,
+            "title": "Level",
+            "type": "integer"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent"
+          },
+          "document": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document"
+          },
+          "onset": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Onset"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          }
+        },
+        "required": [
+          "anchor",
+          "kind",
+          "level",
+          "parent",
+          "document",
+          "onset",
+          "position"
+        ],
+        "title": "SourceNode",
+        "type": "object"
+      },
+      "SourceProjection": {
+        "additionalProperties": false,
+        "description": "An account-bound derived snapshot; consumers recompute it before using saved values.",
+        "properties": {
+          "schema_version": {
+            "const": "storymodel.source-projection/v1",
+            "default": "storymodel.source-projection/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "account_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Account Sha256",
+            "type": "string"
+          },
+          "policy": {
+            "$ref": "#/$defs/SourceProjectionPolicy"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/$defs/SourceNode"
+            },
+            "title": "Nodes",
+            "type": "array"
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/$defs/SourceLayerEdge"
+            },
+            "title": "Edges",
+            "type": "array"
+          }
+        },
+        "required": [
+          "account_sha256",
+          "policy",
+          "nodes",
+          "edges"
+        ],
+        "title": "SourceProjection",
+        "type": "object"
+      },
+      "SourceProjectionPolicy": {
+        "additionalProperties": false,
+        "description": "Declare scoring coordinates and primary containment instead of inferring either silently.",
+        "properties": {
+          "recipe": {
+            "const": "account-source-layers/v1",
+            "default": "account-source-layers/v1",
+            "title": "Recipe",
+            "type": "string"
+          },
+          "scoring_documents": {
+            "default": [],
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Scoring Documents",
+            "type": "array"
+          },
+          "memberships": {
+            "additionalProperties": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "propertyNames": {
+              "minLength": 1
+            },
+            "title": "Memberships",
+            "type": "object"
+          },
+          "entity_fanout": {
+            "default": 8,
+            "minimum": 0,
+            "title": "Entity Fanout",
+            "type": "integer"
+          },
+          "semantic_links": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/SemanticLink"
+            },
+            "title": "Semantic Links",
+            "type": "array"
+          }
+        },
+        "title": "SourceProjectionPolicy",
+        "type": "object"
+      },
+      "SourceSequenceResult": {
+        "additionalProperties": false,
+        "description": "Receipt for a producer of numerical inputs, without claiming local admissibility.",
+        "properties": {
+          "schema_version": {
+            "const": "storymodel.source-sequence/v1",
+            "default": "storymodel.source-sequence/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Source Sha256",
+            "type": "string"
+          },
+          "recall_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Recall Sha256",
+            "type": "string"
+          },
+          "spec_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Spec Sha256",
+            "type": "string"
+          },
+          "projection": {
+            "$ref": "#/$defs/SourceProjection"
+          },
+          "diagnostics": {
+            "items": {
+              "$ref": "#/$defs/TransitionDiagnostic"
+            },
+            "title": "Diagnostics",
+            "type": "array"
+          },
+          "request": {
+            "$ref": "#/$defs/SequenceRequest"
+          }
+        },
+        "required": [
+          "source_sha256",
+          "recall_sha256",
+          "spec_sha256",
+          "projection",
+          "diagnostics",
+          "request"
+        ],
+        "title": "SourceSequenceResult",
+        "type": "object"
+      },
+      "StateCost": {
+        "additionalProperties": false,
+        "description": "Finite energy for a declared state; negative energies are permitted explicitly.",
+        "properties": {
+          "state": {
+            "$ref": "#/$defs/SequenceState"
+          },
+          "cost": {
+            "title": "Cost",
+            "type": "number"
+          }
+        },
+        "required": [
+          "state",
+          "cost"
+        ],
+        "title": "StateCost",
+        "type": "object"
+      },
+      "StateMass": {
+        "additionalProperties": false,
+        "description": "Model-conditional posterior mass, never an empirical calibration claim.",
+        "properties": {
+          "state": {
+            "minLength": 1,
+            "title": "State",
+            "type": "string"
+          },
+          "probability": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Probability",
+            "type": "number"
+          }
+        },
+        "required": [
+          "state",
+          "probability"
+        ],
+        "title": "StateMass",
+        "type": "object"
+      },
+      "TransitionDiagnostic": {
+        "additionalProperties": false,
+        "description": "One anchor pair's features and score, shared by faithful and distorted modes.",
+        "properties": {
+          "source": {
+            "minLength": 1,
+            "title": "Source",
+            "type": "string"
+          },
+          "target": {
+            "minLength": 1,
+            "title": "Target",
+            "type": "string"
+          },
+          "features": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "propertyNames": {
+              "enum": [
+                "stay",
+                "discourse-successor",
+                "world-time-successor",
+                "causal-neighbor",
+                "hierarchy-up",
+                "hierarchy-down",
+                "same-entity-thread",
+                "semantic-neighbor",
+                "backward",
+                "long-jump",
+                "external-in",
+                "external-stay",
+                "cause-to-effect",
+                "effect-to-cause"
+              ]
+            },
+            "title": "Features",
+            "type": "object"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "source",
+          "target",
+          "features",
+          "score"
+        ],
+        "title": "TransitionDiagnostic",
+        "type": "object"
+      },
+      "TransitionEdge": {
+        "additionalProperties": false,
+        "description": "A directed edge between adjacent layers; absent and zero edges are impossible.",
+        "properties": {
+          "from_state": {
+            "minLength": 1,
+            "title": "From State",
+            "type": "string"
+          },
+          "to_state": {
+            "minLength": 1,
+            "title": "To State",
+            "type": "string"
+          },
+          "probability": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Probability",
+            "type": "number"
+          }
+        },
+        "required": [
+          "from_state",
+          "to_state",
+          "probability"
+        ],
+        "title": "TransitionEdge",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Joint-flow readout retains its model; it cannot certify independent organization.",
+    "properties": {
+      "schema_version": {
+        "const": "storymodel.account-organization/v1",
+        "default": "storymodel.account-organization/v1",
+        "title": "Schema Version",
+        "type": "string"
+      },
+      "interpretation": {
+        "const": "model-conditional-not-independent-measurement",
+        "default": "model-conditional-not-independent-measurement",
+        "title": "Interpretation",
+        "type": "string"
+      },
+      "inference": {
+        "$ref": "#/$defs/AccountInferenceResult"
+      },
+      "organization": {
+        "$ref": "#/$defs/OrganizationResult"
+      }
+    },
+    "required": [
+      "inference",
+      "organization"
+    ],
+    "title": "AccountOrganizationResult",
+    "type": "object"
+  }
+}

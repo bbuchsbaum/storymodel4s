@@ -10,13 +10,16 @@ from typing import Literal
 
 from storymodel import (
     LocalEvidenceSpec,
+    OrganizationOrder,
     RecallSelection,
     ReconstructionPolicy,
     ReconstructionSpec,
     infer_accounts,
     make_account,
+    organize_accounts,
     reconstruct_accounts,
     verify_account_inference,
+    verify_account_organization,
     verify_account_reconstruction,
 )
 from storymodel.artifacts import publish_json
@@ -101,6 +104,18 @@ def run(output: Path) -> None:
     )
     assert reconstruction.inference == result
     verify_account_reconstruction(source, recall, spec, reconstruction_spec, reconstruction)
+    order = OrganizationOrder(
+        axis="discourse",
+        positions={
+            **{state.id: float(i) for i, state in enumerate(source.states)},
+            **{row.id: float(i) for i, row in enumerate(source.units)},
+        },
+    )
+    organization = organize_accounts(source, recall, spec, order, inference=result)
+    assert organization.inference == result
+    assert organization.organization.adjacency_count == len(recall.units) - 1
+    assert organization.organization.spec.dependence == "adjacent-joints"
+    verify_account_organization(source, recall, spec, order, organization)
     output.mkdir(parents=True, exist_ok=False)
     for name, artifact in (
         ("source", source),
@@ -111,9 +126,11 @@ def run(output: Path) -> None:
         ("inference", result),
         ("reconstruction-spec", reconstruction_spec),
         ("reconstruction", reconstruction),
+        ("organization-order", order),
+        ("organization", organization),
     ):
         publish_json(output / f"{name}.json", artifact.model_dump(mode="json"))
-    print("Saved 3 inferred units: ordinary, role-reversed and polarity-conflicting controls.")
+    print("Saved 3 units with inference, reconstruction and conditional organization.")
 
 
 if __name__ == "__main__":

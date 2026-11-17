@@ -436,3 +436,21 @@ Python improvements: memoized ancestry, accurately summed mass and wide score in
 strict object/JSON admission and complete input-bound recomputation. No automatic reference or
 fidelity promotion. [Contract](reconstruction.md). Refinement, complete evidence providers and
 organization/scientific readouts remain owed; source review is not executed Scala parity.
+
+## P4 conditional organization readout (2026-11-17)
+
+Reference: `align/organizationreadout.scala`, `OrganizationReadoutSuite`, and `MappingPipeline`
+organization/reference-organization consumers. Python `organization.py` provides source-bound
+supplied numerical rows with explicitly declared independence or adjacent joints, coherent
+product-space bounds and an account-inference joint-flow wrapper. Original input adjacency,
+processing outcomes and external/unranked/incomparable distinctions remain present. Source
+and recall ownership, actual joint marginals and all saved results are checked.
+Mote: `bd-01M7M9T5WGNDFDBRDRD4SMY4FT`.
+
+Deliberate improvements: exact streaming binary64 product aggregation before output conversion,
+a global joint-total check in addition to per-marginal tolerance, and explicit availability
+terminology instead of implying independently measured units. Faithful and distorted modes
+collapse by target for this readout, while the original inference remains available. Coupled
+bounds refuse. Native media part-order/source composition and the registered independent
+measurement-eligibility pipeline remain owed. [Contract](organization.md); no scientific
+accuracy or executed Scala runtime comparison is claimed.

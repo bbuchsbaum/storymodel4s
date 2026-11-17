@@ -56,6 +56,16 @@ from .local_evidence import (
     verify_account_inference,
 )
 from .model import Account, canonical
+from .organization import (
+    AccountOrganizationResult,
+    OrganizationOrder,
+    OrganizationResult,
+    OrganizationSpec,
+    organization_readout,
+    organize_accounts,
+    verify_account_organization,
+    verify_organization_readout,
+)
 from .reconstruction import (
     AccountReconstructionResult,
     ReconstructionSpec,
@@ -411,10 +421,108 @@ def main(argv: list[str] | None = None) -> int:
             reconstruction.add_argument("--output")
         else:
             reconstruction.add_argument("result")
+    for name in (
+        "organization-readout",
+        "verify-organization-readout",
+        "organize-accounts",
+        "verify-account-organization",
+    ):
+        organization = commands.add_parser(
+            name, help="conditional organization with explicit dependence"
+        )
+        organization.add_argument("source")
+        organization.add_argument("recall")
+        if "account" in name:
+            organization.add_argument("evidence_spec")
+            organization.add_argument("order")
+        else:
+            organization.add_argument("spec")
+        organization.add_argument("--source-sha256")
+        organization.add_argument("--recall-sha256")
+        if name.startswith("verify-"):
+            organization.add_argument("result")
+        else:
+            organization.add_argument("--output")
+        if name == "organize-accounts":
+            organization.add_argument("--inference")
     args = parser.parse_args(argv)
     try:
         if args.command == "example":
             emit(example_account().model_dump(mode="json"), args.output)
+        elif args.command in (
+            "organization-readout",
+            "verify-organization-readout",
+            "organize-accounts",
+            "verify-account-organization",
+        ):
+            org_source = read_supported_account(
+                Path(args.source), expected_sha256=args.source_sha256
+            )
+            exporting = not args.command.startswith("verify-")
+            if exporting and org_source.export_permission != "allowed":
+                raise PermissionError("producer denies source organization export")
+            org_recall = read_supported_account(
+                Path(args.recall), expected_sha256=args.recall_sha256
+            )
+            if exporting and org_recall.export_permission != "allowed":
+                raise PermissionError("producer denies recall organization export")
+            if "account" in args.command:
+                org_evidence = LocalEvidenceSpec.model_validate_json(
+                    canonical(strict_json(Path(args.evidence_spec).read_bytes()))
+                )
+                org_order = OrganizationOrder.model_validate_json(
+                    canonical(strict_json(Path(args.order).read_bytes()))
+                )
+                if exporting:
+                    org_inference = (
+                        AccountInferenceResult.model_validate_json(
+                            canonical(strict_json(Path(args.inference).read_bytes()))
+                        )
+                        if args.inference
+                        else None
+                    )
+                    account_organization = organize_accounts(
+                        org_source, org_recall, org_evidence, org_order, inference=org_inference
+                    )
+                    emit(account_organization.model_dump(mode="json"), args.output)
+                else:
+                    verified_org_account = verify_account_organization(
+                        org_source,
+                        org_recall,
+                        org_evidence,
+                        org_order,
+                        AccountOrganizationResult.model_validate_json(
+                            canonical(strict_json(Path(args.result).read_bytes()))
+                        ),
+                    )
+                    emit(
+                        {
+                            "valid": True,
+                            "source_sha256": verified_org_account.organization.source_sha256,
+                        },
+                        None,
+                    )
+            else:
+                org_spec = OrganizationSpec.model_validate_json(
+                    canonical(strict_json(Path(args.spec).read_bytes()))
+                )
+                if exporting:
+                    emit(
+                        organization_readout(org_source, org_recall, org_spec).model_dump(
+                            mode="json"
+                        ),
+                        args.output,
+                    )
+                else:
+                    verified_org_rows = verify_organization_readout(
+                        org_source,
+                        org_recall,
+                        org_spec,
+                        OrganizationResult.model_validate_json(
+                            canonical(strict_json(Path(args.result).read_bytes()))
+                        ),
+                    )
+                    emit({"valid": True, "source_sha256": verified_org_rows.source_sha256}, None)
         elif args.command in ("reconstruct-accounts", "verify-account-reconstruction"):
             reconstruction_source = read_supported_account(
                 Path(args.source), expected_sha256=args.source_sha256
