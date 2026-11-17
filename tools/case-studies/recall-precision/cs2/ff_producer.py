@@ -317,6 +317,17 @@ the speaker moves on. Be calibrated.
 Reply with JSON only: {"units": [{"id": "U1", "kind": "...", "frame": [{"film": "...", "w": 0.9}], \
 "position": null}]} covering every unit exactly once."""
 
+# ---- pass 1, version 1b (hill-climb round 3; 2026-11-17): v1 with one sentence changed, so that
+# speech searching for the next film carries no frame. Nothing else differs from v1.
+PASS1_SENTENCE_V1 = ("Use the whole recall: the film being talked about is usually set by earlier "
+                     "units and holds until the speaker moves on.")
+PASS1_SENTENCE_V1B = ("Use the whole recall: the film being talked about is usually set by earlier "
+                      "units and holds until the speaker moves on, except that speech searching "
+                      "for what came next has no frame.")
+assert PASS1_SYSTEM.count(PASS1_SENTENCE_V1) == 1
+PASS1_SYSTEM_V1B = PASS1_SYSTEM.replace(PASS1_SENTENCE_V1, PASS1_SENTENCE_V1B)
+PASS1_VERSIONS = ("v1", "v1b", "v2")
+
 PASS1_TEMPLATE = (
     "FILMS (arbitrary order)\n{outline}\n\nRECALL UNITS (in spoken order)\n{units}\n\n"
     "Return all {n} units."
@@ -1090,6 +1101,7 @@ def run(
     pass1_from: Path | None = None,
     films: list | None = None,
     control: str | None = None,
+    reuse_pass2_from: Path | None = None,
 ):
     """Both passes over `sessions` (development only), pass 2 pooled across them.
 
@@ -1103,9 +1115,12 @@ def run(
     if layout not in LAYOUTS:
         raise ValueError(f"unknown layout {layout!r}")
     arms = PASS2_SPAN_ARMS if layout == "prefix" else PASS2_ARMS
-    if pass1 not in ("v1", "v2"):
+    if pass1 not in PASS1_VERSIONS:
         raise ValueError(f"unknown pass-1 version {pass1!r}")
-    sys1 = corpus_text(PASS1_SYSTEM_V2 if pass1 == "v2" else PASS1_SYSTEM, A, 1)
+    if reuse_pass2_from is not None and (layout != "per-call" or films or control):
+        raise ValueError("pass-2 reuse is declared for the plain per-call layout only")
+    sys1 = corpus_text(dict(v1=PASS1_SYSTEM, v1b=PASS1_SYSTEM_V1B, v2=PASS1_SYSTEM_V2)[pass1],
+                       A, 1)
     sys2 = corpus_text(arms[arm], A, 2)
     conds = conditions(seed, salt, sample, arm, A.WORD_CLOCK_RECEIPT, (sys1, sys2),
                        getattr(A, "PRODUCER_SEGMENTER", None), layout)
@@ -1213,9 +1228,14 @@ def run(
 
     if control not in (None, "wrong-context", "content-shuffle"):
         raise ValueError(f"unknown control {control!r}")
-    items = []
-    for key, d in data.items():
-        units, frames = d["units"], d["frames"]
+    def build_items(frames_of):
+        out_items = []
+        for key, d in data.items():
+            out_items.extend(session_items(key, d["units"], frames_of(key)))
+        return out_items
+
+    def session_items(key, units, frames):
+        got = []
         if control == "content-shuffle":
             units = shuffle_unit_texts(units, seed, sample, key)
         for i, (u, f) in enumerate(zip(units, frames)):
@@ -1224,7 +1244,7 @@ def run(
                 work = (
                     f["frame"][0][0] if f["frame"] else works[-1]
                 )  # dry: placeholder film
-                items.append(
+                got.append(
                     dict(
                         session_key=key,
                         k=i,
@@ -1235,58 +1255,106 @@ def run(
                         oid=opaque(f"{salt}:{sample}", f"{key[0]}:{key[1]}:{i}"),
                     )
                 )
+        return got
+
+    items = build_items(lambda key: data[key]["frames"])
     if films:
         items = [it for it in items if it["work"] in films]
     if control == "wrong-context":
         swap_contexts(items, seed, sample)
-    batches = (make_film_batches(items, seed, sample) if layout == "prefix"
-               else make_batches(items, seed, sample))
-    ledger["batches"] = batch_report(batches)
-    answers, p2_calls, rendered = {}, [], []
-    film_prefix = {}
-    for bi, batch in enumerate(batches):
-        if layout == "prefix":
-            w = batch[0]["work"]
-            if w not in film_prefix:
-                o2, rmap, _ = film_outline(comp, texts, [w], random.Random(0), f"{salt}:{sample}",
-                                           True, outline_order, extras)
-                head = f"CAST\n{cast_line}\n\n" if cast_line else ""
-                film_prefix[w] = (sys2 + "\n\nFILM ANNOTATION\n" + head + o2, rmap)
-            sysw, rmap = film_prefix[w]
-            rendered.append((pass2_prompt_prefix(batch), rmap, [w], sysw))
-            continue
-        rng = random.Random(f"{seed}:{sample}:pass2:call{bi}")
-        bworks = sorted({it["work"] for it in batch})
-        outline2, rowmap, order2 = film_outline(
-            comp, texts, bworks, rng, f"{salt}:{sample}:call{bi}", True, outline_order, extras
-        )
-        rendered.append((pass2_prompt(batch, outline2, cast_line), rowmap, order2, sys2))
-    if not dry:
-        prefetch([(r[0], r[3]) for r in rendered], jobs)
-    for bi, (batch, (prompt2, rowmap, order2, sysb)) in enumerate(zip(batches, rendered)):
-        rec = dict(
-            call=bi,
-            items=len(batch),
-            films=order2,
-            prompt_sha256=sha256(prompt2),
-            prompt_chars=len(prompt2),
-            system_sha256=sha256(sysb),
-            system_chars=len(sysb),
-            sessions=len({it["session_key"] for it in batch}),
-        )
-        if not dry:
-            got, retries = parse_with_retry(
-                prompt2,
-                sysb,
-                log,
-                f"pass2:call{bi}",
-                "items",
-                conds["pass2"]["id"],
+    def do_pass2(items_, tag, log_):
+        """Batch, render and call pass 2 for items_. tag '' is the run's own rendering; a
+        non-empty tag renders fresh calls for a reuse run so that their keys differ."""
+        batches = (make_film_batches(items_, seed, sample) if layout == "prefix"
+                   else make_batches(items_, seed, sample))
+        answers, p2_calls, rendered = {}, [], []
+        film_prefix = {}
+        for bi, batch in enumerate(batches):
+            if layout == "prefix":
+                w = batch[0]["work"]
+                if w not in film_prefix:
+                    o2, rmap, _ = film_outline(comp, texts, [w], random.Random(0), f"{salt}:{sample}",
+                                               True, outline_order, extras)
+                    head = f"CAST\n{cast_line}\n\n" if cast_line else ""
+                    film_prefix[w] = (sys2 + "\n\nFILM ANNOTATION\n" + head + o2, rmap)
+                sysw, rmap = film_prefix[w]
+                rendered.append((pass2_prompt_prefix(batch), rmap, [w], sysw))
+                continue
+            rng = random.Random(f"{seed}:{sample}:pass2:{tag}call{bi}")
+            bworks = sorted({it["work"] for it in batch})
+            outline2, rowmap, order2 = film_outline(
+                comp, texts, bworks, rng, f"{salt}:{sample}:{tag}call{bi}", True, outline_order, extras
             )
-            rec.update(retries=retries, returned=len(got or []))
-            for x in got or []:
-                answers[str(x.get("id"))] = (x, rowmap)
-        p2_calls.append(rec)
+            rendered.append((pass2_prompt(batch, outline2, cast_line), rowmap, order2, sys2))
+        if not dry:
+            prefetch([(r[0], r[3]) for r in rendered], jobs)
+        for bi, (batch, (prompt2, rowmap, order2, sysb)) in enumerate(zip(batches, rendered)):
+            rec = dict(
+                call=bi,
+                items=len(batch),
+                films=order2,
+                prompt_sha256=sha256(prompt2),
+                prompt_chars=len(prompt2),
+                system_sha256=sha256(sysb),
+                system_chars=len(sysb),
+                sessions=len({it["session_key"] for it in batch}),
+            )
+            if not dry:
+                got, retries = parse_with_retry(
+                    prompt2,
+                    sysb,
+                    log_,
+                    f"pass2:{tag}call{bi}",
+                    "items",
+                    conds["pass2"]["id"],
+                )
+                rec.update(retries=retries, returned=len(got or []))
+                for x in got or []:
+                    answers[str(x.get("id"))] = (x, rowmap)
+            p2_calls.append(rec)
+        return answers, p2_calls, batches
+
+    reuse = None
+    if reuse_pass2_from is not None and not dry:
+        # declared (round 3): rebuild the reference run's own pass-2 calls from its recorded
+        # frames (cache only), reuse each unit's answer where its frame film is unchanged, and
+        # call pass 2 fresh only for items whose frame film changed or that are new
+        ref = json.loads((Path(reuse_pass2_from) / "pass1.json").read_text())
+        ref_units = json.loads((Path(reuse_pass2_from) / "units.json").read_text())
+        for (p, s), d in data.items():
+            if ref_units[f"{p}:{s}"] != d["units"]:
+                raise SystemExit(f"reference units differ for {p}:{s}")
+        # every session of the reference run, so that its batches are rebuilt exactly
+        ref_items = []
+        for k in ref_units:
+            fr = [dict(f, frame=[tuple(x) for x in f["frame"]]) for f in ref[k]["frames"]]
+            ref_items.extend(session_items(tuple(k.split(":")), ref_units[k], fr))
+        global CACHE_ONLY
+        was, CACHE_ONLY = CACHE_ONLY, True
+        ref_log = []
+        try:
+            ref_answers, _, _ = do_pass2(ref_items, "", ref_log)
+        finally:
+            CACHE_ONLY = was
+        same = {(it["session_key"], it["k"], it["work"]) for it in ref_items}
+        kept = [it for it in items if (it["session_key"], it["k"], it["work"]) in same]
+        todo = [it for it in items if (it["session_key"], it["k"], it["work"]) not in same]
+        reuse = dict(reference=str(reuse_pass2_from), items=len(items), reused=len(kept),
+                     fresh_items=len(todo), reference_items=len(ref_items),
+                     reference_calls_replayed=len(ref_log))
+        answers = {it["oid"]: ref_answers[it["oid"]] for it in kept
+                   if it["oid"] in ref_answers}
+        if len(ref_log) != sum(1 for c in ref_log if not c["fresh"]):
+            raise SystemExit("a reference pass-2 call was not in the cache")
+        got, p2_calls, batches = do_pass2(todo, "v1b-reuse:", log) if todo else ({}, [], [])
+        answers.update(got)
+        ledger["pass2_reuse"] = reuse
+        conds["pass2"]["reuse"] = dict(reference=str(reuse_pass2_from),
+                                       rule="unit answer reused where the frame film is "
+                                       "unchanged; fresh calls otherwise")
+    else:
+        answers, p2_calls, batches = do_pass2(items, "", log)
+    ledger["batches"] = batch_report(batches)
     ledger["pass2_calls"] = p2_calls
     ledger["calls"] = call_ledger(log)
     out.mkdir(parents=True, exist_ok=True)

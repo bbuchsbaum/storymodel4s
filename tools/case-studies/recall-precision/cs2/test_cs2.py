@@ -1313,6 +1313,17 @@ def test_stage3_control_manipulations():
     assert all(type(c.sample).__name__ == "RefSample" for c in cells)
 
 
+def test_pass1_v1b_changes_one_sentence_only():
+    P = _producer()
+    a, b = P.PASS1_SYSTEM, P.PASS1_SYSTEM_V1B
+    assert a.count(P.PASS1_SENTENCE_V1) == 1 and b.count(P.PASS1_SENTENCE_V1B) == 1
+    assert a.replace(P.PASS1_SENTENCE_V1, "#") == b.replace(P.PASS1_SENTENCE_V1B, "#")
+    assert "searching for what came next has no frame" in b and "searching for what" not in a
+    c1 = P.conditions(1, "s", 1, systems=(a, P.PASS2_ARMS["coverage"]))
+    c2 = P.conditions(1, "s", 1, systems=(b, P.PASS2_ARMS["coverage"]))
+    assert c1["pass1"]["id"] != c2["pass1"]["id"] and c1["pass2"]["id"] == c2["pass2"]["id"]
+
+
 # ---------------------------------------------------------------- runner
 
 
