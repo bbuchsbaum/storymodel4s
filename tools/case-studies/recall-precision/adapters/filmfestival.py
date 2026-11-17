@@ -495,3 +495,15 @@ def check_gold_numbering(participants=None) -> dict:
         max(comp.scenes()),
     ]
     return rep
+
+
+# ---------------------------------------------------------------- producer facade
+
+
+def producer_composition():
+    """The source model the two-level producer localizes against (JL segments)."""
+    return composition("JL")
+
+
+def producer_unit_texts():
+    return unit_texts("JL")

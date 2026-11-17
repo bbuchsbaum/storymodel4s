@@ -568,7 +568,8 @@ def cmd_ff_run(args):
     rest = []
     it = iter(args)
     for a in it:
-        if a in ("--export", "--seed", "--salt", "--sample", "--sessions", "--arm", "--jobs"):
+        if a in ("--export", "--seed", "--salt", "--sample", "--sessions", "--arm", "--jobs",
+                 "--corpus"):
             opt[a[2:]] = next(it)
         elif a == "--dry":
             opt["dry"] = True
@@ -576,11 +577,13 @@ def cmd_ff_run(args):
             opt["cache_only"] = True
         else:
             rest.append(a)
-    for k in ("export", "seed", "salt", "sample"):
+    corpus = opt.get("corpus", "filmfestival")
+    for k in ("seed", "salt", "sample") + (("export",) if corpus == "filmfestival" else ()):
         if k not in opt:
             raise SystemExit(f"--{k} is required")
     out = Path(rest[0])
-    A = D.adapter("filmfestival")
+    A = D.adapter(corpus)
+    wa = WORK_APPLICABLE[corpus]
     dev = A.development()
     if opt.get("sessions", "development") == "development":
         sessions = [(p, s) for p in dev for s in A.sessions(p)]
@@ -590,7 +593,8 @@ def cmd_ff_run(args):
         if p not in dev:
             raise SystemExit(f"{p} is not a development participant")
     seed, sample = int(opt["seed"]), int(opt["sample"])
-    acc, ledger, log, conds = P.run(A, sessions, Path(opt["export"]), out, seed, opt["salt"],
+    export = Path(opt["export"]) if "export" in opt else None
+    acc, ledger, log, conds = P.run(A, sessions, export, out, seed, opt["salt"],
                                     sample, dry=bool(opt.get("dry")),
                                     arm=opt.get("arm", "coverage"),
                                     jobs=int(opt.get("jobs", 1)))
@@ -604,18 +608,24 @@ def cmd_ff_run(args):
         batches=ledger["batches"], dry=bool(opt.get("dry")), arm=opt.get("arm", "coverage"),
         cache_only=bool(opt.get("cache_only")),
         word_clock=A.WORD_CLOCK_RECEIPT,
-        gold_clock=A.gold_clock_receipt(sorted({p for p, _ in sessions})),
+        gold_clock=(A.gold_clock_receipt(sorted({p for p, _ in sessions}))
+                    if hasattr(A, "gold_clock_receipt") else None),
+        corpus=corpus,
     )
-    inputs = [A.GOLD, A.CODES, A.PARTITION, A.FF / "derived" / "annotation-JL.tsv",
-              Path(opt["export"]) / "index.json"]
-    inputs += [A.FF / "derived" / "recall" / f"{p}_{s}.csv" for p, s in sessions]
+    if corpus == "filmfestival":
+        inputs = [A.GOLD, A.CODES, A.PARTITION, A.FF / "derived" / "annotation-JL.tsv",
+                  export / "index.json"]
+        inputs += [A.FF / "derived" / "recall" / f"{p}_{s}.csv" for p, s in sessions]
+    else:
+        inputs = [A.GOLD, A.RULE, D.DATA / "study/recall-to-video/partition.json"]
+        inputs += [LIBRARY / f"{p.split('_')[0]}_desc-libraryparity_words.tsv" for p, _ in sessions]
     if acc is None:
         manifest(out, "ff-run (dry)", SC.CONFIG, inputs, extra, state, calls["model_calls"])
         print(json.dumps(dict(batches=ledger["batches"], calls=calls,
                               sessions=ledger["sessions"]), indent=1, default=str))
         return
     cfg = SC.load_config()
-    comp = A.composition("JL")
+    comp = A.producer_composition()
     all_gold = gold_by_participant(A, dev)
     gold = {}
     for p, s in sessions:
@@ -624,23 +634,23 @@ def cmd_ff_run(args):
             gold.setdefault(p, []).extend(rows)
     dur, fc_all = baseline_forecasts(A, comp, all_gold, cfg)
     keys = {(p, g.session) for p, rs in gold.items() for g in rs}
-    named = {k: score_map(comp, gold, {x: v[x] for x in keys}, cfg, True) for k, v in fc_all.items()}
+    named = {k: score_map(comp, gold, {x: v[x] for x in keys}, cfg, wa) for k, v in fc_all.items()}
     pmap = {}
     for p, s in keys:
         rows = [g for g in gold[p] if g.session == s]
         ld = LocationDistribution.from_words(acc, acc.words[(p, s)], bins_of(rows),
                                              cfg["allocation"])
         pmap[(p, s)] = SC.producer_forecasts(ld, dur, cfg)
-    named["producer"] = score_map(comp, gold, pmap, cfg, True)
-    fsum = summarize_forecasts(named, cfg, True)
+    named["producer"] = score_map(comp, gold, pmap, cfg, wa)
+    fsum = summarize_forecasts(named, cfg, wa)
     fsum["producer"].update({
         f"skill_vs_{b}": {t: SC.skill(named["producer"], named[b], cfg, t)
                           for t in ("film_bits", "work_bits", "scene_bits", "total_bits")}
         for b in ("lopo", "order_oracle", "tfidf")})
     summary = dict(
-        corpus="filmfestival", sessions=extra["sessions"], ledger=ledger, calls=calls,
-        rows=SC.strata(named["producer"], comp, True)["rows"], forecasts=fsum,
-        producer_strata=SC.strata(named["producer"], comp, True),
+        corpus=corpus, sessions=extra["sessions"], ledger=ledger, calls=calls,
+        rows=SC.strata(named["producer"], comp, wa)["rows"], forecasts=fsum,
+        producer_strata=SC.strata(named["producer"], comp, wa),
         words={f"{p}:{s}": word_ledger(acc.words[(p, s)],
                                        bins_of([g for g in gold[p] if g.session == s]))
                for p, s in keys},

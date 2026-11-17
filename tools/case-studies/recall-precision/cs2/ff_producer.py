@@ -371,17 +371,32 @@ def renderer_sha256():
     return sha256(src)
 
 
-def conditions(seed, salt, sample, arm="coverage", word_clock=None):
+def corpus_text(text, A, pass_no):
+    """A system prompt with the adapter's declared corpus phrases (PRODUCER_PHRASES: exact
+    (pass, old, new) triples). Adapters without phrases (FilmFestival) get the prompt
+    byte-identical."""
+    for k, old, new in getattr(A, "PRODUCER_PHRASES", ()):
+        if k != pass_no:
+            continue
+        if old not in text:
+            raise ValueError(f"declared phrase not in the prompt: {old!r}")
+        text = text.replace(old, new)
+    return text
+
+
+def conditions(seed, salt, sample, arm="coverage", word_clock=None, systems=None,
+               segmenter=None):
     """The two passes' producer conditions (rendering identities), recorded separately. Each id
     is derived from its system prompt, template and renderer digests, so arms differ at the
     reference level."""
-    common = dict(model=MODEL, seed=seed, salt=salt, sample=sample, segmenter=SEGMENTER,
-                  word_clock=word_clock)
+    common = dict(model=MODEL, seed=seed, salt=salt, sample=sample,
+                  segmenter=segmenter or SEGMENTER, word_clock=word_clock)
+    sys1, sys2 = systems or (PASS1_SYSTEM, PASS2_ARMS[arm])
     rend = renderer_sha256()
-    p1 = dict(system_sha256=sha256(PASS1_SYSTEM),
+    p1 = dict(system_sha256=sha256(sys1),
               template_sha256=sha256(PASS1_TEMPLATE + "\n" + PASS1_UNIT),
               renderer_sha256=rend, retry_sha256=sha256(RETRY))
-    p2 = dict(system_sha256=sha256(PASS2_ARMS[arm]),
+    p2 = dict(system_sha256=sha256(sys2),
               template_sha256=sha256(PASS2_TEMPLATE + "\n" + PASS2_ITEM),
               renderer_sha256=rend, retry_sha256=sha256(RETRY))
     ident = lambda name, d: f"{name}:{sha256(json.dumps(d, sort_keys=True))[:16]}"  # noqa: E731
@@ -738,10 +753,15 @@ def run(
     """Both passes over `sessions` (development only), pass 2 pooled across them.
 
     With dry=True no model is called: prompts, batches and digests are built and reported."""
-    comp = A.composition("JL")
-    texts = A.unit_texts("JL")
-    export, index = load_export(export_dir)
-    conds = conditions(seed, salt, sample, arm, A.WORD_CLOCK_RECEIPT)
+    comp = A.producer_composition()
+    texts = A.producer_unit_texts()
+    if hasattr(A, "producer_units"):  # an adapter that binds its own library units
+        export, index = None, A.PRODUCER_UNITS_RECEIPT
+    else:
+        export, index = load_export(export_dir)
+    sys1, sys2 = corpus_text(PASS1_SYSTEM, A, 1), corpus_text(PASS2_ARMS[arm], A, 2)
+    conds = conditions(seed, salt, sample, arm, A.WORD_CLOCK_RECEIPT, (sys1, sys2),
+                       getattr(A, "PRODUCER_SEGMENTER", None))
     log, ledger = (
         [],
         dict(
@@ -752,7 +772,8 @@ def run(
     data = {}
     for p, s in sessions:
         words = A.session_words(p, s)  # refuses frozen participants
-        spans = library_units(export[(p, s)], words)
+        spans = (A.producer_units(p, s, words) if export is None
+                 else library_units(export[(p, s)], words))
         units = [
             dict(
                 k=k,
@@ -774,10 +795,11 @@ def run(
             words_outside_units=len(words) - sum(b - a + 1 for a, b in spans),
             pass1_film_order=order1,
             pass1_prompt_sha256=sha256(prompt1),
+            pass1_prompt_chars=len(prompt1),
         )
         data[(p, s)] = dict(words=words, units=units, prompt1=prompt1, rec=rec)
     if not dry:
-        prefetch([(d["prompt1"], PASS1_SYSTEM) for d in data.values()], jobs)
+        prefetch([(d["prompt1"], sys1) for d in data.values()], jobs)
     for (p, s), d in data.items():
         words, units, prompt1, rec = d["words"], d["units"], d["prompt1"], d["rec"]
         if dry:
@@ -785,7 +807,7 @@ def run(
         else:
             p1, retries = parse_with_retry(
                 prompt1,
-                PASS1_SYSTEM,
+                sys1,
                 log,
                 f"pass1:{p}:{s}",
                 "units",
@@ -831,19 +853,20 @@ def run(
         )
         rendered.append((pass2_prompt(batch, outline2), rowmap, order2))
     if not dry:
-        prefetch([(r[0], PASS2_ARMS[arm]) for r in rendered], jobs)
+        prefetch([(r[0], sys2) for r in rendered], jobs)
     for bi, (batch, (prompt2, rowmap, order2)) in enumerate(zip(batches, rendered)):
         rec = dict(
             call=bi,
             items=len(batch),
             films=order2,
             prompt_sha256=sha256(prompt2),
+            prompt_chars=len(prompt2),
             sessions=len({it["session_key"] for it in batch}),
         )
         if not dry:
             got, retries = parse_with_retry(
                 prompt2,
-                PASS2_ARMS[arm],
+                sys2,
                 log,
                 f"pass2:call{bi}",
                 "items",

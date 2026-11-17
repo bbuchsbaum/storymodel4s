@@ -269,3 +269,53 @@ def gold_rows(name: str, session: str = "recall") -> list:
         GoldRow(name, "recall", i, lo, hi, True, "specific", WORK, frozenset({s}), None)
         for i, (lo, hi, s) in enumerate(iv)
     ]
+
+
+# ---------------------------------------------------------------- producer facade
+#
+# The two-level producer (cs2/ff_producer.py) runs here through the same facade. Units are the
+# CS1 frozen library units (D.units), bound to word cells by the landed library parity words
+# ledger (parity/library-v4/<NN>_desc-libraryparity_words.tsv: word index -> unit index).
+
+PRODUCER_SEGMENTER = "CS1 frozen library units (stage record) bound by parity/library-v4 words"
+PRODUCER_UNITS_RECEIPT = dict(source="data/study/recall-precision/parity/library-v4",
+                              rule="word_index -> unit_index from the library words ledger")
+PRODUCER_PHRASES = (
+    (1, "a sequence of short films they watched", "a film they watched, shown in two parts"),
+    (2, "recall of short films within the film they are about", "recall of a film within that film"),
+)
+WORD_CLOCK_RECEIPT = dict(
+    clock=WORD_CLOCK,
+    wordOnsetsAreMeasured=None,
+    note="Princeton dataspace word onsets; how they were measured is not recorded here",
+)
+
+
+def producer_composition():
+    return composition()
+
+
+def producer_unit_texts():
+    return unit_texts()
+
+
+def producer_units(name, session, words):
+    """[(first word, last word)] per unit, from the library words ledger (development only)."""
+    guard(name)
+    short = name.split("_")[0]
+    path = OUT / "parity" / "library-v4" / f"{short}_desc-libraryparity_words.tsv"
+    rows = list(csv.DictReader(open(path), delimiter="\t"))
+    if len(rows) != len(words):
+        raise ValueError(f"{name}: {len(rows)} ledger words vs {len(words)} recall words")
+    spans = {}
+    for i, r in enumerate(rows):
+        u = int(r["unit_index"])
+        if u < 0:
+            continue
+        a, b = spans.get(u, (i, i))
+        spans[u] = (min(a, i), max(b, i))
+    out = [spans[u] for u in sorted(spans)]
+    for (_, l1), (f2, _) in zip(out, out[1:]):
+        if f2 <= l1:
+            raise ValueError(f"{name}: library units overlap or are out of order")
+    return out
