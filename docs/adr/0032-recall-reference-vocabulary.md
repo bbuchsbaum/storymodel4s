@@ -1,7 +1,9 @@
 # ADR 0032 — Recall reference vocabulary: talk, topic frame, address and programme
 
-**Status:** Proposed, 2026-11-17. Not binding until the owner decides it. No runtime type,
-codec or producer change is made by this record.
+**Status:** Proposed, 2026-11-17. Not binding until the owner rules after a cold review. The
+owner accepted the resolutions of the six open questions of the first draft on 2026-11-17; they
+are folded into the sections below. No runtime type, codec or producer change is made by this
+record.
 
 **Decider:** the owner
 
@@ -78,11 +80,25 @@ A referring expression inside an evaluation is its own `Content` reference over 
 rest of the evaluation stays non-addressed. The topic frame never creates location mass: a
 consumer that falls back on it, as the case-study scorer does, declares that as its own rule.
 
+Three consequences are decided with this section (owner, 2026-11-17):
+
+- **An evaluation with no framed work is non-addressed talk**, as in the frozen harness. No
+  commentary destination is invented for it.
+- **Searching within a work gets no work-level mass in the library.** Only a scorer's declared
+  fallback may assign it mass. A corpus whose gold codes such search at film level, as
+  FilmFestival's does, maps it in that corpus adapter's crosswalk.
+- **Frame weights summing above 1 are refused**, with the weight refusals of
+  `ProvisionalReference`. The frozen harness normalizes them; that is a known parity deviation
+  for slice 8, not a library rule.
+
 **Rejected:** one state enum for both, as pass 1 v1 used (content, work, memory search, gave up,
 off task, fragment). Its `work` state meant both naming a film and evaluating one, and the cached
 replies cannot separate them; the harness had to report two variants of one reading. Also
 rejected: deriving the topic frame from the local address. A film is held as discourse topic
-across many units, and a blend is exactly a reference whose address and frame differ.
+across many units, and a blend is exactly a reference whose address and frame differ. Also
+rejected: a non-work commentary destination for an unframed evaluation, as the dropped v2
+converter used. Commentary is a talk type, and a destination for it would put what the speaker
+does on the same axis as where the speech points.
 
 **Types.**
 
@@ -150,7 +166,7 @@ an assessment (rule 7).
 - Refusals: `UnknownWork`, `NotAnExcerpt(work)`, `StimulusCoverageUnknown(work)` (fail closed),
   `PositionOutOfRange`, and `PositionUnresolved` as a typed outcome rather than a refusal, since
   an unresolved position is a legitimate result (rule 13).
-- `ExternalState` and the ADR 0001 alignment matrix are unchanged.
+- Two `ExternalState` cases are retired as destinations (§8).
 
 ### 3. Non-work states are typed destinations, and the destination simplex is declared
 
@@ -218,11 +234,14 @@ same edition interval.
   be resolved, and it cannot hold a span that crosses works.
 - **Relaxing `TrackComposition`'s disjoint-target rule.** That rule protects edition
   correspondence within one work.
+- **`Programme` in `corpus`, with `align` depending on `corpus`.** The alignment layer would then
+  depend on the intake contract. `Programme` lives in `core` (owner, 2026-11-17), and corpus
+  adapters build it.
 
 **Types.**
 
-- `Programme` is a `final` non-case class in `core`, beside `TrackComposition`, because `align`
-  does not depend on `corpus`. It is validated as a whole:
+- `Programme` is a `final` non-case class in `core`, beside `TrackComposition`. It is validated
+  as a whole:
   - positions are unique;
   - each occurrence names a declared work and has segments on distinct parts;
   - each segment lies within its part.
@@ -316,6 +335,90 @@ apart from an assessed zero, and it would let abstention pass as a destination.
 its own enum on `LocationDistribution`, not a new case of the level projection's `Absence`. Both
 are produced only by their projection.
 
+### 8. Retiring `ExternalState.Commentary` and `ExternalState.SourceConsistentInference`
+
+**Decision** (owner, 2026-11-17). Both cases stop being alignment destinations:
+
+- **Commentary** is a talk type (`Evaluation`, §1). It is non-addressed talk, not a place where
+  recall mass goes.
+- **Source-consistent inference** is ADR 0030's `recaller-inference` fidelity grade. The inferring
+  unit keeps the address of the material it is about.
+
+The other four cases stay, each for its own reason:
+
+- **`Association`** is a real destination: the speech points outside the programme. It is the
+  alignment-matrix counterpart of the external address (§2).
+- **`Intrusion`** is the column for asserted episodic content that no source unit anchors. The
+  matrix needs a place for that mass. It is not relabelled as ADR 0030's `invented` grade, which a
+  later assessment assigns.
+- **`Uninterpretable`** is a statement about the expression: its words cannot be read. Without it
+  such mass would be forced onto the source or onto another state.
+- **`Unranked`** is a statement about the aligner, not the participant. `RecallSignature` keeps it
+  apart from attributed external mass, and that separation must stay.
+
+**Who uses the retired cases today** (read, not run):
+
+- `align/matrix.scala` defines them. `ExternalStates.natural` in `align/cost.scala` maps the
+  `Evaluation`, `TaskCommentary` and `SourceMonitoring` discourse functions to `Commentary`, and
+  `Inference` to `SourceConsistentInference`.
+- `align/signature.scala` reports `commentaryMass` and `sourceConsistentInferenceMass`, includes
+  both in attributed external mass, and exports them under those keys.
+- `codec/align.scala` encodes `AlignState.External` by the case name. `codec/mappingjson.scala`
+  decodes `ext:<case>` destinations. `view/mappingmatrix.scala` carries the external columns.
+- `embed-bench/wog.scala` expects `SourceConsistentInference` as the external subtype of the
+  War of the Ghosts inference paraphrase. `embed-bench/metrics.scala` reports
+  `open-world:source-consistent-inference-mass`.
+- Tests in `codec`, `view`, `align`, `fixtures` and `embed-bench`, and an archived probe under
+  `docs/refactor/evidence/`, which is a record and is not edited.
+
+**Migration without breaking records.**
+
+- Encoders never write the retired cases again.
+- Decoders still read legacy `Commentary` and `SourceConsistentInference` values, in both the
+  `AlignState.External` form and the `ext:` form. They decode to a typed deprecation outcome that
+  names the legacy value and its replacement (a talk type, or a fidelity grade). They never map it
+  silently to another destination. A record's bytes and digest are unchanged.
+- A legacy record cannot be re-encoded as a current record: no address is invented for an old
+  inference unit, so the deprecation outcome is kept as it is.
+- The aligner's external columns shrink to four. Units with the retired discourse functions
+  become non-addressed talk, and inference units align to their material, with the grade recorded
+  separately.
+- `RecallSignature.EstimandVersion` changes because attributed external mass is redefined, so an
+  old figure cannot be compared with a new one silently.
+- The bench's inference metric is retired, and its name is not reused. Its replacement measures
+  the inference paraphrase's mass on its target units under a new name.
+
+**Rejected:** keeping both cases as destinations beside the new vocabulary. A unit's mass could
+then mean either where the speech points or what the speech does, or how it was graded, which
+rule 7 forbids. Also rejected: deleting the cases outright, which would make every existing record
+that uses them undecodable.
+
+**Types.** The deprecation outcome is a typed value in `codec` (rule 12), and it is constructed
+only by the legacy decode path.
+
+### 9. Measured and interpolated word onsets
+
+**Decision** (owner, 2026-11-17). Every recall timing intake receipt declares how its word
+onsets were obtained: **measured**, **interpolated** within a named segmentation, or **unknown**.
+FilmFestival already records `wordOnsetsAreMeasured: false`: its onsets are interpolated within
+the authors' utterances.
+
+- A projection over interpolated onsets refuses to claim timing finer than the interpolation
+  segments. A bin that splits an interpolation segment is refused with a typed reason. Bins made
+  of whole segments, such as the gold rows, are admitted.
+- Unknown is treated as interpolated, which fails closed. An adapter whose onsets are measured
+  declares so, with its evidence. Sherlock's adapter currently records no value and must declare
+  one.
+- This is a property of the whole receipt. It is separate from the per-observation `Basis`
+  (`SourceReported` or `Estimated`): a corpus can report interpolated onsets.
+
+**Rejected:** inferring measurement from the values, for example from onset spacing, which would
+make a class depend on a guess (the second design principle). Also rejected: allowing any bin
+grain with a warning, because a warning does not stop sub-utterance timing from being quoted.
+
+**Types.** The onset provenance is an enum on the intake result, with `Custom` excluded: an
+unrecognised provenance is unknown. The refusal is a new `OnsetLevelProjection.Refusal` case.
+
 ## Findings recorded with this decision
 
 **Pass 1 v2 put this vocabulary into a prompt and scored worse.** Pass 1 v2 asked the producer
@@ -337,25 +440,19 @@ of a simpler reply, as the frozen harness does.
 **The harness already runs the decisions on development data.** The frozen configuration
 (`talk: orthogonal`, `fallback: frame-film`) implements §1, §3 and §7, with these differences:
 
-- frame weights summing above 1 are normalized there, whereas the library refuses them (§1);
+- frame weights summing above 1 are normalized there, whereas the library refuses them. This is
+  the known parity deviation for slice 8 (§1);
 - an unframed evaluation is non-addressed talk under pass 1 v1, but was a non-work commentary
-  state in the dropped v2 converter. This record follows v1.
+  state in the dropped v2 converter. This record follows v1 (§1).
 
-## Open questions for the owner
+## Questions resolved by the owner (2026-11-17)
 
-1. **Placement of `Programme`.** `core` is proposed because `align` does not depend on `corpus`.
-   The alternative is an `align` → `corpus` dependency.
-2. **Unframed evaluation.** This record makes it non-addressed talk, as pass 1 v1 does. The
-   case-study gap list and the dropped v2 converter made it a non-work commentary state.
-3. **Searching within a work.** Here it is non-addressed talk with a topic frame, although the
-   FilmFestival gold codes film search at film level. Should the library ever give it work-level
-   mass, or only a scorer's declared fallback?
-4. **Frame weights above 1.** The library refuses them, while the frozen harness normalizes. Slice
-   8 must either report the refused rows or adopt a declared normalization.
-5. **`ExternalState`.** It is left unchanged here. Retiring its `Commentary` and
-   `SourceConsistentInference` cases as destinations would be a separate ADR.
-6. **Interpolated onsets.** FilmFestival's onsets are interpolated within utterances
-   (`wordOnsetsAreMeasured: false`). How intake declares that is not decided here.
+1. `Programme` lives in `core`, not in `corpus` (§4).
+2. An evaluation with no framed work is non-addressed talk (§1).
+3. Searching within a work gets no work-level mass in the library (§1).
+4. Frame weights summing above 1 are refused; the harness deviation is recorded for slice 8 (§1).
+5. `ExternalState.Commentary` and `SourceConsistentInference` are retired as destinations (§8).
+6. Intake receipts declare measured or interpolated onsets, and projections respect it (§9).
 
 ## Deferred
 
@@ -393,7 +490,17 @@ Each is about a day's work with one acceptance criterion. Slices 2 to 4 need sli
    the lexical recipe still refuses it.
 8. **Conversion of the frozen harness replies in `pipeline/agentmapping`.** Acceptance: on the
    develop five's recorded replies, with no model call, the library account reproduces the
-   harness ledger counts by talk type and state.
+   harness ledger counts by talk type and state, except for rows with frame weights above 1,
+   which are refused and reported as the known deviation.
+9. **Legacy decode of the retired `ExternalState` cases in `codec`.** Acceptance: recorded legacy
+   records in both wire forms decode to the typed deprecation outcome byte-for-byte unchanged,
+   and encoding either retired case does not compile.
+10. **Retiring the two columns in `align` and `embed-bench`.** Acceptance: the aligner, signature
+    and bench suites pass with four external columns, the estimand version changes, and the old
+    inference metric name is absent from bench output.
+11. **Onset provenance on intake receipts.** Acceptance: an onset-point projection over a receipt
+    declared interpolated refuses a bin that splits an interpolation segment and admits bins of
+    whole segments, in one known-answer test.
 
 ## Rejected alternatives (summary)
 
@@ -406,6 +513,10 @@ Each is about a day's work with one acceptance criterion. Slices 2 to 4 need sli
 - Attribution as an alternative (§5).
 - Divided onsets, or refusing multi-token transcripts (§6).
 - Zero-mass destinations for uncovered or non-addressed words (§7).
+- A commentary destination for an unframed evaluation (§1).
+- `Programme` in `corpus`, with `align` depending on intake (§4).
+- Keeping or deleting the two retired `ExternalState` cases (§8).
+- Inferring onset measurement from the values, or warning instead of refusing (§9).
 
 ## Out of scope
 
