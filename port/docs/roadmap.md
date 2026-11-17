@@ -4,7 +4,8 @@ Owner direction, 2026-11-16: make all working, non-redundant, non-stale StoryMod
 capabilities available in idiomatic Python, improving the implementation using lessons learned.
 Small slices are delivery order, not scope cuts. Deferred work remains owed.
 
-This is the current **port** execution direction, refreshed through rich-consumer integration.
+This is the current **port** execution direction, refreshed on 2026-11-17 through
+rich-consumer integration and the claim-assessment implementation in progress.
 It extends [Stage 1](stage-1.md); it does not supersede the parent project's
 [VISION](../../VISION.md), scientific contracts or Scala roadmap. Mote holds live status.
 The [preservation map](preservation.md) remains the behavioral contract. Phase numbering starts
@@ -28,8 +29,8 @@ evidence, not a claim that the branch has landed or that the full phases are com
 The sparse sequence kernel and rich relation path have local implementation and independent
 evidence; see [sequence inference](sequence-inference.md) and [relations](relations.md).
 Rich identity extends the same sidecar path to state participants; [rich structural candidates](alignment.md)
-extend the sparse local rule with separate qualifier diagnostics. The next delivery is a
-discriminating correspondence workflow. Playback, attribution,
+extend the sparse local rule with separate qualifier diagnostics. Finish the fixed-population
+claim-assessment slice, then deliver a discriminating correspondence workflow. Playback, attribution,
 richer graph families, semantic channels and account-derived inference remain owed. Mote owns
 live status; the preservation map records each slice's behavioral coverage and limitations.
 
@@ -219,79 +220,143 @@ one working day of scope. If it grows, split at an artifact boundary. Review con
 semantics cold; rerun only affected checks unless the change has broader reach. Engineering
 proof precedes scientific claims, but scientific qualification must not block unrelated ports.
 
-## Immediate sequence
+## Next deliveries: execution order from the current branch
 
-These computational deliveries establish the route into the wider phases. They do not rename
-or replace the full phase exits above. Finish each executable slice before adding another
-public abstraction; completed local slices remain subject to landing and the full parity audit.
+These checkpoints organize the next work across P2–P6; they do not rename the phases or
+replace their full exits. The supplied-transition kernel and rich consumer integrations are
+already implemented locally. Do not restart them. Claim assessment is in progress under
+`bd-01M7M0916GDS07X2Q0M0TCRQTK`; its text profile does not yet close chart/playback assessment.
+Mote owns verification and landing status.
 
-| Order | Delivery | Concrete completion evidence |
-|---|---|---|
-| 1 — P4.1 | Sparse sequence inference over supplied, checked local costs and transition distributions. | Posterior marginals, adjacent flow, deterministic best path and log normalizer agree with exhaustive enumeration; installed API/CLI artifact roundtrip. |
-| 2 — Next P2 integration | Rich accounts through relation admission, text-identity consumers and structural candidate generation, one consumer at a time. | States, circumstances, contexts and existing IDs survive every update; state/event endpoints and foreign-context refusals have discriminating examples; legacy recordings remain readable. |
-| 3 — Next P3 integration | Recurring-scene correspondence with explicit target grain and hypothesis-conditional assessment. | Repeated actors in different actions, actor swaps, changed attributes, broad/joint/alternative references and external content produce distinct saved outcomes through the same analysis API. |
+### 1. Finish assessment and demonstrate useful correspondence — P3
 
-### First delivery: the numerical kernel
+**Deliver:** one runnable Python workflow and CLI equivalent that constructs a reusable source,
+pairs two independent recalls, maps reference, assesses expressed claims and produces the
+existing analysis views. Researchers should not assemble internal IDs or intermediate classes
+by hand.
 
-Numerical kernel bead: `bd-01M7KVBD5K6101NP5DG2P2QK1M` (Mote owns status).
+- Finish fixed-population claim assessment: exactly one outcome per declared question,
+  supporting and counterevidence retained, source ownership checked, absence distinguished
+  from extraction/reference failure, and receipts bound to the actual inputs.
+- Connect the retained graded assessor to explicit reference hypotheses and source support.
+  Keep fixed-question accounting distinct from graded fidelity; neither automatically changes
+  the other. Define the checked link before a downstream analysis consumes an assessment.
+- Extend target grain to retained event/scene/episode references and add semantic evidence
+  channels through the same candidate contract, exposing each channel and its search limits.
+  Keep expensive backends optional; checkpoint 4 completes their operational coverage.
+- Exercise recurring actors in different actions, actor swaps, changed attributes, broad and
+  joint recall, alternative targets, explicit external content, reordering and revisiting.
+  Include both direct unit-only mapping and structural candidates, with separate recipes.
+- Close API friction discovered by this workflow using the existing construction, pairing,
+  recording and analysis functions. Consolidate repeated mechanisms when demonstrated; avoid
+  a second account model or universal workflow framework.
 
-Use the working numerical seam in `align/hsmm.scala` (`GraphHsmm.run`), separating inference
-from account-specific evidence production. Inputs declare ordered units, admissible source,
-distorted and external states, finite local costs, positive temperature, and sparse stochastic
-transitions. Unranked is an explicit state, not a substitute for a failed calculation. The
-initial state prior is uniform, as in the reference implementation.
+**Done when:** installed API and CLI recover the same saved results offline; the controls
+separate reference errors from fidelity errors; pending/unresolved evidence earns no supported
+coverage; source identity and bytes remain unchanged across recalls. Validate refusal paths,
+exact input binding and the relevant scientific distinctions independently. Recorded model
+replies establish reproducibility, not model accuracy.
 
-Implement stable forward/backward and Viterbi computation with deterministic ordering. Center
-or scale the calculation so a large shared cost cannot corrupt normalized posterior mass;
-refuse unrepresentable numerical ranges. Do not allocate a dense full-source pair matrix.
-Keep the first implementation dependency-light; add numerical libraries when measured needs
-justify them. Public consumption revalidates input relationships and binds saved results to
-the exact input. Posterior mass is conditional on this model, not calibrated confidence or
-automatic fidelity credit.
+**Next action:** complete verification and cold review of the current claim-assessment slice,
+then add the correspondence workflow and hypothesis-conditional graded assessment.
 
-The independent starting oracle is the three-unit, seven-state, 343-path enumeration in
-`align/src/test/scala/storymodel4s/align/StructuralWeightSuite.scala`. Compare every marginal,
-every adjacent flow, the normalizer and the best path. Add one-unit, absent-edge, deterministic
-tie, reordered-state, extreme-cost and malformed-input cases, plus a targeted mutation and
-cold review. An executed Scala comparison, when recorded, is separate evidence from porting
-the oracle; neither establishes empirical accuracy.
+### 2. Complete the representations that downstream computation needs — P2
 
-This first slice accepts supplied transitions. Graph-derived transition features, admissibility
-mode gates, refinement and reconstruction are subsequent P4 work, not implied by the kernel.
-Audit the actual duration behavior supported by Scala rather than inferring it from the HSMM
-name. Save the example, schema, commands and results under `port/`.
+**Deliver:** construction and consumption paths for the remaining evidence and graph families,
+in small connected slices rather than one schema expansion.
 
-### Finish the phases after those deliveries
+1. Playback evidence and explicit attribution/holders, preserving context and clock ownership.
+2. Narrative hierarchy and the retained temporal, causal, referential and entity relations;
+   distinguish hierarchy from a generic situation part-of edge.
+3. Cross-unit identity/construction, recall grouping, summaries, repetition and discourse
+   functions, preserving alternatives and unresolved outcomes.
 
-1. **Close P2/P3 construction and correspondence.** Add remaining playback/context/attribution,
-   identity, hierarchy and recall-grouping paths in bounded slices. Extend target granularity,
-   semantic channels and the retained fixed-question assessment receipts. Keep the direct
-   unit-only route usable while richer structural methods develop. The phase exit must consume
-   every retained collection, not merely serialize it.
-2. **Finish P4 inference and measurement.** Connect checked account evidence to transitions,
-   refinement and reconstruction; then port retained feature tracks, windows, temporal
-   projections and trajectory measures. Report retrieval, local ranking and decoding separately.
-   Use tiny independent numerical cases and declared sparse size measurements. Preserve raw
-   score, posterior, transport mass and calibrated probability as different quantities.
-3. **Finish P5 operational coverage.** Take one retained study through installed intake,
-   construction, mapping, analysis and replay before widening to the other studies. Add media,
-   provider, proposition/AMR, embedding and interview capabilities against their real consumers.
-   Fake-provider and recorded paths precede live operations; data permissions remain separate.
-4. **Finish P6 inspection and parity closure.** Build the useful React artifact inspector once
-   the producers are stable, then saved investigations, exports and specialized views. Run the
-   capability ledger against installed workflows and old artifacts. Resolve every gap with a
-   port, a documented improvement, or an evidence-backed exclusion; no silent retirement.
+Each slice must have an actual builder, checked admission, roundtrip and consumer. Extend
+claim assessment to playback and later chart evidence when those ownership contracts exist.
+Keep independent source/recall construction and the lightweight direct mapping path usable.
+Do not require all enrichments before advancing a numerical method that already has its inputs.
 
-### Keep development fast and the design coherent
+**Done when:** the same independently constructed source supports multiple recalls and all
+retained graph/evidence families have positive and adversarial examples through a real consumer.
+The preservation ledger identifies every remaining gap; a serialized unused collection does
+not count as a delivered capability.
 
-- Extend the existing account, resolver and execution mechanisms; avoid parallel model trees,
-  provider engines or estimator copies. Preserve scientific distinctions while removing
-  incidental Scala machinery.
-- For each slice, identify the actual Scala producer and consumer, specify the Python behavior,
-  implement the smallest connected path, run the relevant independent checks, and commit it.
-  Record changed semantics and compatibility at that point, rather than postponing them to P6.
-- Keep focused-test and installed-example turnaround visible. Make a comparative productivity
-  claim only after matched edits with the same behavioral acceptance in both implementations;
-  a fast Python test run alone does not prove a development speedup.
-- Do not turn phase planning into a prerequisite for every change. Expand the next Mote bead
-  when its input contract is known; the remaining phase obligations above already hold scope.
+### 3. Connect structured inference and scientific readouts — P4
+
+**Deliver in this order:**
+
+1. Build checked local evidence, admissible states and sparse transitions from accounts; feed
+   the existing sequence kernel. Keep retrieval, local ranking and decoding diagnostics apart.
+2. Port supported mode gates, refinement, reconstruction, duration behavior and other retained
+   alignment/transport methods from their actual implementations and callers. Do not infer
+   capabilities merely from the Graph-HSMM name.
+3. Add feature tracks, windows and derivation dependencies, followed by native-coordinate
+   temporal projection/exposure and retained trajectory/calibration/evaluation readouts.
+
+Use ordinary numerical arrays and sparse structures where justified. Preserve the tested
+large-cost cancellation behavior when optimizing; a faster implementation must pass the same
+independent numerical controls. Raw score, transport mass, model-conditional posterior and
+empirically calibrated probability remain distinct outputs.
+
+**Done when:** account-derived examples reach reconstruction/readouts through the installed
+package; tiny exhaustive oracles and pinned reference outputs where available discriminate
+errors; named sparse-size measurements expose runtime/memory costs. Missing observations and
+unmeasured time remain explicit. Engineering availability is separate from demonstrated
+scientific benefit.
+
+**Dependency:** reuse the existing kernel now; add each account producer as its needed P2
+representation becomes available. Avoid a full P2 completion barrier.
+
+### 4. Take one study through the installed library, then widen — P5
+
+**Deliver:** the first retained study's intake → source construction → recall construction →
+mapping/assessment → analysis → saved artifact/replay path. Start with Sherlock's existing
+contracts and admitted synthetic adapter fixtures; actual restricted data requires the recorded
+permission basis. Then carry FilmFestival and Friends through the same public path.
+
+Bring specialized capabilities in through their consumers: provider recovery and execution,
+media observations, proposition/AMR, embedding/cache backends, and interview/detail/episode
+workflows. Keep optional tools and dependencies optional. Preserve existing artifact/cache
+compatibility or supply explicit nondestructive adapters. This checkpoint does not authorize
+paid provider calls or new participant-data use.
+
+**Done when:** installed commands work outside the checkout, offline replay reproduces outputs,
+and interruption/malformed/foreign-input cases preserve accounting and provenance. Every
+retained specialized family has a construction and consuming workflow, not merely an import.
+Use the first study path to expose API problems before cloning adapters for the others.
+
+### 5. Inspect the artifacts and close the parity ledger — P6
+
+**Deliver:** a React inspector over the stable Python outputs: linked source/recall selection,
+evidence, hypotheses, contexts, missingness, timing and channel diagnostics; then saved
+artifact-bound investigations, permission-checked exports and specialized views.
+
+A minimal inspector can follow checkpoint 1 when useful for debugging. Look-and-feel work
+stays late. Python owns scientific values; TypeScript handles interaction and rendering.
+
+**Done when:** each working, nonredundant, nonstale Scala capability has an installed Python
+workflow, a meaningful behavioral check and an executed consumer. Each changed behavior has
+a rationale and compatibility/version contract. Proposed exclusions require evidence; uncertain
+capabilities remain owed. Run old-artifact and workflow comparisons, not class-count comparisons.
+
+## Keep development fast and the design coherent
+
+- Work one connected delivery at a time. Expand the next Mote bead when its input contract is
+  known; avoid creating a large speculative ticket tree or repeatedly replanning the phases.
+- Read the relevant Scala producer, caller and tests; specify the behavior to preserve or
+  improve; implement the shortest useful Python path; verify and commit a coherent slice.
+- Reuse one package, ordinary functions/modules and shared admission/execution mechanisms.
+  Keep compatibility in adapters. Add dependencies or abstractions only for demonstrated needs.
+- Revalidate public input/update boundaries, then reuse validated data inside computation;
+  avoid repeated whole-account serialization in inner loops. Preserve deterministic identity
+  through harmless Python refactors.
+- Use targeted independent checks and cold review for consequential semantics. Run the required
+  broader checks when shared behavior changes. Do not substitute process or test volume for
+  discriminating evidence, or rerun unchanged passing gates without a reason.
+- At each connected workflow, improve the public API and remove proven duplication before
+  adding another layer. Retain provenance and scientific distinctions while reducing ceremony.
+- Keep feedback latency visible. Compare matched Python/Scala edits with identical behavioral
+  acceptance before claiming a measured productivity gain; fast Python tests alone do not
+  establish that claim. This measurement must not become a prerequisite for useful delivery.
+- Preserve the full P2–P6 obligations above. A successful checkpoint is progress toward parity,
+  not permission to declare the remainder unnecessary.
