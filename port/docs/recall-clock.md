@@ -44,3 +44,19 @@ The API is `storymodel.recall_clock.timed_recall(plan_path, query)`. The CLI com
 inputs and enforce the analysis export grants. This profile assumes unit playback speed
 with a declared origin. Scanner synchronization and drifting clocks require additional
 correspondence evidence.
+
+## Local verification
+
+The full Python suite at `bf58c977c` passed 1,084 tests in 51.93 seconds. Mypy checked
+70 source files and Ruff passed. Both synthetic recalls produced byte-identical saved results
+through the installed API and CLI. The CLI verified each against its saved inputs. The
+tested wheel's SHA-256 was `fee76d3bae38e9f3edf7b1f1e4c58958b4993594f2cfad569eb5d5bc15292219`.
+
+Independent review identified a multi-unit join error. Construction includes separator
+whitespace in covering rows, while lexical utterance spans exclude it. The readout now takes
+admitted unit IDs from replayed construction resolutions. The two-unit regression matches
+separate details to ticks 105 and 113. Restoring the original join reproduces the failure.
+Synthetic joint and alternative mapping probes each retained two targets and counted one
+detail. The Scala reference for timing declarations is
+`recall/src/main/scala/storymodel4s/recall/timing.scala`. These checks exercised the Python
+workflow with synthetic inputs.
