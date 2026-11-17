@@ -15,6 +15,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, model_validator
 
+from ._decimal_context import computation_context
 from ._lexical import STOPWORDS, lower, stem_set, words
 from .model import Digest, Event, Model, Name, State, Support, _validate_instance, contained_in
 from .rich_account import SupportedAccount, validate_supported_account
@@ -531,8 +532,7 @@ def _price(
     if not excluded:
         # Wide intermediate arithmetic avoids overflow/underflow in the missing-term
         # scaling ratio. Absolute outputs must still fit a finite binary64 cost.
-        with localcontext() as ctx:
-            ctx.prec = 80
+        with localcontext(computation_context(80)):
             weights = {k: Decimal.from_float(policy.weights.get(k, 0.0)) for k in _TERMS}
             priced = sum((weights[k] * Decimal.from_float(v) for k, v in terms.items()), Decimal(0))
             w_present = sum((weights[k] for k in terms), Decimal(0))

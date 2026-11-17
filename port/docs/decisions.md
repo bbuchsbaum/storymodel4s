@@ -272,3 +272,9 @@ memoized ancestry, sparse weights and wide score intermediates. Rejected alterna
 reference/fidelity bindings from posterior choices, normalizing arbitrary supplied weights,
 implicit historical transition scaling, deriving hierarchy from part-of, and translating every
 Scala class into a Python class. See [reconstruction](reconstruction.md).
+
+Cold review exposed ambient Decimal state in reconstruction and the account wrapper's upstream
+cost calculation. Use one private context factory for all three wide-arithmetic stages,
+retaining each algorithm's precision. Explicit rounding/exponent/trap settings and context-free
+precision selection replace inheritance from caller Decimal settings. This is a determinism
+repair, not a method or wire-format change.

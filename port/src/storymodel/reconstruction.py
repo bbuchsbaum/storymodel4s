@@ -13,6 +13,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, model_validator
 
+from ._decimal_context import computation_context
 from .local_evidence import (
     AccountInferenceResult,
     LocalEvidenceSpec,
@@ -279,8 +280,7 @@ def _decode(
     if rows and ranks and policy.order != "unconstrained":
         # Exact binary64 inputs in wide arithmetic preserve small mass differences even
         # after a large accumulated score. No float log transforms.
-        with localcontext() as context:
-            context.prec = 1200
+        with localcontext(computation_context(1200)):
             previous = [Decimal.from_float(groups[0].get(g, 0.0)) for g in ranks]
             back: list[list[int]] = []
             for row_groups in groups[1:]:

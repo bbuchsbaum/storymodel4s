@@ -12,6 +12,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, field_validator, model_validator
 
+from ._decimal_context import computation_context
 from .model import Digest, Model, Name, _validate_instance
 from .serialization import canonical, digest, strict_json
 
@@ -313,12 +314,11 @@ def infer_sequence(value: SequenceRequest | str | bytes) -> SequenceResult:
     indices = [{name: i for i, name in enumerate(row)} for row in ids]
     costs = [[Decimal.from_float(entry.cost) for entry in row] for row in ordered]
     tau = Decimal.from_float(request.temperature)
-    exponent = max((abs(c).adjusted() for row in costs for c in row if c), default=0)
+    exponent = max((c.copy_abs().adjusted() for row in costs for c in row if c), default=0)
     # Finite binary64 inputs need at most about 632 magnitude digits after division.
     # Preserve at least 32 absolute fractional digits, with path-length accumulation room.
     precision = max(50, exponent - tau.adjusted() + 2 * len(str(len(ordered))) + 34)
-    with localcontext() as context:
-        context.prec = precision
+    with localcontext(computation_context(precision)):
         minima = [min(row) for row in costs]
         emissions = [[-(cost - base) / tau for cost in row] for row, base in zip(costs, minima)]
         offset = sum((-base / tau for base in minima), _ZERO)

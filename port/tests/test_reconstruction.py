@@ -572,3 +572,50 @@ def test_reconstruction_wire_schema_matches_public_models():
         "rows_result": ReconstructionResult.model_json_schema(),
         "account_result": AccountReconstructionResult.model_json_schema(),
     }
+
+
+def test_reconstruction_and_inference_ignore_and_preserve_hostile_decimal_contexts():
+    import decimal
+    import math
+
+    from storymodel.sequence import infer_sequence
+
+    source, recall, events, units = _accounts()
+    reconstruction_spec = ReconstructionSpec(
+        roots={events[0].id: 1, events[1].id: 9},
+        policy=ReconstructionPolicy(order="nondecreasing"),
+    )
+    populations = tuple(
+        (
+            _row(units[0].id, (_source(events[0].id), big)),
+            _row(units[1].id, (_source(events[1].id), small)),
+        )
+        for big, small in ((1e20, 1.0), (1e300, math.ulp(0.0)))
+    )
+    expected = tuple(
+        reconstruct_rows(source, recall, rows, reconstruction_spec) for rows in populations
+    )
+    assert all([d.assigned_group for d in result.decisions] == [1, 9] for result in expected)
+    evidence_spec = LocalEvidenceSpec(units=tuple(RecallSelection(unit=u.id) for u in units))
+    account_result = reconstruct_accounts(source, recall, evidence_spec, reconstruction_spec)
+    request = account_result.inference.evidence.sequence.request
+    for rounding in (decimal.ROUND_FLOOR, decimal.ROUND_UP):
+        with decimal.localcontext() as caller:
+            caller.prec = 2
+            caller.rounding = rounding
+            caller.Emin = -9
+            caller.Emax = 9
+            caller.clamp = 1
+            caller.capitals = 0
+            for signal in caller.traps:
+                caller.traps[signal] = True
+            caller.flags[decimal.Rounded] = True
+            before = repr(caller)
+            for rows, reference in zip(populations, expected):
+                assert reconstruct_rows(source, recall, rows, reconstruction_spec) == reference
+            assert infer_sequence(request) == account_result.inference.inference
+            assert (
+                reconstruct_accounts(source, recall, evidence_spec, reconstruction_spec)
+                == account_result
+            )
+            assert repr(caller) == before

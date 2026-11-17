@@ -113,6 +113,12 @@ from binary64 inputs, preserving small increments after large accumulated scores
 weights, aggregate masses, transition penalties, scores and final accumulations are required;
 overflow is a controlled refusal. This improves arithmetic rather than reproducing incidental
 Scala rounding. Source identities and input probabilities remain unchanged.
+All three numerical stages (local evidence, sequence inference and reconstruction) use fresh,
+fully specified private Decimal contexts with their existing precision contracts. Caller
+rounding, exponent limits, flags and traps neither change results nor get modified. Sequence
+precision selection also uses context-free absolute magnitude before entering its context.
+Cold review found valid inputs could otherwise raise Decimal exceptions under hostile caller
+settings; both public reconstruction paths now exercise this boundary.
 
 Reference contracts: `align/reconstruction.scala`, `matrix.scala`, `source.scala`, the
 `MappingPipeline` consumer and `ReconstructionPolicySuite`. Runtime Scala equivalence is not
