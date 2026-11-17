@@ -829,7 +829,7 @@ def run(
             if dry or (f["kind"] == "content" and f["frame"]):
                 ctx = context_of(units, i)
                 work = (
-                    f["frame"][0][0] if f["frame"] else works[1]
+                    f["frame"][0][0] if f["frame"] else works[-1]
                 )  # dry: placeholder film
                 items.append(
                     dict(
