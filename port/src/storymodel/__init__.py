@@ -9,6 +9,13 @@ from .artifacts import (
     read_account,
     read_supported_account,
 )
+from .claim_assessment import (
+    ClaimQuestion,
+    assess_claims,
+    claim_population_digest,
+    prepare_claim_assessment,
+    verify_claim_assessment,
+)
 from .detail_admission import admit_details, detail_prompt, prepare_details, verify_details
 from .detail_workflow import DetailRecording, import_details, replay_details
 from .direct_mapping import mapping_prompt, prepare_mapping, resolve_mapping, verify_mapping
@@ -31,6 +38,7 @@ __all__ = [
     "Account",
     "AlignmentPolicy",
     "Analysis",
+    "ClaimQuestion",
     "DetailRecording",
     "ExtractionRecording",
     "MappingRecording",
@@ -41,6 +49,10 @@ __all__ = [
     "SourceRow",
     "SourceRecording",
     "account_digest",
+    "assess_claims",
+    "claim_population_digest",
+    "prepare_claim_assessment",
+    "verify_claim_assessment",
     "admit_relations",
     "admit_details",
     "detail_prompt",

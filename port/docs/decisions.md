@@ -200,3 +200,14 @@ agreement; choosing an alternative by matching qualifiers; or labeling equal tim
 equal measured times. Rich v2 receipts preserve situation IDs/kinds and complete accounts while
 legacy v1 artifacts stay unchanged. The conservative role/context/row gates are a named local
 recipe, not a replacement for Scala distorted anchors or full semantic alignment.
+
+Fixed-population claim assessment (2026-11-17): bind a separately declared question population
+to the complete checked account snapshot, including existing mappings; derive accounting states
+from attributed recall availability, support, counterevidence and unresolved reasons. Rejected
+alternatives: deriving the denominator from successful extraction, changing existing fidelity,
+turning an evidence-ownership check into semantic truth, or inventing accuracy fractions. Source
+citation origin may differ from the assessed target; the semantic link remains attributed.
+Content-derived question/citation IDs reject duplicate descriptions; adjacent citation spans
+share identity while original UTF-16 boundaries are still checked. The first explicit text profile
+refuses chart/playback fields pending their checked representations. Their Scala capabilities
+remain owed, not retired. This avoids copying the Scala mapping class hierarchy into Python.

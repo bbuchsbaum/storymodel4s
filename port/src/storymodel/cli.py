@@ -8,6 +8,13 @@ from typing import Any
 from .alignment import align_account, validate_policy
 from .analysis import Analysis, Policy, project
 from .artifacts import publish_json, read_account, read_supported_account
+from .claim_assessment import (
+    ClaimQuestion,
+    assess_claims,
+    prepare_claim_assessment,
+    validate_claim_plan,
+    verify_claim_assessment,
+)
 from .demo import example_account
 from .detail_admission import detail_prompt, prepare_details
 from .detail_workflow import (
@@ -254,6 +261,23 @@ def main(argv: list[str] | None = None) -> int:
     relation_inspect.add_argument("account")
     relation_inspect.add_argument("--expected-sha256")
     relation_inspect.add_argument("--output")
+    claim_prepare = commands.add_parser(
+        "prepare-claim-assessment",
+        help="freeze a declared question population against an account snapshot",
+    )
+    claim_prepare.add_argument("account")
+    claim_prepare.add_argument("questions")
+    claim_prepare.add_argument("--expected-sha256")
+    claim_prepare.add_argument("--output")
+    for command in ("assess-claims", "verify-claims"):
+        claim_command = commands.add_parser(
+            command, help="check fixed-population attributed text assessments"
+        )
+        claim_command.add_argument("plan")
+        claim_command.add_argument("reply")
+        if command == "verify-claims":
+            claim_command.add_argument("result")
+        claim_command.add_argument("--output")
     identity_resolve = commands.add_parser(
         "resolve-identity", help="resolve document-local identity from recorded form annotations"
     )
@@ -305,6 +329,37 @@ def main(argv: list[str] | None = None) -> int:
                 {"account": Account.model_json_schema(), "analysis": Analysis.model_json_schema()},
                 args.output,
             )
+        elif args.command == "prepare-claim-assessment":
+            claim_account = read_supported_account(
+                Path(args.account), expected_sha256=args.expected_sha256
+            )
+            if claim_account.export_permission != "allowed":
+                raise PermissionError("producer denies claim assessment export")
+            question_data = strict_json(Path(args.questions).read_bytes())
+            if not isinstance(question_data, list):
+                raise ValueError("claim questions must be a JSON array")
+            questions = tuple(
+                ClaimQuestion.model_validate_json(canonical(q)) for q in question_data
+            )
+            emit(
+                prepare_claim_assessment(claim_account, questions).model_dump(mode="json"),
+                args.output,
+            )
+        elif args.command in ("assess-claims", "verify-claims"):
+            claim_plan = validate_claim_plan(Path(args.plan).read_bytes())
+            if claim_plan.account.export_permission != "allowed":
+                raise PermissionError("producer denies claim assessment export")
+            claim_reply = Path(args.reply).read_bytes()
+            if args.command == "assess-claims":
+                emit(assess_claims(claim_plan, claim_reply).model_dump(mode="json"), args.output)
+            else:
+                verified_claims = verify_claim_assessment(
+                    claim_plan, claim_reply, Path(args.result).read_bytes()
+                )
+                emit(
+                    {"valid": True, "population_sha256": verified_claims.population_sha256},
+                    args.output,
+                )
         elif args.command == "align":
             account = read_supported_account(
                 Path(args.account), expected_sha256=args.expected_sha256

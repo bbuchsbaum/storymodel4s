@@ -305,3 +305,23 @@ deterministic repeated-label circumstance evidence, prior assessments and comple
 preservation. The installed example constructs one source and two recalls, admits details,
 localizes both while exposing their polarity difference, and leaves fidelity pending in analysis.
 The broader recurring-scene correspondence, semantic channels and full P3/P4 exits remain owed.
+
+## Fixed-population attributed claim assessment
+
+Bead `bd-01M7M0916GDS07X2Q0M0TCRQTK` ports the text ownership and complete-accounting path
+from `align/claimassessment.scala` through `prepare_claim_assessment`, `assess_claims` and
+`verify_claim_assessment`. The separate plan fixes recall-unit/source-target/facet questions
+against the complete account snapshot before assessment success. Existing mappings are unchanged.
+
+Scala's `ClaimAssessmentReceiptSuite` supplies independent requirements: seven derived states,
+all questions retained in the denominator, five expressed/two resolved in the seven-state control,
+support with unresolved context, conflicting evidence, unknown reference, source-origin ownership,
+review/claim scope and complete submission accounting. Python improves semantic identity by
+deriving question/citation IDs and refusing duplicate descriptions. Citations may originate from
+a different source target than the assessed question; only physical ownership is certified.
+
+The [claim-assessment contract](claim-assessment.md) exposes statuses/counts and the attribution
+limits. Chart-element/provenance checks and media-bundle anchored support from the Scala suite
+remain explicit outstanding seams: this first text profile refuses those fields rather than
+accepting unchecked placeholders. Automatic semantic comparison, graded assessment integration
+and full P3 correspondence remain owed. No question count is presented as accuracy or calibration.
