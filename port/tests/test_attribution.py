@@ -22,6 +22,11 @@ from storymodel.cli import main
 from storymodel.identity import resolve_text_identity
 from storymodel.model import Context, Span, State, Support, validate_account
 from storymodel.rich_account import pair_rich_accounts, upgrade_account, validate_rich_account
+from storymodel.rich_construction import (
+    RichConstructionRequest,
+    RichConstructionResult,
+    verify_rich_construction,
+)
 from storymodel.serialization import canonical, digest
 
 PILOT = Path(__file__).resolve().parents[1]
@@ -377,6 +382,23 @@ def test_construction_example_api_and_all_cli_commands_agree(tmp_path, capsys):
     annotations = (destination / "identity-annotations.json").read_text()
     proposals = (destination / "holder-proposals.json").read_text()
     result = resolve_context_holders(account, annotations, proposals)
+    saved_result = AttributionResult.model_validate_json(
+        (destination / "attribution.json").read_bytes()
+    )
+    assert verify_attribution(account, annotations, proposals, saved_result) == result
+    assert json.loads((destination / "situations.json").read_text()) == [
+        r.model_dump(mode="json")
+        for r in attribution_table(account, annotations, proposals, saved_result)
+    ]
+    verify_rich_construction(
+        RichConstructionRequest.model_validate_json(
+            (destination / "construction-request.json").read_bytes()
+        ),
+        (destination / "construction-proposals.json").read_text(),
+        RichConstructionResult.model_validate_json(
+            (destination / "construction-result.json").read_bytes()
+        ),
+    )
     inputs = [
         str(destination / n)
         for n in ("account.json", "identity-annotations.json", "holder-proposals.json")

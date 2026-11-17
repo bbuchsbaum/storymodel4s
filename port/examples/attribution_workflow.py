@@ -73,7 +73,8 @@ construction = {
         }
     ],
 }
-built = compile_rich_construction(request, canonical(construction))
+# publish_json writes canonical JSON plus a newline; receipts must bind those exact bytes.
+built = compile_rich_construction(request, canonical(construction) + "\n")
 assert built.resolutions[0].status == "admitted"
 account = built.account
 before = account.model_dump_json()
@@ -109,7 +110,7 @@ proposals = {
         }
     ],
 }
-raw_forms, raw_holders = canonical(annotations), canonical(proposals)
+raw_forms, raw_holders = canonical(annotations) + "\n", canonical(proposals) + "\n"
 result = resolve_context_holders(account, raw_forms, raw_holders)
 verify_attribution(account, raw_forms, raw_holders, result)
 table = attribution_table(account, raw_forms, raw_holders, result)
