@@ -497,6 +497,33 @@ def step_split(X, prod, dec):
             for k, ii in sorted(out.items())}
 
 
+def evidence_bound(dcd, rates, prod, dec):
+    """Post hoc: how far a row's content can outweigh the order prior. The floor is the lowest
+    q / d over a row's scene cells (mass that abstains or stays at work level sits under every
+    scene); the bound is log2(top ratio / floor), before alpha."""
+    keys = [(p, s) for p, rows in dcd.X.gold.items() for s in by_session(rows)]
+    q = np.concatenate([dcd.q[k] for k in keys])
+    d = np.concatenate([np.tile(dcd.d[k[0]], (len(dcd.q[k]), 1)) for k in keys])
+    n, ix = dcd.sp.n, dcd.sp.index()
+    ratio = q[:, :n] / d[:, :n]
+    floor, top = ratio.min(1), ratio.max(1)
+    lost = [i for i, (a, b) in enumerate(zip(prod, dec)) if a.scene_hit and b.scene_hit is False]
+    won = [i for i, (a, b) in enumerate(zip(prod, dec)) if a.scene_hit is False and b.scene_hit]
+    lr = [math.log2(ratio[i, ix[prod[i].top_scene]] / ratio[i, ix[dec[i].top_scene]])
+          for i in lost]
+    size = int(np.median(dcd.sp.size))
+    sc = rates["scene"]
+    return dict(
+        median_floor_ratio=float(np.median(floor)), median_top_ratio=float(np.median(top)),
+        median_bound_bits=float(np.median(np.log2(top / floor))),
+        tops_right_to_wrong=len(lost), tops_wrong_to_right=len(won),
+        median_evidence_bits_producer_top_over_decoded_top_on_right_to_wrong=float(
+            np.median(lr)) if lr else None,
+        order_prior_bits_one_step_forward_over_a_jump=math.log2(
+            sc["forward"] * (1 - sc["rho"]) / (sc["jump"] / (size - 1))) if size > 1 else None,
+        median_scenes_per_work=size)
+
+
 def run_variant(X, fmap, alpha=None, extra=None, bands=None):
     """Decode one evidence map. alpha None: fitted leave-one-participant-out; else fixed."""
     dcd = Decoder(X, fmap)
@@ -520,7 +547,8 @@ def run_variant(X, fmap, alpha=None, extra=None, bands=None):
                                    for a in ALPHAS},
                    grid_scene_bits={str(a): tmean(sc[a], "scene_bits") for a in ALPHAS}),
         rows_with_in_work_residual=int(dcd.residual_rows),
-        rates_all_participants={k: v for k, v in DC.fit(X.comp, X.gold, None, X.cfg).items()},
+        rates_all_participants=(allr := DC.fit(X.comp, X.gold, None, X.cfg)),
+        post_hoc_evidence_bound=evidence_bound(dcd, allr, named["producer"], dec),
         states=3 * dcd.sp.n + 2, cells=dcd.sp.n + 2)
     return out, all_alpha, named
 
