@@ -1516,6 +1516,185 @@ def test_decoded_forecast_marks_inferred_top():
     assert all(f.top_from == "neighbours" and f.own_share is None for f in flat)
 
 
+# ---------------------------------------------------------------- round 5: descriptive scores
+
+
+def test_top_scene_within_one_and_gold_step():
+    comp = fixture()
+    dur = B.duration_prior(comp, CFG)
+    valid = B.valid_scenes(comp, CFG)
+
+    def top(scene):  # a forecast whose top scene in C is `scene`
+        d = {s: 0.1 for s in valid["C"]}
+        d[scene] = 0.8
+        return B.Forecast(dur.work, dict(dur.scene, C=d), 0.05)
+
+    g = lambda i, *a, **k: _gold("P", "s", i, *a, **k)  # noqa: E731
+    gold = [g(0, "specific", "C", {8}), g(1, "specific", "C", {8}),
+            g(2, "specific", "C", {10}), g(3, "nonfilm", None, nonfilm="off_task"),
+            g(4, "specific", "C", {9}), g(5, "film_only", "B"), g(6, "specific", "C", {9}),
+            g(7, "film_only", "C"), g(8, "specific", "C", {10})]
+    fc = [top(9), top(10), top(8), dur, top(9), dur, top(9), dur, top(9)]
+    sc = SC.score_rows(gold, fc, comp, valid)
+    # the position is kept across a non-film row and a work-level row of the same work, and is
+    # lost when another work is recalled in between
+    assert [s.gold_step for s in sc] == ["first in the work", "stay", "forward 2-3", None,
+                                         "backward", None, "first in the work", None,
+                                         "forward 1"]
+    assert [s.scene_hit for s in sc if s.scene_hit is not None] == [False, False, False, True,
+                                                                     True, False]
+    # top 9 for gold 8 is one step away; top 10 for gold 8 and top 8 for gold 10 are two
+    assert [s.within1 for s in sc if s.within1 is not None] == [True, False, False, True, True,
+                                                                True]
+    assert [SC.gold_step(k) for k in (None, 0, 1, 2, 3, 4, 9, -1)] == [
+        "first in the work", "stay", "forward 1", "forward 2-3", "forward 2-3", "forward 4+",
+        "forward 4+", "backward"]
+    st = SC.strata(sc, comp)
+    assert {k: v["n"] for k, v in st["by_gold_step"].items()} == {
+        "stay": 1, "forward 1": 1, "forward 2-3": 1, "backward": 1, "first in the work": 2}
+    assert st["out_of_order"]["n"] == 1 and st["out_of_order"]["top_scene"] == 1.0
+
+
+def test_film_time_error_known_answer():
+    from types import SimpleNamespace
+
+    from cs2 import descriptive as DS
+
+    comp = fixture()
+    dur = B.duration_prior(comp, CFG)
+    valid = B.valid_scenes(comp, CFG)
+    clock = DS.film_clock(comp)
+    # C spans two parts: its clock joins them (p1 60-100, then p2 10-100)
+    assert clock.scene[8][1:] == (0, 40) and clock.scene[9][1:] == (40, 80)
+    assert clock.scene[10][1:] == (80, 130)
+    assert clock.single == {"A": False, "B": True, "C": True}  # A has two occurrences
+    close(DS.mean_distance(40, 80, [[0, 40]]), 20.0)
+    close(DS.mean_distance(0, 40, [[0, 40]]), 0.0)
+    # between two gold stretches the nearest boundary changes at the midpoint of the gap
+    close(DS.mean_distance(10, 20, [[0, 5], [30, 40]]), 9.375)
+    close(DS.gap(10, 20, [[0, 5], [30, 40]]), 5.0)
+    close(DS.gap(40, 80, [[0, 40]]), 0.0)
+    assert DS.merge([(40, 80), (0, 40), (90, 95)]) == [[0, 80], [90, 95]]
+    gold = _gold("P", "s", 0, "specific", "C", {8})
+    # the duration prior on C: 40 s, 40 s, 50 s at mean distances 0, 20 and 65
+    close(DS.time_error(dur, gold, valid, clock), (40 * 20 + 50 * 65) / 130)
+    assert DS.time_error(dur, _gold("P", "s", 0, "specific", "A", {1}), valid, clock) is None
+    assert DS.time_error(dur, _gold("P", "s", 0, "film_only", "C"), valid, clock) is None
+    f = SC.ProducerForecast({9: 0.3}, {}, {}, 0.0, 0.7, dur, 0.01, comp)
+    close(DS.time_error(f, gold, valid, clock, located_only=True), 20.0)
+    assert DS.time_error(f, gold, valid, clock) > 20.0  # the unlocated mass reaches scene 10
+    none = SC.ProducerForecast({}, {}, {}, 0.0, 1.0, dur, 0.01, comp)
+    assert DS.time_error(none, gold, valid, clock, located_only=True) is None
+    row = SimpleNamespace(mass={("at", "unit", "c3"): 0.5, ("at", "unit", "c4"): 0.2,
+                                ("unassigned",): 0.3})
+    close(DS.located_span(row, comp, 9, [[0, 40]], clock)[0], 20.0)
+    close(DS.located_span(row, comp, 9, [[0, 40]], clock)[1], 0.0)
+    close(DS.located_span(row, comp, 10, [[0, 40]], clock)[1], 40.0)
+    assert DS.located_span(row, comp, 8, [[0, 40]], clock) is None
+
+
+# ---------------------------------------------------------------- round 5: order as a fallback
+
+
+def _random_cells(sp, seed, rows):
+    rng = np.random.default_rng(seed)
+    q = rng.random((rows, sp.n + 2)) + 0.05
+    return q / q.sum(1, keepdims=True)
+
+
+def test_order_fallback_null_producer_equals_order_prior_only():
+    # a producer with nothing located and no frame leaves everything unplaced, so order places
+    # all of it: the forecast is the order prior alone, exactly, on cells and on scored bits
+    DC, comp, dur, sp, rates, T, init = _decoder_setup()
+    valid = B.valid_scenes(comp, CFG)
+    words = [(0.2 + i, f"u{i}", Uncovered(f"u{i}")) for i in range(4)]
+    acc = Account(comp, {}, {("P", "s"): cells(words)})
+    gold = [_gold("P", "s", 0, "specific", "C", {8}), _gold("P", "s", 1, "film_only", "B"),
+            _gold("P", "s", 2, "nonfilm", None, nonfilm="off_task"),
+            _gold("P", "s", 3, "specific", "B", {6, 7})]
+    ld = LocationDistribution.from_words(acc, acc.words[("P", "s")],
+                                         [Bin(g.lo, g.hi) for g in gold])
+    null = SC.producer_forecasts(ld, dur, CFG, [dur] * 4)
+    d = DC.cells(dur, sp, dur, rates["nu"])[0]
+    q = np.array([DC.cells(f, sp, dur, rates["nu"])[0] for f in null])
+    other = DC.leave_row_out(sp, T, init, q, d, 0.7)
+    row = other[0]
+    assert DC.restricted(sp, row, {}, 0.01) is row  # no frame: q itself, untouched
+    got = [DC.order_fallback(f, {}, 0.01, other[t], sp) for t, f in enumerate(null)]
+    prior = DC.decode(sp, T, init, 4, d, 0.7)
+    for a, b in zip(got, prior):
+        assert np.array_equal(a.post, b.post)
+        assert a.order_mass == 1.0 and a.top_source == "order, nothing located"
+    for a, b in zip(SC.score_rows(gold, got, comp, valid),
+                    SC.score_rows(gold, prior, comp, valid)):
+        for t in ("film_bits", "work_bits", "scene_bits"):
+            assert getattr(a, t) == getattr(b, t), t
+
+
+def test_order_fallback_leaves_located_mass_unchanged():
+    DC, comp, dur, sp, rates, T, init = _decoder_setup()
+    q = _random_cells(sp, 3, 1)[0]
+    ix, n, e = sp.index(), sp.n, 0.01
+    # located: scene 9, the title-only scene 5 of B, and two non-film states; 0.1 at work
+    # level in C; 0.3 unassigned
+    f = SC.ProducerForecast({9: 0.4, 5: 0.1}, {"C": 0.1}, {}, 0.1, 0.3, dur, e, comp,
+                            {"memory_search": 0.06, "gave_up": 0.04})
+    g = DC.order_fallback(f, {}, 0.01, q, sp)
+    close(g.located[ix[9]], (1 - e) * 0.4)
+    close(g.resid[sp.works.index("B")], (1 - e) * 0.1)
+    close(g.located[n], (1 - e) * 0.06)
+    close(g.located[n + 1], (1 - e) * 0.04)
+    close(float(g.located.sum()), (1 - e) * 0.5)
+    assert (g.post - g.located >= 0).all()  # order only adds to what the producer placed
+    close(float(g.post.sum() + g.resid.sum()), 1.0)
+    close(g.order_mass_unassigned, f.u)
+    close(g.order_mass, f.u + (1 - e) * 0.1)
+    c = [ix[s] for s in (8, 9, 10)]
+    placed = g.post - g.located - f.u * q  # the work-level mass, placed inside C by q
+    assert np.allclose(placed[c], (1 - e) * 0.1 * q[c] / q[c].sum(), atol=1e-12)
+    assert abs(placed).sum() - abs(placed[c]).sum() < 1e-12
+    close(g.p_work("B"), float(g.post[[ix[6], ix[7]]].sum()) + (1 - e) * 0.1)
+    assert g.top_source == "located"
+    # scene-set mass stays inside its set
+    f2 = SC.ProducerForecast({10: 0.3}, {}, {}, 0.0, 0.5, dur, e, comp,
+                             sets={("C", frozenset({8, 9})): 0.2})
+    g2 = DC.order_fallback(f2, {}, 0.01, q, sp)
+    placed2 = g2.post - g2.located - f2.u * q
+    close(float(placed2[[ix[8], ix[9]]].sum()), (1 - e) * 0.2)
+    close(placed2[ix[10]], 0.0)
+    close(placed2[ix[8]] / placed2[ix[9]], q[ix[8]] / q[ix[9]], 1e-9)
+
+
+def test_order_fallback_restricts_unassigned_mass_to_the_frame_film():
+    DC, comp, dur, sp, rates, T, init = _decoder_setup()
+    q = _random_cells(sp, 5, 1)[0]
+    ix, n = sp.index(), sp.n
+    f = SC.ProducerForecast({}, {}, {}, 0.0, 1.0, dur, 0.01, comp)  # everything unassigned
+    g = DC.order_fallback(f, {"C": 1.0}, 0.01, q, sp)
+    film = float(q[:n].sum())
+    c = [ix[s] for s in (8, 9, 10)]
+    close(float(g.post.sum()), 1.0)
+    close(g.p_work("C"), 0.99 * film + 0.01 * float(q[c].sum()))
+    close(g.p_work("B"), 0.01 * float(q[[ix[6], ix[7]]].sum()))
+    close(g.p_nonfilm(), float(q[n] + q[n + 1]))  # the frame does not restrict the film level
+    assert np.allclose(g.post[c] / g.post[c].sum(), q[c] / q[c].sum(), atol=1e-12)
+    # a frame of 0.6 leaves 0.4 to q itself
+    h = DC.order_fallback(f, {"C": 0.6}, 0.01, q, sp)
+    close(h.p_work("B"), (0.99 * 0.4 + 0.01) * float(q[[ix[6], ix[7]]].sum()))
+
+
+def test_leave_row_out_ignores_the_rows_own_evidence():
+    DC, comp, dur, sp, rates, T, init = _decoder_setup()
+    d = DC.cells(dur, sp, dur, rates["nu"])[0]
+    q = _random_cells(sp, 11, 3)
+    q2 = q.copy()
+    q2[1] = _random_cells(sp, 12, 1)[0]
+    a, b = DC.leave_row_out(sp, T, init, q, d, 0.8), DC.leave_row_out(sp, T, init, q2, d, 0.8)
+    assert np.array_equal(a[1], b[1])  # row 1's own evidence never enters its own posterior
+    assert not np.allclose(a[0], b[0]) and not np.allclose(a[2], b[2])
+    assert np.allclose(a.sum(1), 1.0, atol=1e-12)
+
+
 # ---------------------------------------------------------------- runner
 
 

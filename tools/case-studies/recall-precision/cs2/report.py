@@ -259,8 +259,16 @@ def corpus_report(corpus, producer, dirs, work_applicable):
                         "fallback_mass",
                         "typed_absence",
                         "rows",
+                        "by_gold_step",
+                        "out_of_order",
                     )
                 },
+                # the standing out-of-order stratum, for the producer and every baseline
+                gold_step={k: dict(by_gold_step=v.get("by_gold_step"),
+                                   out_of_order=v.get("out_of_order")) for k, v in
+                           dict(producer=st, **(sm.get("baseline_strata") or {})).items()},
+                top_scene_within_1={k: (v.get("top_scene_within_1") or {}).get("share")
+                                    for k, v in sm["forecasts"].items()},
                 words=tot,
                 conversion=conv,
                 checks=sm.get("checks"),

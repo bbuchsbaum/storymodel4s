@@ -264,6 +264,8 @@ def write_rows(path, named_scores):
                 "nonwork",
                 "abstain",
                 "dropped_scenes",
+                "within_1",
+                "gold_step",
             ]
         )
         for name, scores in named_scores.items():
@@ -287,6 +289,8 @@ def write_rows(path, named_scores):
                         _fmt(s.nonwork),
                         _fmt(s.abstain),
                         s.dropped_scenes,
+                        "" if s.within1 is None else int(s.within1),
+                        s.gold_step or "",
                     ]
                 )
 
@@ -314,6 +318,10 @@ def summarize_forecasts(named, cfg, work_applicable, reference="duration"):
         d["top_scene_in_gold_set"] = dict(
             n=len(spec),
             share=sum(s.scene_hit for s in spec) / len(spec) if spec else None,
+        )
+        d["top_scene_within_1"] = dict(
+            n=len(spec),
+            share=sum(s.within1 for s in spec) / len(spec) if spec else None,
         )
         out[name] = d
     return out

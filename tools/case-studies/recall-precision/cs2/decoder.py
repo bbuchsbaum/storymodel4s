@@ -424,7 +424,8 @@ def forward_backward(T, init, L) -> tuple:
     for t in range(n - 2, -1, -1):
         b = T @ (L[t + 1] * beta[t + 1])
         beta[t] = b / b.sum()
-    post = alpha * beta
+    # both from the same factors, so a row with flat evidence has the two exactly equal
+    post = (pred * L) * beta
     nbr = pred * beta
     return post / post.sum(1, keepdims=True), nbr / nbr.sum(1, keepdims=True)
 
@@ -470,3 +471,114 @@ def decode(sp: Space, T, init, q, d, alpha) -> list:
             )
         out.append(f)
     return out
+
+
+# ---------------------------------------------------------------- order as a fallback only
+
+
+def leave_row_out(sp: Space, T, init, q, d, alpha) -> np.ndarray:
+    """Rows x cells: each row's posterior from the OTHER rows' evidence only. This is what
+    order knows about a row without looking at it."""
+    _, nbr = forward_backward(T, init, likelihood(sp, q, d, alpha))
+    return to_cells(sp, nbr)
+
+
+@dataclass
+class OrderFallbackForecast(DecodedForecast):
+    """The producer's own forecast with only its unplaced mass placed by order (round 5).
+
+    Located mass is the producer's, unchanged. `order_mass` is the mass order placed: the
+    unassigned share (`order_mass_unassigned`) and the mass placed inside a work or scene set
+    the producer named (`order_mass_within`). `top_source` says whether the top scene cell is
+    the producer's own located top ('located'), was set by order where nothing was located
+    ('order, nothing located'), or was set by order above a located scene ('order over
+    located')."""
+
+    resid: np.ndarray | None = None  # per work: in-work mass on no valid scene (unchanged)
+    located: np.ndarray | None = None  # the producer's own placed mass on the cells
+    order_mass: float = 0.0
+    order_mass_unassigned: float = 0.0
+    order_mass_within: float = 0.0
+    top_source: str = "order, nothing located"
+
+    def p_work(self, w):
+        wi = self.sp.works.index(w)
+        a = self.sp.start[wi]
+        return float(self.post[a : a + self.sp.size[wi]].sum()) + float(self.resid[wi])
+
+
+def restricted(sp: Space, q, mix, floor):
+    """The order posterior under the frame-film restriction of the scorer's fallback: the
+    frame's works first (inside each by q), the rest by q itself, with the same floor. An
+    empty frame is q itself (the same array, so a null producer is exact)."""
+    widx = {w: i for i, w in enumerate(sp.works)}
+    mix = {w: v for w, v in (mix or {}).items() if w in widx}
+    if not mix:
+        return q
+    n = sp.n
+    total = math.fsum(mix.values())
+    if total > 1:  # declared, as in the frame fallback: weights above 1 are normalised
+        mix = {w: v / total for w, v in mix.items()}
+    rest = max(0.0, 1 - math.fsum(mix.values()))
+    film = q[:n].sum()
+    out = np.empty(n + 2)
+    out[n:] = q[n:]  # the non-film level is not restricted by the frame, as today
+    out[:n] = ((1 - floor) * rest + floor) * q[:n]
+    for w, v in mix.items():
+        a, m = sp.start[widx[w]], sp.size[widx[w]]
+        out[a : a + m] += (1 - floor) * v * film * q[a : a + m] / q[a : a + m].sum()
+    return out
+
+
+def order_fallback(f, mix, floor, q, sp: Space, index=None) -> OrderFallbackForecast:
+    """p' = located + (unplaced mass placed by q). Wherever the scorer spreads a producer's
+    mass by the duration prior, q spreads it under the same restriction: unassigned mass
+    inside the frame film, work-level mass inside its work, scene-set mass inside its set.
+    f: a ProducerForecast; mix: the row's frame (work -> weight); q: the row's posterior from
+    the other rows' evidence only, on the cells."""
+    if not isinstance(f, SC.ProducerForecast):
+        raise DecodeError("the order fallback is defined for a producer forecast")
+    n, e = sp.n, f.eps
+    index = index or sp.index()
+    widx = {w: i for i, w in enumerate(sp.works)}
+
+    def inside(w):  # q inside one work, renormalised
+        a, m = sp.start[widx[w]], sp.size[widx[w]]
+        return slice(a, a + m), q[a : a + m] / q[a : a + m].sum()
+
+    fr = restricted(sp, q, mix, floor)
+    located, placed = np.zeros(n + 2), np.zeros(n + 2)
+    resid = np.zeros(len(sp.works))
+    for s, m in f.loc.items():
+        if s in index:
+            located[index[s]] += (1 - e) * m
+        else:  # a title-only scene: in its work, on no valid scene
+            resid[widx[f.comp.work_of_scene(s)]] += (1 - e) * m
+    for w, m in f.outside.items():
+        resid[widx[w]] += (1 - e) * m
+    search = f.nonfilm.get(SEARCH_LABEL, 0.0)
+    located[n] += (1 - e) * search
+    located[n + 1] += (1 - e) * (f.nonwork - search)
+    for w, m in f.spread.items():
+        sl, c = inside(w)
+        placed[sl] += (1 - e) * m * c
+    for (w, scenes), m in f.sets.items():
+        ii = [index[x] for x in scenes if x in index and sp.work_of[index[x]] == widx[w]]
+        if ii:
+            placed[ii] += (1 - e) * m * q[ii] / q[ii].sum()
+        else:  # a set with no valid scene is the work node
+            sl, c = inside(w)
+            placed[sl] += (1 - e) * m * c
+    if f.composition:
+        placed[:n] += (1 - e) * f.composition * fr[:n] / fr[:n].sum()
+    within = float(placed.sum())
+    post = (located + placed) + f.u * fr
+    if located[:n].max() <= 0:
+        src = "order, nothing located"
+    elif int(np.argmax(post[:n])) == int(np.argmax(located[:n])):
+        src = "located"
+    else:
+        src = "order over located"
+    return OrderFallbackForecast(sp, post, index, resid=resid, located=located,
+                                 order_mass=f.u + within, order_mass_unassigned=f.u,
+                                 order_mass_within=within, top_source=src)

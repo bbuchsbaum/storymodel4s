@@ -490,6 +490,72 @@ MUTANTS = [
         test="test_decoded_forecast_marks_inferred_top",
     ),
     dict(
+        id="M58",
+        guard="the order fallback places unassigned mass by the order posterior",
+        file="cs2/decoder.py",
+        edits=[("    post = (located + placed) + f.u * fr\n",
+                "    post = (located + placed) + f.u * np.full(n + 2, 1.0 / (n + 2))\n")],
+        test="test_order_fallback_null_producer_equals_order_prior_only",
+    ),
+    dict(
+        id="M65",
+        guard="without a frame the order posterior is used as it is, so a null producer is exact",
+        file="cs2/decoder.py",
+        edits=[("    if not mix:\n        return q\n",
+                "    if not mix:\n        return q * (1 + 1e-13)\n")],
+        test="test_order_fallback_null_producer_equals_order_prior_only",
+    ),
+    dict(
+        id="M59",
+        guard="the order fallback leaves the producer's located mass unchanged",
+        file="cs2/decoder.py",
+        edits=[("            located[index[s]] += (1 - e) * m\n",
+                "            located[index[s]] += (1 - e) * m * 0.5\n"
+                "            placed[index[s]] += (1 - e) * m * 0.5\n")],
+        test="test_order_fallback_leaves_located_mass_unchanged",
+    ),
+    dict(
+        id="M60",
+        guard="the order fallback keeps unassigned mass inside the frame film",
+        file="cs2/decoder.py",
+        edits=[("    if not mix:\n        return q\n", "    if True:\n        return q\n")],
+        test="test_order_fallback_restricts_unassigned_mass_to_the_frame_film",
+    ),
+    dict(
+        id="M61",
+        guard="a row's order posterior leaves out the row's own evidence",
+        file="cs2/decoder.py",
+        edits=[("    _, nbr = forward_backward(T, init, likelihood(sp, q, d, alpha))\n",
+                "    nbr, _ = forward_backward(T, init, likelihood(sp, q, d, alpha))\n")],
+        test="test_leave_row_out_ignores_the_rows_own_evidence",
+    ),
+    dict(
+        id="M62",
+        guard="within one scene step is measured, not exact identity",
+        file="cs2/scorer.py",
+        edits=[("                    rs.within1 = any(abs(ix[rs.top_scene] - ix[s]) <= 1 "
+                "for s in gs)\n",
+                "                    rs.within1 = any(abs(ix[rs.top_scene] - ix[s]) <= 0 "
+                "for s in gs)\n")],
+        test="test_top_scene_within_one_and_gold_step",
+    ),
+    dict(
+        id="M63",
+        guard="a gold step is counted inside one visit to a work",
+        file="cs2/scorer.py",
+        edits=[("            if last is not None and last[0] != g.work:\n"
+                "                last = None  # another work was recalled: the next row of a "
+                "work is its first\n", "")],
+        test="test_top_scene_within_one_and_gold_step",
+    ),
+    dict(
+        id="M64",
+        guard="the film clock joins an occurrence's segments end to end",
+        file="cs2/descriptive.py",
+        edits=[("            t += seg.end_s - seg.start_s\n", "            t += 0.0\n")],
+        test="test_film_time_error_known_answer",
+    ),
+    dict(
         id="M16",
         guard="the part marginal places a unit's mass on the unit's own part",
         file="cs2/projections.py",

@@ -263,6 +263,23 @@ class RowScore:
     transition: bool | None = None
     dropped_scenes: int = 0
     empty: str | None = None  # producer rows: typed absence ('no_sample', 'only_uncovered')
+    within1: bool | None = None  # the top scene is at most one scene step from a gold scene
+    gold_step: str | None = None  # the gold step from the previous scene-coded row of the work
+
+
+GOLD_STEPS = ("stay", "forward 1", "forward 2-3", "forward 4+", "backward", "first in the work")
+OUT_OF_ORDER = ("backward", "forward 4+")
+
+
+def gold_step(k) -> str:
+    """The type of a gold step of k scenes (None: no earlier scene-coded row in the work)."""
+    if k is None:
+        return "first in the work"
+    if k == 0:
+        return "stay"
+    if k < 0:
+        return "backward"
+    return "forward 1" if k == 1 else "forward 2-3" if k <= 3 else "forward 4+"
 
 
 def score_rows(gold_rows, forecasts, comp, valid, work_applicable=True) -> list:
@@ -271,6 +288,7 @@ def score_rows(gold_rows, forecasts, comp, valid, work_applicable=True) -> list:
         raise ScoreError("one forecast per gold row is required")
     works = [w for w, ss in valid.items() if ss]
     out, prev = [], None
+    last = None  # (work, ordinal) of the last scene-coded gold row; kept across non-film rows
     for g, f in zip(gold_rows, forecasts):
         rs = RowScore(g.participant, g.session, g.row, g.cls, g.work, None, None)
         rs.nonfilm_label = g.nonfilm
@@ -305,6 +323,16 @@ def score_rows(gold_rows, forecasts, comp, valid, work_applicable=True) -> list:
                     ps = {s: f.p_set_and_work({s}, g.work) for s in valid[g.work]}
                     rs.top_scene = max(valid[g.work], key=lambda s: ps[s])
                     rs.scene_hit = rs.top_scene in gs
+                    # declared: steps are counted over the work's valid scenes in order; a
+                    # gold row's position is the last valid scene of its set
+                    ix = {s: i for i, s in enumerate(valid[g.work])}
+                    rs.within1 = any(abs(ix[rs.top_scene] - ix[s]) <= 1 for s in gs)
+                    j = max(ix[s] for s in gs)
+                    same = last is not None and last[0] == g.work
+                    rs.gold_step = gold_step(j - last[1] if same else None)
+                    last = (g.work, j)
+            if last is not None and last[0] != g.work:
+                last = None  # another work was recalled: the next row of a work is its first
         terms = [t for t in (rs.film_bits, rs.work_bits, rs.scene_bits) if t is not None]
         rs.total_bits = math.fsum(terms) if terms else None
         out.append(rs)
@@ -433,6 +461,22 @@ def strata(scores, comp, work_applicable=True):
     out["scene_hit_given_correct_work"] = dict(
         n=len(cond), share=float(np.mean([s.scene_hit for s in cond])) if cond else None
     )
+    by_step = {}
+    for s in spec:
+        if s.gold_step is not None:
+            by_step.setdefault(s.gold_step, []).append(s)
+    out["by_gold_step"] = {
+        k: dict(n=len(v), top_scene=float(np.mean([s.scene_hit for s in v])),
+                top_scene_within_1=float(np.mean([s.within1 for s in v])),
+                scene_bits=float(np.mean([s.scene_bits for s in v])))
+        for k in GOLD_STEPS if (v := by_step.get(k))
+    }
+    ooo = [s for k in OUT_OF_ORDER for s in by_step.get(k, [])]
+    out["out_of_order"] = dict(
+        steps=list(OUT_OF_ORDER), n=len(ooo),
+        top_scene=float(np.mean([s.scene_hit for s in ooo])) if ooo else None,
+        top_scene_within_1=float(np.mean([s.within1 for s in ooo])) if ooo else None,
+        scene_bits=float(np.mean([s.scene_bits for s in ooo])) if ooo else None)
     sp = {}
     for s in spec:
         k = comp.work[s.work].speech
