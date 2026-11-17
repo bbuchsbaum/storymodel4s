@@ -376,8 +376,8 @@ MUTANTS = [
         id="M43",
         guard="a span [a, b] covers word cells a..b inclusive",
         file="cs2/ff_producer.py",
-        edits=[("                            covered_w = wids[a_:b_ + 1]\n",
-                "                            covered_w = wids[a_:b_]\n")],
+        edits=[("                                         else wids[a_:b_ + 1])\n",
+                "                                         else wids[a_:b_])\n")],
         test="test_span_anchors_convert_to_word_cells",
     ),
     dict(
