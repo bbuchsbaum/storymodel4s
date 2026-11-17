@@ -2,6 +2,8 @@
 
 The local baseline connects extracted event/detail accounts to source rows through their
 source events. Candidate evidence, reference outcome and fidelity remain separate.
+[Verification receipt](../evidence/alignment-workflow.json): full suite, independent review,
+predicate-guard mutation and installed-package checks.
 
 From `port/`, run the entire admitted synthetic path into a new directory:
 

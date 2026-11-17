@@ -1,0 +1,49 @@
+{
+  "stage": "sparse candidates and partial reference alignment",
+  "source_commit": "e0b90ba029869ad8ee5cff15971ee538247873b8",
+  "checks": {
+    "pytest": "200 passed in 3.92s",
+    "mypy": "19 source files; no issues",
+    "ruff": "lint passed; 55 files formatted"
+  },
+  "cold_review": {
+    "verdict": "no BLOCKs",
+    "focused_tests": "20 passed",
+    "additional_probes": [
+      "duplicate retrieval hits at cap",
+      "overlapping containing rows",
+      "preserved narrative bindings",
+      "tampered receipt/input/policy refusal",
+      "denied-export stdout suppression"
+    ],
+    "fixture": "example reuses admitted extraction_demo; no new narrative passage"
+  },
+  "mutation_check": {
+    "mutation": "remove predicate admission requirement",
+    "baseline": "3 passed",
+    "mutant": "1 failed, 2 passed",
+    "named_failure": "test_same_actor_different_actions_need_predicate_support",
+    "mutant_imported": true
+  },
+  "wheel_smoke": {
+    "installed_module": "data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "outside_checkout": true,
+    "cli_matches_api": true,
+    "verified_receipt": true,
+    "resolved_details": 2,
+    "unresolved_details": 1,
+    "new_fidelity_assessments": 0,
+    "live_provider_calls": 0
+  },
+  "scala_reference_files": {
+    "align/src/main/scala/storymodel4s/align/candidates.scala": "11e9b450e9d2c62eedc28613ee20aae2e71d707abfcf6b624dd07b08cc57092e",
+    "align/src/main/scala/storymodel4s/align/evidence.scala": "d8c74be7b05fc859ecc74a003faf8f52a08099239b5d84bd8442a93dac6dd7b2"
+  },
+  "limits": [
+    "Declared heuristic consistency only; not semantic reference accuracy or calibration.",
+    "Explicit caller aliases; no implicit synonym model, embeddings or sequence prior.",
+    "Only single-row references and alternatives inferred; joint/broad/external references preserved if supplied, not inferred.",
+    "No new fidelity assessments or source coverage credit.",
+    "No large-input performance or comparative development-speed claim."
+  ]
+}
