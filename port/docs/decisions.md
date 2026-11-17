@@ -183,3 +183,11 @@ silently broadening the v1 event vocabulary, dropping rich collections to fit le
 or maintaining a second graph engine. The four pilot relation rules remain deliberately
 bounded; situation `part_of` does not replace Scala narrative segment hierarchy. Its full
 construction and semantic contract remain owed.
+
+Rich identity consumers (2026-11-17): include event and state participants in the existing
+context classification and verified role readout. Annotation and identity-result schemas stay
+unchanged because they refer to mentions and bind the full account digest without embedding an
+event-only graph. Rich role rows explicitly name situation kind. Rejected alternatives: a second
+identity resolver, dropping state placement, calling a state an event, or adding a new sidecar
+version with no changed identity rule. Full accepted-holder, quantity and cross-modal contracts
+remain owed; this extension does not infer them from nearby roles.

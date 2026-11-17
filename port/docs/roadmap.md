@@ -4,8 +4,8 @@ Owner direction, 2026-11-16: make all working, non-redundant, non-stale StoryMod
 capabilities available in idiomatic Python, improving the implementation using lessons learned.
 Small slices are delivery order, not scope cuts. Deferred work remains owed.
 
-This is the current **port** execution direction, refreshed after rich-detail integration at
-`2da708d7c`. It extends [Stage 1](stage-1.md); it does not supersede the parent project's
+This is the current **port** execution direction, refreshed through rich-consumer integration.
+It extends [Stage 1](stage-1.md); it does not supersede the parent project's
 [VISION](../../VISION.md), scientific contracts or Scala roadmap. Mote holds live status.
 The [preservation map](preservation.md) remains the behavioral contract. Phase numbering starts
 at P2 to distinguish this expansion from the initial Stage 1 pilot.
@@ -25,12 +25,12 @@ and the three analysis views. Its recorded checks are in
 [rich-detail-workflow.json](../evidence/rich-detail-workflow.json). This is local engineering
 evidence, not a claim that the branch has landed or that the full phases are complete.
 
-Important gaps remain: relation admission, identity and structural alignment still use the
-legacy account boundary; they must gain explicit rich-account support. Playback, attribution,
-richer graph families, semantic channels and probabilistic inference are still owed. The next
-algorithmic slice is the sparse sequence kernel, followed by those rich-consumer seams and a
-discriminating correspondence workflow. Mote owns live status; the preservation map records
-each slice's behavioral coverage and limitations.
+The sparse sequence kernel and rich relation path have local implementation and independent
+evidence; see [sequence inference](sequence-inference.md) and [relations](relations.md).
+Rich identity extends the same sidecar path to state participants. Structural alignment is the
+next rich consumer, followed by a discriminating correspondence workflow. Playback, attribution,
+richer graph families, semantic channels and account-derived inference remain owed. Mote owns
+live status; the preservation map records each slice's behavioral coverage and limitations.
 
 Do not require a complete event graph for basic categorical localization. Conversely, graph
 construction is owed independently of whether it improves localization accuracy.
@@ -220,8 +220,9 @@ proof precedes scientific claims, but scientific qualification must not block un
 
 ## Immediate sequence
 
-The next three deliveries are computational. They do not rename or replace the full phase
-exits above. Finish each executable slice before adding another public abstraction.
+These computational deliveries establish the route into the wider phases. They do not rename
+or replace the full phase exits above. Finish each executable slice before adding another
+public abstraction; completed local slices remain subject to landing and the full parity audit.
 
 | Order | Delivery | Concrete completion evidence |
 |---|---|---|
@@ -231,7 +232,7 @@ exits above. Finish each executable slice before adding another public abstracti
 
 ### First delivery: the numerical kernel
 
-Next implementation bead: `bd-01M7KVBD5K6101NP5DG2P2QK1M` (Mote owns status).
+Numerical kernel bead: `bd-01M7KVBD5K6101NP5DG2P2QK1M` (Mote owns status).
 
 Use the working numerical seam in `align/hsmm.scala` (`GraphHsmm.run`), separating inference
 from account-specific evidence production. Inputs declare ordered units, admissible source,

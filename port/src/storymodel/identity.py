@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import unicodedata
 from hashlib import sha256
-from typing import ClassVar, Literal, Self
+from typing import ClassVar, Literal, Self, overload
 
 from pydantic import Field, model_validator
 
@@ -19,12 +19,13 @@ from .model import (
     Identified,
     Model,
     Name,
+    State,
     Support,
     _validate_instance,
     contained_in,
-    validate_account,
 )
 from .recall_intake import _simple_lower
+from .rich_account import RichAccount, SupportedAccount, validate_supported_account
 from .serialization import canonical, digest, strict_json
 
 RECIPE = "annotated-text-identity/v1"
@@ -148,13 +149,13 @@ class IdentityResult(Model):
     mentions: tuple[MentionIdentity, ...]
 
 
-def resolve_text_identity(value: Account, raw: str) -> IdentityResult:
+def resolve_text_identity(value: SupportedAccount, raw: str) -> IdentityResult:
     """Apply introducing-label/type and unique-preceding-antecedent rules within documents.
 
     Forms/types are explicit interpretations, not grammar certified by quotation. This
     first profile has no quantity or accepted holder inputs. It preserves those gaps.
     """
-    account = validate_account(value)
+    account = validate_supported_account(value)
     account_sha = digest(account.model_dump(mode="json"))
     parsed = strict_json(raw)
     if (
@@ -240,9 +241,9 @@ def resolve_text_identity(value: Account, raw: str) -> IdentityResult:
     attached: dict[str, int] = dict(introducing)
     context_by_id = {c.id: c for c in account.contexts}
     mention_contexts: dict[str, set[str]] = {}
-    for event in account.events:
-        for participation in event.participants:
-            mention_contexts.setdefault(participation.entity, set()).add(event.context)
+    for situation in account._situations():
+        for participation in situation.participants:
+            mention_contexts.setdefault(participation.entity, set()).add(situation.context)
     candidates: dict[str, tuple[int, ...]] = {}
     for mention in sorted(entities, key=lambda m: (entities[m].origin_document, positions[m], m)):
         current_annotation = annotations.get(mention)
@@ -334,7 +335,7 @@ def resolve_text_identity(value: Account, raw: str) -> IdentityResult:
     )
 
 
-def verify_identity(value: Account, raw: str, result: IdentityResult) -> IdentityResult:
+def verify_identity(value: SupportedAccount, raw: str, result: IdentityResult) -> IdentityResult:
     """Recompute the sidecar against original graph and annotation bytes before consumption."""
     checked = _validate_instance(IdentityResult, result)
     expected = resolve_text_identity(value, raw)
@@ -354,22 +355,55 @@ class IdentityRoleRow(Model):
     identity: MentionIdentity
 
 
+class RichIdentityRoleRow(Model):
+    """Rich role placements identify event/state kind without changing a mention or its context."""
+
+    situation: Name
+    kind: Literal["event", "state"]
+    context: Name
+    mention: Name
+    role: Name
+    evidence: tuple[Support, ...]
+    identity: MentionIdentity
+
+
+@overload
 def identity_role_table(
     value: Account, raw: str, result: IdentityResult
-) -> tuple[IdentityRoleRow, ...]:
-    """Consume a verified identity sidecar without rewriting or promoting any event claim."""
-    account = validate_account(value)
+) -> tuple[IdentityRoleRow, ...]: ...
+
+
+@overload
+def identity_role_table(
+    value: RichAccount, raw: str, result: IdentityResult
+) -> tuple[RichIdentityRoleRow, ...]: ...
+
+
+def identity_role_table(
+    value: SupportedAccount, raw: str, result: IdentityResult
+) -> tuple[IdentityRoleRow, ...] | tuple[RichIdentityRoleRow, ...]:
+    """Consume a verified identity sidecar without rewriting or promoting any situation claim."""
+    account = validate_supported_account(value)
     checked = verify_identity(account, raw, result)
     identities = {m.mention: m for m in checked.mentions}
-    return tuple(
-        IdentityRoleRow(
-            event=e.id,
-            context=e.context,
-            mention=p.entity,
-            role=p.role,
-            evidence=p.evidence,
-            identity=identities[p.entity],
-        )
-        for e in account.events
-        for p in e.participants
-    )
+    rows = []
+    for situation in account._situations():
+        for participation in situation.participants:
+            fields = dict(
+                context=situation.context,
+                mention=participation.entity,
+                role=participation.role,
+                evidence=participation.evidence,
+                identity=identities[participation.entity],
+            )
+            if isinstance(account, RichAccount):
+                fields.update(
+                    situation=situation.id,
+                    kind="state" if isinstance(situation, State) else "event",
+                )
+            else:
+                fields.update(event=situation.id)
+            rows.append(fields)
+    if isinstance(account, RichAccount):
+        return tuple(RichIdentityRoleRow.model_validate(row) for row in rows)
+    return tuple(IdentityRoleRow.model_validate(row) for row in rows)

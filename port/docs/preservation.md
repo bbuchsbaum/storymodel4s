@@ -267,3 +267,21 @@ This does not implement Scala's full temporal algebra, causal/reference subfamil
 state-change edges, entity relations or `NarrativeHierarchy`. Pilot situation-to-situation
 `part_of` is explicitly distinct from situation/segment membership under a narrative segment.
 Identity and structured candidate consumers still need their own rich-account integration.
+
+## Rich identity consumer integration
+
+Bead `bd-01M7KZ12DNTKHFN1KSV5PNDKSG` extends `resolve_text_identity`, `verify_identity`,
+`identity_role_table` and the existing CLI commands to complete v4 accounts. State participants
+join event participants in context placement; rich role rows retain situation ID/kind, original
+context, mention, role evidence and identity decision. No graph objects are rewritten.
+The existing annotation/result schemas remain valid because they bind the full account digest
+and address mentions, not event-only containers. Legacy schemas and output hashes are frozen.
+
+Independent witnesses distinguish state-only root, attributed, missing and mixed placements;
+the latter includes a root event and attributed state sharing a mention. First/second-person
+mentions stay open with the appropriate missingness reason. Unique third-person resolution,
+full-rich-account binding, forged-object refusal, nonempty detail/mapping preservation and
+installed CLI role readback have executable controls. These extend the existing ADR 0012
+bounded text-identity path; automatic acquisition, quantity, accepted holders, cross-modal
+identity and canonical graph projection remain owed. Structured candidates are the next rich
+consumer integration.

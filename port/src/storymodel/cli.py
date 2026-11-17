@@ -436,7 +436,7 @@ def main(argv: list[str] | None = None) -> int:
                     args.output,
                 )
         elif args.command in ("resolve-identity", "identity-roles"):
-            identity_account = read_account(
+            identity_account = read_supported_account(
                 Path(args.account), expected_sha256=args.expected_sha256
             )
             if identity_account.export_permission != "allowed":

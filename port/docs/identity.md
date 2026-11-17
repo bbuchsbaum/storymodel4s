@@ -1,7 +1,7 @@
 # Text mention identity without rewriting the graph
 
 `resolve_text_identity(account, raw_annotations)` returns an account-bound identity sidecar.
-It preserves local mention/entity IDs and every event, role and context. Accepted referent
+It preserves local mention/entity IDs and every event, state, role and context. Accepted referent
 classes are separate, content-derived records. Open mentions receive no referent ID.
 `identity_role_table` verifies the sidecar against its inputs before exposing role, mention,
 context, referent, candidates and exact evidence to a notebook or inspector.
@@ -12,11 +12,22 @@ uv run storymodel resolve-identity data/identity-example/account.json \
   data/identity-example/annotations.json --output data/identity-replayed.json
 uv run storymodel identity-roles data/identity-example/account.json \
   data/identity-example/annotations.json data/identity-example/identity.json
+
+# The same sidecar contract with participants placed in rich states:
+uv run python examples/rich_identity_workflow.py data/rich-identity-example
+uv run storymodel identity-roles data/rich-identity-example/account.json \
+  data/rich-identity-example/annotations.json data/rich-identity-example/identity.json
 ```
 
 The example uses an abstract two-token control, explicit grammatical annotations and source
 construction proposals. It saves the inputs and outputs for both stages. There is no provider
 call or extraction accuracy claim. Existing source and extraction recording formats are unchanged.
+
+Legacy and rich accounts use the same annotation and result schemas: these sidecars bind the
+complete account digest and do not embed or downcast its graph. The verified role table returns
+legacy `event` fields for old accounts. Rich rows use `situation` and `kind` (`event` or `state`),
+and include every event/state participant. State and event placements both contribute to context
+decisions. The original account, including details, mappings and circumstances, is unchanged.
 
 ## Annotation boundary
 
@@ -58,7 +69,7 @@ an already collapsed canonical entity disguised as a single mention.
   concept ordering evidence.
 - First/second-person resolution needs accepted holder placement, which is not yet supplied.
   Existing role placement distinguishes `outside-held-context` in an explicitly narrated root,
-  `holder-not-supplied` in an attributed context, `context-unknown` with no event placement, and
+  `holder-not-supplied` in an attributed context, `context-unknown` with no situation placement, and
   `ambiguous-context` across root and attributed placements. A nearby speaker role is not a holder.
 
 Identity is document-local, not automatically partitioned by event context: a person can be
