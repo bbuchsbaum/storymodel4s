@@ -31,8 +31,11 @@ and an evidence/context inspection table over independently built graphs.
 The [port roadmap](docs/roadmap.md) defines the next phases toward full working capability.
 [Source-account construction](docs/source-construction.md) and the connected
 [rich-detail workflow](docs/rich-detail-workflow.md) now provide reusable source graphs and
-recorded recall construction through mapping and analysis. Next come sparse sequence inference,
-rich graph consumers and fuller correspondence, followed by study operations and inspection.
+recorded recall construction through mapping and analysis. Account-derived sequence inference,
+reconstruction, organization, native playback readouts and cross-unit construction links now
+have bounded implementations. The [next deliveries](docs/roadmap.md#next-deliveries-execution-order-from-the-current-branch)
+start with primary hierarchy and connected graphs, then consolidate construction-to-analysis
+before expanding semantic evidence, remaining numerical methods and study/inspection coverage.
 
 ## Run it
 
