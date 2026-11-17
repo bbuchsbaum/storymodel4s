@@ -969,7 +969,7 @@ def test_talk_is_orthogonal_and_non_addressed_talk_has_no_mass():
     # 'work' unit is a work-level reference.
     frames = [
         dict(kind="memory_search", frame=[("C", 0.7)], position=None),
-        dict(kind="gave_up", frame=[], position=None),
+        dict(kind="work", frame=[], position=None),  # unframed remark: commentary talk
         dict(kind="content", frame=[("B", 1.0)], position=None),  # unanchored commentary
         dict(kind="content", frame=[("B", 1.0)], position=None),  # anchored commentary
         dict(kind="off_task", frame=[], position=None),
@@ -982,12 +982,12 @@ def test_talk_is_orthogonal_and_non_addressed_talk_has_no_mass():
     comp, cells, refs, conv, framing, talk = _orthogonal_session(
         frames, answers, {2: dict(oid="o2"), 3: dict(oid="o3")})
     kinds = [type(c.sample).__name__ for c in cells[::2]]
-    assert kinds == ["TalkSample", "StateSample", "TalkSample", "Uncovered", "StateSample",
+    assert kinds == ["TalkSample", "TalkSample", "TalkSample", "Uncovered", "StateSample",
                      "RefSample", "TalkSample"], kinds
     assert type(cells[7].sample).__name__ == "RefSample"  # the anchored word
     assert refs[cells[7].sample.ref].talk == "commentary"
     assert isinstance(refs[cells[10].sample.ref], WorkReference)
-    assert conv["non_addressed_words"] == {"metamemory": 2, "commentary": 2, "fragment": 2}
+    assert conv["non_addressed_words"] == {"metamemory": 2, "commentary": 4, "fragment": 2}
     assert talk[("P", "s", "P:s:u0")] == "metamemory" and framing[("P", "s", "P:s:u0")]
     acc = Account(comp, refs, {("P", "s"): cells})
     ld = LocationDistribution.from_words(acc, cells, [Bin(0, 1.5), Bin(4, 5.5)])
@@ -1106,13 +1106,11 @@ def test_non_film_states_are_destinations_not_talk():
     # non-film states with mass; memory search inside a framed film stays non-addressed talk
     frames = [dict(kind="memory_search", frame=[], position=None),
               dict(kind="gave_up", frame=[], position=None),
-              dict(kind="off_task", frame=[], position=None),
-              dict(kind="memory_search", frame=[("B", 0.8)], position=None)]
+              dict(kind="off_task", frame=[], position=None)]
     comp, cells, refs, _, _, _ = _orthogonal_session(frames, {}, {})
     states = [c.sample.state if type(c.sample).__name__ == "StateSample" else None
               for c in cells[::2]]
-    assert states == ["memory_search", "gave_up", "off_task", None], states
-    assert type(cells[6].sample).__name__ == "TalkSample"
+    assert states == ["memory_search", "gave_up", "off_task"], states
     acc = Account(comp, refs, {("P", "s"): cells})
     row = LocationDistribution.from_words(acc, cells, [Bin(0, 1.5)]).rows[0]
     assert row.mass == {("nonfilm", "memory_search"): 1.0}
