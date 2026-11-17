@@ -1,0 +1,42 @@
+{
+  "source_commit": "d90976d14c6446778b547668e4d717efb20806d7",
+  "bead": "bd-01M7KZ12DNTKHFN1KSV5PNDKSG",
+  "scope": "Rich account admission, event/state participant context classification and verified situation role readout in the existing text identity engine",
+  "checks": {
+    "pytest": {"passed": 465, "seconds": 5.56},
+    "mypy_source_files": 35,
+    "ruff_check": "passed",
+    "ruff_format_files": 86,
+    "diff_check": "passed"
+  },
+  "compatibility": {
+    "baseline_commit": "c7713dcfd",
+    "frozen": "Three legacy schemas, deterministic identity result and role rows unchanged",
+    "rich_contract": "Same mention annotation/result schema with complete account digest; rich role rows explicitly name situation and event/state kind",
+    "preserved": "Account fields and identities unchanged, including nonempty details, bindings and circumstances; analysis unchanged"
+  },
+  "mutations": {
+    "method": "Isolated source copies; compiled mutations; each baseline 3 passed; each mutant 1 failed and 2 passed",
+    "cases": [
+      {"change": "Context placement iterates events only", "failed": "test_state_placements_distinguish_context_missingness[root-outside-held-context-first]"},
+      {"change": "Role readout iterates events only", "failed": "test_state_only_third_person_identity_and_roles_preserve_every_field[source]"}
+    ],
+    "controls": ["test_state_placements_distinguish_context_missingness[missing-context-unknown-first]", "test_rich_role_schema_and_frozen_legacy_hashes"]
+  },
+  "installed_artifact": {
+    "environment": "Wheel site-packages import outside checkout with PYTHONPATH unset",
+    "example": "examples/rich_identity_workflow.py",
+    "result": "Rich state construction -> identity sidecar -> verified role readback; installed API/CLI complete JSON results agree"
+  },
+  "independent_review": {
+    "commit": "d90976d14c6446778b547668e4d717efb20806d7",
+    "verdict": "no BLOCK found",
+    "focused_tests": 71,
+    "additional_side_person_placement_controls": 16,
+    "stale_or_forged_sidecar_refusal_probes": 5,
+    "legacy_comparison": "Direct parent comparison: three schemas and 12 complete result/role cases identical",
+    "exact_raw_annotation_hashing": "passed",
+    "limits": "Reviewer did not repeat full suite, mutations or installed-wheel checks"
+  },
+  "remaining": ["Rich structured candidates", "Automatic annotation acquisition and quantity evidence", "Accepted holder and cross-modal identity contracts", "Canonical graph projection", "No full identity parity or scientific accuracy claim"]
+}
