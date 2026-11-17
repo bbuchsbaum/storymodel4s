@@ -238,8 +238,9 @@ proof precedes scientific claims, but scientific qualification must not block un
 
 ## Next deliveries: execution order from the current branch
 
-Refreshed 2026-11-17 through connected saved-analysis source `83a25cda5` and
-qualification `a4b35df97`, following recorded semantic inference `3255f57d9`.
+Refreshed 2026-11-17 through Sherlock intake source `43c2f7e13`, following raw-input
+preparation `092228d86` and its qualification `512feab4f`. Sherlock's independent
+qualification is still pending; implementation is not counted as a completed phase.
 This is the next-work plan within P2–P6,
 not a second phase numbering system. Mote owns live status. Completed checkpoints move
 out of the future queue; capability obligations remain until their complete exit is met.
@@ -307,32 +308,63 @@ The installed example reuses one source across two canonically equal but raw-dis
 retaining separate recording provenance and admitted/pending fidelity outcomes.
 [Evidence](../evidence/prepared-construction.json) records the installed CLI checks, existing
 suite plus targeted additions, and three independently reviewed discriminating mutations.
-This does not yet implement the actual Sherlock TSV/word-CSV contracts or recovery.
+That generic slice does not implement the actual Sherlock TSV/word-CSV contracts or recovery.
 
-**Next implementation action:** retained Sherlock annotation TSV and word-timestamp CSV
-adapters into this prepared account workflow, followed by explicit recovery of interrupted
-imported recordings. Reuse the existing intake/execution code.
+[Sherlock intake](sherlock-intake.md), source `43c2f7e13`, now implements the retained
+annotation TSV and word-timestamp CSV formats through prepared construction and saved
+analysis. Retained local logs record 1,024 passing tests and 17 installed CLI checks.
+These were inspected for this planning refresh, not rerun. Independent review and a durable
+qualification receipt remain the immediate completion work. The implementation preserves
+part-local source clocks and exact selected recall onsets, but does not yet supply composed
+source-time consumers, recording/scanner links or measured-time analysis.
+
+**Next action:** qualify the committed Sherlock slice, then implement explicit recovery of
+interrupted imported recordings. Follow with native source composition and measured recall
+timing consumed by analysis. Reuse the existing intake, execution and analysis code.
 
 ### Immediate work queue
 
-These are the next delivery checkpoints within P2–P6, not additional phase numbers. Refreshed
-at the owner's planning request on 2026-11-17, then refreshed after semantic and saved-workflow
-qualification. Recorded surface vectors and connected replay are locally qualified; study intake,
-recovery and remaining capability families still keep their full phases open.
+These are ordered delivery checkpoints within P2–P6, not additional phase numbers. Each
+checkpoint can span several small beads. Finish one executable path before broadening it;
+do not wait for an entire phase to finish before putting its useful outputs into the workflow.
 
 | Order | Work and researcher-visible result | Exit evidence |
 |---|---|---|
-| 1. Study inputs through analysis (P2/P3/P5) | Feed checked synthetic source annotations and recall inputs into existing construction and saved analysis. Preserve declared part order, native clocks, row/occurrence identity and original bytes. Extend to the actual Sherlock annotation and word-CSV contracts. | One installed command and notebook-friendly functions run inputs → accounts → details → mapping → fidelity → views; two recalls reuse one source; malformed inputs and foreign recordings are refused. Generic text intake alone does not close Sherlock coverage. |
+| 1. Qualify the connected Sherlock workflow (P2/P3/P5) | Finish independent review of the committed TSV/CSV adapters and retain their checks. Reuse one unchanged source across two recalls through details, mapping, fidelity and views. | Installed API/CLI agreement; discriminating malformed-input and foreign-recording controls; independent review of repair arithmetic, raw-byte identity and recall token/timing correspondence. Synthetic engineering proof only; full Sherlock coverage stays open. |
 | 2. Recover interrupted work (P5) | Resume imported recordings against their exact prepared inputs, model/prompt profile and existing completed stages. Reuse the recording executor; keep recovery explicit. | Inject interruption before/after reply persistence and import publication; recovery agrees with an uninterrupted run, retains original replies and refuses changed inputs. No implicit provider call or overwrite of completed assessments. |
-| 3. Complete computational families (P2/P4) | Extend that workflow with remaining graph/recall families, duration/refinement and retained transport methods, then feature tracks, clock maps and measured-time readouts. Port each method into the existing interfaces as its inputs become stable. | Per-family producer and consumer; independent small-case oracle; executable Scala comparison where available; support/denominator/missingness contract; measured sparse resource use. No claim that the existing sequence kernel is the entire Scala inference surface. |
-| 4. Close operational and inspection coverage (P5/P6) | Expand to FilmFestival/Friends, retained providers, media, proposition/AMR, embedding backends and interview workflows. Add React inspection of actual artifacts, then saved investigations and exports. | Capability-by-capability executed workflow coverage, compatibility/recovery checks and a clear disposition for every retained Scala/Atlas behavior. Visual polish follows useful inspection. |
+| 3. Make timing computationally useful (P4/P5) | Compose native source parts while preserving native anchors and declared part order. Bind measured recall onsets only through explicit recording/clock relationships, then feed existing temporal allocation and feature/projection consumers. | A two-part reset-clock fixture and recalls with missing onsets produce independently calculated allocation/readouts. Unestablished links remain unavailable; no inferred origin, duration or scanner equivalence. Save outputs through API and CLI. |
+| 4. Expand computational parity (P2/P3/P4) | Add remaining graph/recall families and semantic evidence, duration/refinement and retained transport methods, then feature tracks and scientific summaries. Select the next family from actual Scala callers/tests and the preservation map. | Every family has a producer and executed consumer, independent small-case oracle, Scala comparison where executable, and explicit support/denominator/missingness semantics. Measure sparse resource use. The existing sequence kernel is not the full inference surface. |
+| 5. Broaden studies and finish inspection (P5/P6) | Expand the same workflow to FilmFestival/Friends, retained providers, media, proposition/AMR, embedding backends and interviews. Add React inspection of real artifacts, then saved investigations and exports. | Executed coverage and compatibility/recovery checks for every retained capability. A researcher can trace a result to its evidence and processing gaps. Visual polish follows useful inspection; full closure requires the capability audit below. |
 
-**The next three implementation beads:** implement the retained Sherlock input formats against
-synthetic fixtures; add input-bound recovery for interrupted imported recordings; complete the next retained
-graph/target family needed by that journey. Reuse existing intake, execution, examples and
-recordings. If a workflow bead needs a missing graph family, implement that bounded dependency
-first.
-Do not wait for every graph family or numerical method before exercising a complete workflow.
+**The next three implementation beads after Sherlock qualification:**
+
+1. Input-bound recovery of interrupted imported recordings, demonstrated against an
+   uninterrupted run.
+2. Exact composed source coordinates with native-anchor roundtrip and part-order controls.
+3. Explicit recall timing linkage into one saved temporal allocation/readout workflow,
+   including missing and unlinked observations.
+
+If a bead reveals a missing representation, implement that bounded dependency first. Reuse
+existing examples and recordings; do not build a general workflow engine or a second model.
+
+### Keep the port idiomatic and the pace measurable
+
+At each connected workflow milestone, remove duplication exposed by real callers, simplify
+public function names and inputs, and keep compatibility at the file/provider adapters.
+Prefer ordinary modules, immutable records at boundaries, and arrays or sparse indexes inside
+numerical work. Validate complete relationships at public boundaries, then avoid repeatedly
+serializing validated accounts inside inner loops. A new abstraction must simplify an actual
+consumer; the Scala module layout is not a Python architecture requirement.
+
+For every delivered capability, record its Scala entry point and consumer, Python public path,
+preserved behavior or deliberate correction, independent check and remaining limits in the
+preservation map. Exclusions need evidence and a named replacement when redundant. This keeps
+the full-port obligation visible without making a repository-wide audit block each slice.
+
+Record feedback time during normal implementation: targeted test/type-check time, full-suite
+time and any packaging/replay overhead. Use matched changes in both languages before claiming
+a development-speed multiplier. Keep most effort on computational capability; build further
+recording or receipt machinery only when a concrete failure or consumer requires it.
 
 ### Checked intake foundation and study-format follow-through
 
