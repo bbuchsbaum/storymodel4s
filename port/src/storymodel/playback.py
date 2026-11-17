@@ -162,19 +162,46 @@ def project_playback(
     """Measure interval-union exposure without filling gaps or assigning duration to points."""
     media = _validate_instance(MediaSource, source)
     checked = validate_playback(media, support)
-    timebase = exact(media.seconds_per_tick)
-    cells = []
+    duration_seconds, cells = _project_checked_axis(
+        start_tick=media.start_tick,
+        end_tick=media.end_tick,
+        seconds_per_tick=media.seconds_per_tick,
+        support=checked,
+        bins=bins,
+        bin_error="playback bin escapes selected source extent",
+    )
+    return PlaybackReadout(
+        source=media,
+        support=checked,
+        duration_seconds=duration_seconds,
+        cells=cells,
+    )
+
+
+def _project_checked_axis(
+    *,
+    start_tick: str,
+    end_tick: str,
+    seconds_per_tick: str,
+    support: PlaybackSupport,
+    bins: tuple[TickInterval, ...],
+    bin_error: str,
+) -> tuple[str, tuple[PlaybackCell, ...]]:
+    """Measure already-admitted support on one exact half-open axis."""
+    start, end = tick(start_tick), tick(end_tick)
+    timebase = exact(seconds_per_tick)
+    cells: list[PlaybackCell] = []
     previous: int | None = None
     for raw in bins:
         interval = _validate_instance(TickInterval, raw)
         lo, hi = tick(interval.start), tick(interval.end)
-        if not tick(media.start_tick) <= lo < hi <= tick(media.end_tick):
-            raise ValueError("playback bin escapes selected source extent")
+        if not start <= lo < hi <= end:
+            raise ValueError(bin_error)
         if previous is not None and lo < previous:
             raise ValueError("playback bins must be ordered and nonoverlapping")
         previous = hi
         overlap = sum(
-            max(0, min(hi, tick(i.end)) - max(lo, tick(i.start))) for i in checked.intervals
+            max(0, min(hi, tick(i.end)) - max(lo, tick(i.start))) for i in support.intervals
         )
         cells.append(
             PlaybackCell(
@@ -182,14 +209,10 @@ def project_playback(
                 overlap_ticks=str(overlap),
                 duration_seconds=fraction_text(overlap * timebase),
                 coverage=fraction_text(Fraction(overlap, hi - lo)),
-                points=tuple(p for p in checked.points if lo <= tick(p) < hi),
+                points=tuple(p for p in support.points if lo <= tick(p) < hi),
             )
         )
-    return PlaybackReadout(
-        source=media,
-        support=checked,
-        duration_seconds=fraction_text(
-            sum(tick(i.end) - tick(i.start) for i in checked.intervals) * timebase
-        ),
-        cells=tuple(cells),
+    return (
+        fraction_text(sum(tick(i.end) - tick(i.start) for i in support.intervals) * timebase),
+        tuple(cells),
     )

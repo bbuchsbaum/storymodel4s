@@ -459,3 +459,15 @@ and implementing a separate workflow engine. Use a stable-inode POSIX advisory l
 death releases ownership without guessing from PID files; unsupported recording platforms
 refuse explicitly. Legacy replay remains supported, but missing legacy intent is not invented.
 [Contract](import-recovery.md).
+
+## Native playback composition (2026-11-17, provisional)
+
+Represent ordered native concatenation as a separate content-addressed `PlaybackComposition`
+with physical-source registry and ordered segment selections. Derive occurrence identities
+from composition and sequence position; preserve repeated media. Use a common rational clock
+and exact integer projection, refusing nonrepresentable inverse native ticks. Share the
+existing exposure kernel through checked coordinate inputs. Rejected alternatives: a synthetic
+physical `MediaSource` checksum; time-sorting reset clocks; deduplicating repeated sources;
+using notebook repair offsets as presentation time; and silently extending account admission
+to composed evidence. Sherlock rows/scenes retain both native and composed supports, with full
+media tails preserved. General mapping families remain owed. [Contract](composition.md).

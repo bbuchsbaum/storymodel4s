@@ -163,6 +163,13 @@ from .semantic_workflow import (
     replay_semantic,
 )
 from .sequence import infer_sequence, validate_sequence, verify_sequence
+from .sherlock_composition import (
+    SherlockComposition,
+    SherlockCompositionReadout,
+    compose_sherlock_source,
+    project_sherlock_composition,
+    verify_sherlock_composition_readout,
+)
 from .sherlock_recall import (
     SherlockRecall,
     prepare_sherlock_recall,
@@ -335,6 +342,22 @@ def main(argv: list[str] | None = None) -> int:
     sherlock_timing.add_argument("request")
     sherlock_timing.add_argument("--clock", required=True, choices=("princeton", "openneuro"))
     sherlock_timing.add_argument("--output")
+    sherlock_compose = commands.add_parser(
+        "sherlock-compose", help="compose native source parts while retaining original anchors"
+    )
+    sherlock_compose.add_argument("request")
+    sherlock_compose.add_argument("--expected-input-sha256")
+    sherlock_compose.add_argument("--output")
+    for command in ("sherlock-composition-readout", "verify-sherlock-composition-readout"):
+        composition_command = commands.add_parser(
+            command, help="measure composed row/scene support"
+        )
+        composition_command.add_argument("composition")
+        composition_command.add_argument("--unit", action="append", default=[])
+        composition_command.add_argument("--bins")
+        composition_command.add_argument("--output")
+        if command.startswith("verify-"):
+            composition_command.add_argument("result")
     prepared_construction_prompt_command = commands.add_parser(
         "prepared-construction-prompt", help="render a raw-intake construction contract"
     )
@@ -1431,6 +1454,47 @@ def main(argv: list[str] | None = None) -> int:
                 export_permission="allowed" if args.allow_export else "denied",
             )
             emit(sherlock_prepared.model_dump(mode="json"), args.output)
+        elif args.command == "sherlock-compose":
+            composition_prepared = read_prepared_construction(
+                Path(args.request), expected_sha256=args.expected_input_sha256
+            )
+            if composition_prepared.export_permission != "allowed":
+                raise PermissionError("producer denies Sherlock composition export")
+            if not isinstance(composition_prepared.intake, SherlockSource):
+                raise ValueError("Sherlock composition requires a Sherlock source intake")
+            composed = compose_sherlock_source(
+                composition_prepared.intake, export_permission="allowed"
+            )
+            emit(composed.model_dump(mode="json"), args.output)
+        elif args.command in (
+            "sherlock-composition-readout",
+            "verify-sherlock-composition-readout",
+        ):
+            saved_composition = SherlockComposition.model_validate_json(
+                canonical(strict_json(Path(args.composition).read_bytes()))
+            )
+            if saved_composition.export_permission != "allowed":
+                raise PermissionError("producer denies Sherlock composition readout export")
+            composition_bin_values = strict_json(Path(args.bins).read_bytes()) if args.bins else []
+            if not isinstance(composition_bin_values, list):
+                raise ValueError("composition bins must be a JSON array")
+            composition_bins = tuple(
+                TickInterval.model_validate_json(canonical(item)) for item in composition_bin_values
+            )
+            composition_units = tuple(args.unit)
+            if args.command == "sherlock-composition-readout":
+                composition_readout = project_sherlock_composition(
+                    saved_composition, composition_units, composition_bins
+                )
+                emit(composition_readout.model_dump(mode="json"), args.output)
+            else:
+                prior_readout = SherlockCompositionReadout.model_validate_json(
+                    canonical(strict_json(Path(args.result).read_bytes()))
+                )
+                checked_readout = verify_sherlock_composition_readout(
+                    saved_composition, composition_units, composition_bins, prior_readout
+                )
+                emit({"verified": True, "input_sha256": checked_readout.input_sha256}, args.output)
         elif args.command == "sherlock-recall-timing":
             sherlock_prepared = read_prepared_construction(Path(args.request))
             if sherlock_prepared.export_permission != "allowed":

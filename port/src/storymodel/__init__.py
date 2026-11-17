@@ -48,6 +48,20 @@ from .claim_assessment import (
     prepare_claim_assessment,
     verify_claim_assessment,
 )
+from .composition import (
+    CompositionPart,
+    CompositionReadout,
+    CompositionSegment,
+    OccurrenceSupport,
+    PlaybackComposition,
+    compose_support,
+    concatenate_playback,
+    inverse_support,
+    project_composition,
+    validate_composed_support,
+    validate_occurrence_support,
+    verify_composition_readout,
+)
 from .construction_links import (
     ConnectedConstructionResult,
     ConstructionLink,
@@ -192,6 +206,15 @@ from .semantic import (
 )
 from .semantic_workflow import SemanticRecording, import_semantic, replay_semantic
 from .sequence import SequenceRequest, SequenceResult, infer_sequence, verify_sequence
+from .sherlock_composition import (
+    ComposedSourceUnit,
+    SherlockComposition,
+    SherlockCompositionReadout,
+    compose_sherlock_source,
+    project_sherlock_composition,
+    validate_sherlock_composition,
+    verify_sherlock_composition_readout,
+)
 from .sherlock_recall import (
     SherlockRecall,
     SherlockRecallTiming,
@@ -282,6 +305,25 @@ __all__ = [
     "validate_prepared_construction",
     "verify_prepared_construction",
     "SherlockSource",
+    "CompositionPart",
+    "CompositionReadout",
+    "CompositionSegment",
+    "OccurrenceSupport",
+    "PlaybackComposition",
+    "compose_support",
+    "concatenate_playback",
+    "inverse_support",
+    "project_composition",
+    "validate_composed_support",
+    "validate_occurrence_support",
+    "verify_composition_readout",
+    "ComposedSourceUnit",
+    "SherlockComposition",
+    "SherlockCompositionReadout",
+    "compose_sherlock_source",
+    "project_sherlock_composition",
+    "validate_sherlock_composition",
+    "verify_sherlock_composition_readout",
     "prepare_sherlock_source",
     "validate_sherlock_source",
     "SherlockRecall",
