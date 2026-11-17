@@ -1,0 +1,35 @@
+{
+  "source_commit": "aef993c75d0ad6a8c32758ede66f0579c47d8a85",
+  "scope": "Strict recursive instance validation followed by canonical JSON and UTF-8 representability at inspected public consumers in 23 implementation files",
+  "checks": {
+    "pytest": {"passed": 421, "seconds": 5.03},
+    "mypy_source_files": 35,
+    "ruff_check": "passed",
+    "ruff_format_files": 82,
+    "diff_check": "passed",
+    "frozen_legacy_schema_and_hash_controls": "passed within suite"
+  },
+  "independent_review": {
+    "commit": "aef993c75d0ad6a8c32758ede66f0579c47d8a85",
+    "verdict": "no remaining BLOCK found",
+    "targeted_tests_passed": 63,
+    "initial_block": "Direct validation alone admitted lone-surrogate reply strings, unlike the former JSON boundary; imports could reach filesystem creation.",
+    "fix": "Validate original Python types first, then encode canonical JSON as UTF-8 before consumption or I/O.",
+    "extra_probes": "Forged bools and unknown fields refuse before serialization; lone surrogates refuse; ASCII, actual emoji, accented text and NUL preserve roundtrips and recording digests."
+  },
+  "mutations": {
+    "method": "Isolated source copies; each mutant compiled; each baseline had 3 passing tests; each mutant had 1 named failure and 2 passing controls.",
+    "initial_candidate": ["policy serialization before validation", "source recording serialization before validation", "relation receipt serialization before validation"],
+    "final_candidate": [
+      {"change": "Remove strict instance validation", "failed": "test_copied_boolean_numbers_and_unknown_fields_refuse_at_public_boundaries"},
+      {"change": "Remove UTF-8 encoding check", "failed": "test_unencodable_recordings_refuse_before_io_but_valid_unicode_imports[source]"}
+    ]
+  },
+  "installed_wheel": {
+    "source_commit": "aef993c75d0ad6a8c32758ede66f0579c47d8a85",
+    "environment": "site-packages import outside checkout with PYTHONPATH unset",
+    "boundary_probes": "passed: Boolean policy refusal, valid emoji import, surrogate and extra-field refusal before directories exist",
+    "rich_detail_workflow": {"coverage": "present", "detail_inventory": "completed", "rich_collections_preserved": true, "source_reused": 2, "source_unchanged": true}
+  },
+  "limits": ["No Scala gate run for this Python-only change", "No scientific accuracy or full-port parity claim", "Independent reviewer did not repeat full suite or mutation runs"]
+}
