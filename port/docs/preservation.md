@@ -1,5 +1,10 @@
 # What the pilot preserves
 
+The destination is full working StoryModel4s capability in idiomatic Python, not a permanently
+reduced subset. Small slices sequence the work; they do not cut scope. Every capability must
+be ported, improved, or excluded with evidence that it is broken, redundant or stale.
+Deferred functionality remains owed; passing pilot tests are not proof of full parity.
+
 The owner's instruction is to preserve the best of StoryModel and StoryAtlas. Existing
 behavior earns a place by its scientific or practical value, not by its implementation
 language. A different implementation must retain the behavior or explicitly defer its

@@ -7,26 +7,18 @@ Public consumers call ``validate_account`` even when given an existing Python ob
 from __future__ import annotations
 
 import hashlib
-import json
 from collections.abc import Iterable
-from typing import Annotated, Any, Literal, Self
+from typing import Annotated, Any, ClassVar, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, model_validator
+
+from .serialization import canonical as canonical
+from .serialization import digest as digest
+from .serialization import strict_json
 
 Name = Annotated[str, Field(min_length=1)]
 Digest = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
 Side = Literal["source", "recall"]
-
-
-def canonical(value: Any) -> str:
-    """Canonical pilot JSON; this is not the legacy Scala digest encoding."""
-    return json.dumps(
-        value, ensure_ascii=False, allow_nan=False, sort_keys=True, separators=(",", ":")
-    )
-
-
-def digest(value: Any) -> str:
-    return hashlib.sha256(canonical(value).encode("utf-8")).hexdigest()
 
 
 class Model(BaseModel):
@@ -40,14 +32,20 @@ class Model(BaseModel):
 class Identified(Model):
     """Content-derived identities refuse caller substitutions on readback."""
 
+    namespace: ClassVar[str] = ""
     id: str = ""
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        super().__init_subclass__(**kwargs)
+        if "namespace" not in cls.__dict__ or not cls.namespace:
+            raise TypeError("identified subclasses require an explicit stable namespace")
 
     def identity_fields(self) -> dict[str, Any]:
         return self.model_dump(mode="json", exclude={"id"})
 
     @model_validator(mode="after")
     def identify(self) -> Self:
-        expected = self.__class__.__name__.lower() + ":" + digest(self.identity_fields())
+        expected = self.namespace + ":" + digest(self.identity_fields())
         if self.id and self.id != expected:
             raise ValueError("identity differs from content")
         object.__setattr__(self, "id", expected)
@@ -79,6 +77,7 @@ class Span(Model):
 class Document(Identified):
     """A named source edition or recall session and its exact canonical text."""
 
+    namespace: ClassVar[str] = "document"
     key: Name
     side: Side
     text: str
@@ -115,6 +114,7 @@ Evidence = Annotated[tuple[Support, ...], Field(min_length=1)]
 class Unit(Identified):
     """An occurrence anchored in a source or recall document."""
 
+    namespace: ClassVar[str] = "unit"
     kind: Literal["row", "scene", "recall"]
     support: Support
     parent: str | None = None
@@ -123,6 +123,7 @@ class Unit(Identified):
 class Context(Identified):
     """Narrated worlds and attributed content remain separate on each account side."""
 
+    namespace: ClassVar[str] = "context"
     side: Side
     kind: Literal["narrated", "reported", "believed", "intended"]
     parent: str | None = None
@@ -149,9 +150,18 @@ class Entity(Identified):
     ``source_document`` is the retained wire name for the origin document, preserving IDs.
     """
 
-    source_document: Name
+    namespace: ClassVar[str] = "entity"
+    source_document: Name = Field(
+        validation_alias=AliasChoices("source_document", "origin_document"),
+        serialization_alias="source_document",
+    )
     label: Name
     evidence: Evidence
+
+    @property
+    def origin_document(self) -> Name:
+        """The idiomatic Python name for this entity's document-local origin."""
+        return self.source_document
 
 
 class Participation(Model):
@@ -165,6 +175,7 @@ class Participation(Model):
 class Event(Identified):
     """An occurrence can group many details without making each detail an event."""
 
+    namespace: ClassVar[str] = "event"
     side: Side
     context: Name
     predicate: Name
@@ -175,6 +186,7 @@ class Event(Identified):
 class Relation(Identified):
     """Typed, evidenced relationships between contextualized occurrences."""
 
+    namespace: ClassVar[str] = "relation"
     kind: Literal["part_of", "before", "causes", "references"]
     source: Name
     target: Name
@@ -185,6 +197,7 @@ class Relation(Identified):
 class Detail(Identified):
     """Recall content has occurrence identity independent of its later fidelity assessment."""
 
+    namespace: ClassVar[str] = "detail"
     unit: Name
     kind: Literal[
         "event",
@@ -212,6 +225,7 @@ class Detail(Identified):
 class Hypothesis(Identified):
     """A single, joint, broad or external reference; no invented probability."""
 
+    namespace: ClassVar[str] = "hypothesis"
     kind: Literal["single", "joint", "broad", "external"]
     targets: tuple[str, ...] = ()
     external: Literal["personal", "general", "other_episode"] | None = None
@@ -376,9 +390,9 @@ def acyclic(edges: Iterable[tuple[str, str]], label: str) -> None:
 class Account(Model):
     """One validated paired account; absent information stays absent."""
 
-    schema_version: Literal["storymodel.account/v1", "storymodel.account/v2"] = (
-        "storymodel.account/v1"
-    )
+    schema_version: Literal[
+        "storymodel.account/v1", "storymodel.account/v2", "storymodel.account/v3"
+    ] = "storymodel.account/v1"
     documents: tuple[Document, ...]
     units: tuple[Unit, ...]
     contexts: tuple[Context, ...]
@@ -447,7 +461,14 @@ class Account(Model):
                     raise ValueError("attributed context requires same-side parent and evidence")
         acyclic(((c.id, c.parent) for c in contexts.values() if c.parent), "context hierarchy")
         for side in ("source", "recall"):
-            if sum(c.kind == "narrated" and c.side == side for c in contexts.values()) != 1:
+            narrated = sum(c.kind == "narrated" and c.side == side for c in contexts.values())
+            present = any(document.side == side for document in docs.values())
+            if self.schema_version.endswith("/v3"):
+                if present and narrated != 1:
+                    raise ValueError("each present account side needs exactly one narrated world")
+                if not present and any(context.side == side for context in contexts.values()):
+                    raise ValueError("absent account sides cannot have contexts")
+            elif narrated != 1:
                 raise ValueError("each account side needs exactly one narrated world")
         for entity in entities.values():
             origin = docs.get(entity.source_document)
@@ -551,20 +572,7 @@ class Account(Model):
 def validate_account(value: Account | str | bytes) -> Account:
     """Revalidate even model_copy/model_construct results at every public operation."""
     raw = canonical(value.model_dump(mode="json")) if isinstance(value, Account) else value
-
-    def unique(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
-        result: dict[str, Any] = {}
-        for key, item in pairs:
-            if key in result:
-                raise ValueError(f"duplicate JSON field: {key}")
-            result[key] = item
-        return result
-
-    def nonfinite(value: str) -> None:
-        raise ValueError(f"nonfinite JSON constant: {value}")
-
-    parsed = json.loads(raw, object_pairs_hook=unique, parse_constant=nonfinite)
-    return Account.model_validate_json(canonical(parsed))
+    return Account.model_validate_json(canonical(strict_json(raw)))
 
 
 def account_digest(value: Account) -> str:

@@ -95,3 +95,11 @@ equivalences. The method is a named heuristic, not a calibrated inference engine
 Reuse existing bindings and projections without changing address or fidelity; never infer
 external content from no-match. Preserve existing references rather than overwriting decisions.
 Keep event ambiguity unresolved when the row-level reference vocabulary cannot express it.
+
+Python consolidation (2026-11-16): one domain model gains v3 independent accounts and an explicit
+pairing operation; v1/v2 remain readable under their existing rules. Rejected alternatives:
+dummy opposite-side worlds in new APIs or parallel SourceAccount/RecallAccount class trees.
+Use an honest Python entity-origin name with a compatibility wire name, and explicit stable
+identity namespaces rather than deriving identity from class names. Share strict JSON handling
+and reuse already validated snapshots for hashing. Keep the existing common RecordedRun engine;
+do not introduce another generic workflow layer solely to unify superficially similar profiles.

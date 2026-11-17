@@ -10,8 +10,9 @@ from pydantic import Field, model_validator
 
 from .model import Model, canonical, digest
 from .recall_intake import PreparedRecall, prepare_recall_utf8, validate_prepared_recall
+from .serialization import strict_json
 from .source_intake import NativeSource, compile_source, native_source_digest
-from .study_workflow import SuppliedRecall, SuppliedUnit, TimeStudy, strict_json
+from .study_workflow import SuppliedRecall, SuppliedUnit, TimeStudy
 
 
 class PreparedTimeStudy(Model):

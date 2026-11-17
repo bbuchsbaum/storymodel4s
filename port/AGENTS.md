@@ -1,5 +1,10 @@
 # Port implementation contract
 
+The destination is full working StoryModel4s capability in idiomatic Python, not a permanently
+reduced subset. Small slices sequence the work; they do not cut scope. Every capability must
+be ported, improved, or excluded with evidence that it is broken, redundant or stale.
+Deferred functionality remains owed; passing pilot tests are not proof of full parity.
+
 The owner wants fast, correct progress toward behavioral parity with StoryModel and
 StoryAtlas, with freedom to improve the design. Preserve their strongest semantics and
 working behavior; use fresh eyes to remove cruft and unnecessary machinery.

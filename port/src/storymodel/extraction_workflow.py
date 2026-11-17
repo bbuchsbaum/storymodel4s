@@ -16,7 +16,7 @@ from .extraction import (
     validate_request,
 )
 from .model import Digest, Model, Name, canonical
-from .study_workflow import strict_json
+from .serialization import strict_json
 
 
 class ExtractionRecording(Model):

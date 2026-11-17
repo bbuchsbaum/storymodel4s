@@ -12,8 +12,8 @@ from .model import (
     Span,
     Support,
     Unit,
-    account_digest,
     contained_in,
+    digest,
     validate_account,
 )
 
@@ -235,7 +235,7 @@ def project(
     denominator = counts["internal"] + counts["external"]
     correspondence.sort(key=lambda r: (r.detail, r.interpretation, r.hypothesis, r.target or ""))
     return Analysis(
-        account_sha256=account_digest(account),
+        account_sha256=digest(account.model_dump(mode="json")),
         policy=policy,
         recall=tuple(recall),
         inventories=inventory_rows,

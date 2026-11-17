@@ -26,13 +26,12 @@ from .model import (
     Span,
     Support,
     Unit,
-    account_digest,
     canonical,
     digest,
     validate_account,
 )
 from .recall_intake import PreparedRecall, prepare_recall_utf8, validate_prepared_recall
-from .study_workflow import strict_json
+from .serialization import strict_json
 
 RECIPE: Literal["recall-extractive-admission/v1"] = "recall-extractive-admission/v1"
 ROOT = "narrated"
@@ -386,6 +385,7 @@ def resolve_extraction(value: ExtractionRequest, raw: str) -> ExtractionResult:
     unit. All raw data remains receipted by its hash and in the caller's recording.
     """
     request = validate_request(value)
+    request_sha = digest(request.model_dump(mode="json"))
     parsed = strict_json(raw)
     if (
         not isinstance(parsed, dict)
@@ -404,7 +404,9 @@ def resolve_extraction(value: ExtractionRequest, raw: str) -> ExtractionResult:
         supplied[u] = item
     source = request.source
     root = Context(side="recall", kind="narrated")
-    contexts = list(source.contexts if source else (Context(side="source", kind="narrated"), root))
+    contexts = list(source.contexts if source else ())
+    if not any(c.side == "recall" for c in contexts):
+        contexts.append(root)
     entities = list(source.entities if source else ())
     events = list(source.events if source else ())
     details: list[Detail] = []
@@ -465,14 +467,18 @@ def resolve_extraction(value: ExtractionRequest, raw: str) -> ExtractionResult:
         )
     inputs = [
         request.recall.document.sha256,
-        request_digest(request),
+        request_sha,
         sha256(raw.encode()).hexdigest(),
     ]
     if source:
         inputs.extend(d.sha256 for d in source.documents)
-        inputs.append(account_digest(source))
+        inputs.append(digest(source.model_dump(mode="json")))
     account = Account(
-        schema_version="storymodel.account/v2",
+        schema_version=(
+            "storymodel.account/v2"
+            if source and source.schema_version != "storymodel.account/v3"
+            else "storymodel.account/v3"
+        ),
         documents=(*source.documents, request.recall.document)
         if source
         else (request.recall.document,),
@@ -487,7 +493,7 @@ def resolve_extraction(value: ExtractionRequest, raw: str) -> ExtractionResult:
         export_permission=request.export_permission,
     )
     return ExtractionResult(
-        request_sha256=request_digest(request),
+        request_sha256=request_sha,
         response_sha256=sha256(raw.encode()).hexdigest(),
         account=account,
         resolutions=tuple(resolutions),

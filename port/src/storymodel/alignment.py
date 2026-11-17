@@ -24,13 +24,12 @@ from .model import (
     Reference,
     Support,
     Unit,
-    account_digest,
     canonical,
     contained,
     digest,
     validate_account,
 )
-from .study_workflow import strict_json
+from .serialization import strict_json
 
 RECIPE = "local-predicate-role-reference/v1"
 
@@ -143,7 +142,7 @@ def align_account(value: Account, policy: AlignmentPolicy | None = None) -> Alig
     """
     account = validate_account(value)
     policy = validate_policy(policy if policy is not None else AlignmentPolicy())
-    input_sha = account_digest(account)
+    input_sha = digest(account.model_dump(mode="json"))
     entities = {e.id: e for e in account.entities}
     contexts = {c.id: c for c in account.contexts}
     events = {e.id: e for e in account.events}

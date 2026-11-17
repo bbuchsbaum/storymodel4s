@@ -27,6 +27,9 @@ outcomes, existing external references, and unassessed fidelity.
 
 ## Run it
 
+For the idiomatic Python entry points and independent source/recall construction, start with
+the [Python API guide](docs/python-api.md) and `examples/python_workflow.py`.
+
 From this directory, with Python 3.12 and `uv`:
 
 ```sh

@@ -7,8 +7,6 @@ strict-chunked-time/v1 interpretation, without claiming historical prompt/cache 
 from __future__ import annotations
 
 import hashlib
-import json
-import math
 from collections import Counter
 from pathlib import Path
 from typing import Annotated, Any, Literal, Self
@@ -18,34 +16,10 @@ from pydantic import Field, JsonValue, field_validator, model_validator
 from .artifacts import publish_json
 from .execution import RecordedRun, RunProfile
 from .model import Model, Name, canonical, digest
+from .serialization import strict_json as strict_json
 from .study_time import StudySource, resolve_time_item
 
 RECIPE: Literal["storymodel.supplied-time-study/v1"] = "storymodel.supplied-time-study/v1"
-
-
-def strict_json(raw: str | bytes) -> Any:
-    """Reject duplicate keys and nonfinite constants before schema/algorithm admission."""
-
-    def unique(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
-        result: dict[str, Any] = {}
-        for key, value in pairs:
-            if key in result:
-                raise ValueError(f"duplicate JSON field: {key}")
-            result[key] = value
-        return result
-
-    def invalid(value: str) -> None:
-        raise ValueError(f"nonfinite JSON constant: {value}")
-
-    def finite_float(value: str) -> float:
-        parsed = float(value)
-        if not math.isfinite(parsed):
-            raise ValueError("nonfinite JSON number")
-        return parsed
-
-    return json.loads(
-        raw, object_pairs_hook=unique, parse_constant=invalid, parse_float=finite_float
-    )
 
 
 class SuppliedUnit(Model):
