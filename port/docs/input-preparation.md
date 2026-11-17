@@ -3,6 +3,7 @@
 Input preparation now feeds the existing recorded mapping workflow. Source timing is built
 independently of recall; raw recall becomes deterministic units with exact evidence spans.
 The preparation artifact retains the inputs and recomputes derived values when read.
+Verification: [checks and evidence](../evidence/input-preparation.json).
 
 Run the complete admitted synthetic example from `port/`:
 
@@ -79,6 +80,10 @@ scores, propositions or scientific recall categories. Heuristic boundaries are a
 baseline, not validated psychological idea-unit labels. Units use generated ordinal row keys;
 they do not pretend to retain study row keys that a raw transcript never supplied.
 
+Surface normalization uses code-point lowercase, including the dotted-I boundary control,
+rather than Python's context-sensitive full lowercase. Short-clause merging avoids rescanning
+the accumulated prefix when the new fragment already determines the merge.
+
 The recipe records the interpreter's Unicode database version and explicit ASCII connective
 regex boundaries. This avoids silently changing preparation identity when Unicode tables
 change. Tests cover the selected surface/clause behavior and Unicode controls; they do not
@@ -98,7 +103,9 @@ from storymodel.intake_workflow import prepare_time_study_files
 from storymodel.study_workflow import replay_time_study
 
 prepared = prepare_time_study_files(
-    Path("data/source.json"), Path("data/recall.txt"), "participant-session",
+    Path("data/source.json"),
+    Path("data/recall.txt"),
+    "participant-session",
 )
 for unit in prepared.recall.units:
     assert unit.support.slice(prepared.recall.document.text) == unit.text

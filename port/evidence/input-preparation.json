@@ -1,0 +1,42 @@
+{
+  "stage": "raw recall and native clock preparation",
+  "source_commit": "6b189e0abf4592d5b9aa76819ef6b7cef3d98fd6",
+  "checks": {
+    "pytest": "145 passed in 2.04s",
+    "mypy": "15 source files; no issues",
+    "ruff": "lint passed; all 41 files formatted",
+    "cold_review": "36 focused tests passed; no remaining correctness BLOCK"
+  },
+  "native_fixture_sha256": "648dee31d25581f08ceb5b9607e23e70615afa28abed91fd0d3eaca7cda9ce01",
+  "mutation_checks": [
+    {
+      "mutation": "replace declared clip rate by one",
+      "baseline_exit": 0,
+      "baseline": "3 passed",
+      "mutant_imported": true,
+      "mutant_exit": 1,
+      "mutant": "1 failed, 2 passed",
+      "named_failure": "test_native_clock_construction_matches_existing_scala_parity_source"
+    },
+    {
+      "mutation": "restore Python full lowercase",
+      "baseline": "3 passed",
+      "mutant": "1 failed, 2 passed",
+      "named_failure": "test_simple_lowercase_sentence_starter_matches_scala_codepoint_rule"
+    }
+  ],
+  "wheel_smoke": {
+    "installed_module": "data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "outside_checkout": true,
+    "cli_matches_api": true,
+    "scala_semantic_rows": 6,
+    "scala_interpretations": 12,
+    "live_provider_calls": 0
+  },
+  "limits": [
+    "Synthetic admitted inputs and synthetic recorded answer constants; no live provider calls.",
+    "Selected Scala surface/clause behavior and clock arithmetic; not exhaustive Unicode or cross-platform parity.",
+    "No event/detail extraction, candidate generation or graph-HSMM implemented in this slice.",
+    "No comparative development or runtime speed claim."
+  ]
+}

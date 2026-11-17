@@ -56,8 +56,11 @@ from storymodel.pipeline import replay_account
 
 # Documents come from independent intake, not from the proposed response.
 profile = RunProfile(
-    provider="fixture", model="recorded-account/v1", endpoint="local:fixture",
-    max_tokens=4096, recipe="admitted-worked-example/v1",
+    provider="fixture",
+    model="recorded-account/v1",
+    endpoint="local:fixture",
+    max_tokens=4096,
+    recipe="admitted-worked-example/v1",
     input_sha256=tuple(document.sha256 for document in expected_documents),
 )
 run = RecordedRun(Path("data/recording"), profile)
