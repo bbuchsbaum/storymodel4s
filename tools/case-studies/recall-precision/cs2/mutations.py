@@ -151,9 +151,9 @@ MUTANTS = [
         guard="uncovered words are never samples (old rule: one unassigned sample per unit)",
         file="cs2/projections.py",
         edits=[
-            ("    samples = {c.sample for c in inside if not isinstance(c.sample, Uncovered)}\n",
-             "    samples = {c.sample for c in inside}\n"),
-            ('        raise ProjectionError("uncovered-is-not-a-sample", "uncovered words are ledger counts")\n',
+            ("    samples = {c.sample for c in inside if not isinstance(c.sample, (Uncovered, TalkSample))}\n",
+             "    samples = {c.sample for c in inside if not isinstance(c.sample, TalkSample)}\n"),
+            ('        raise ProjectionError("not-a-sample", "uncovered and non-addressed words are ledger counts")\n',
              '        return [(("unassigned",), 1.0)]\n'),
         ],
         test="test_uncovered_words_never_create_unassigned_mass",
@@ -164,9 +164,9 @@ MUTANTS = [
         file="cs2/scorer.py",
         edits=[
             (
-                "        return (1 - self.eps) * (own + self.spread.get(w, 0.0) * f_set) + self.u * (\n"
+                "        return (1 - self.eps) * (own + self.spread.get(w, 0.0) * f_set + set_part) + self.u * (\n"
                 "            self.fallback.p_work(w) * f_set\n        )\n",
-                "        return (1 - self.eps) * (own + self.spread.get(w, 0.0) * f_set) + self.u * (\n"
+                "        return (1 - self.eps) * (own + self.spread.get(w, 0.0) * f_set + set_part) + self.u * (\n"
                 "            self.fallback.p_work(w) * len(scenes) / max(1, len(fs))\n        )\n",
             )
         ],
@@ -233,10 +233,10 @@ MUTANTS = [
         guard="a broad reference is located at the smallest grain holding its span (ADR 0030)",
         file="cs2/projections.py",
         edits=[(
-            "    if target.shape is Shape.BROAD:\n        case = broad_case(target, comp)\n",
+            "    if target.shape is Shape.BROAD:\n        case = broad_case(target, comp, broad_rule)\n",
             "    if target.shape is Shape.BROAD:\n"
             "        return [((\"held_out\", \"broad\", w), f) for w, f in _work_split(target.support, comp)]\n"
-            "        case = broad_case(target, comp)\n",
+            "        case = broad_case(target, comp, broad_rule)\n",
         )],
         test="test_broad_within_one_scene_is_located_at_the_scene",
     ),
@@ -288,30 +288,58 @@ MUTANTS = [
         test="test_small_batches_respect_the_window",
     ),
     dict(
-        id="M30",
-        guard="a pass-1 fragment is a ledger count, never a non-film destination",
-        file="cs2/ff_producer.py",
-        edits=[('            conv["fragment_words"] += len(wids)  # a ledger count, never a destination\n'
-                '        elif kind == "work":',
-                '            sample_of = {w: StateSample(uid, "fragment") for w in wids}\n'
-                '        elif kind == "work":')],
-        test="test_state_mapping_matches_the_gold_definitions",
-    ),
-    dict(
-        id="M31",
-        guard="pass-1 memory search inside a framed film routes work-level",
-        file="cs2/ff_producer.py",
-        edits=[('        if kind in ("work", "memory_search") and top is not None:\n',
-                '        if kind == "work" and top is not None:\n')],
-        test="test_memory_search_in_a_framed_film_is_work_level",
-    ),
-    dict(
         id="M32",
         guard="gold alignment refuses non-monotone utterance onsets",
         file="adapters/filmfestival.py",
         edits=[("    if any(b < a for a, b in zip(onsets, onsets[1:])):\n",
                 "    if False:\n")],
         test="test_gold_alignment_refuses_non_monotone_onsets",
+    ),
+    dict(
+        id="M33",
+        guard="rule fallback 'frame-film': unassigned mass goes to the row's frame film first",
+        file="cs2/baselines.py",
+        edits=[("    if not mix:\n        return dur\n", "    return dur\n")],
+        test="test_frame_fallback_spreads_unassigned_over_the_frame_film",
+    ),
+    dict(
+        id="M34",
+        guard="rule talk 'orthogonal': memory search (even framed) is non-addressed talk",
+        file="cs2/ff_producer.py",
+        edits=[('            elif kind in ("memory_search", "gave_up", "fragment"):\n',
+                '            elif kind in ("gave_up", "fragment"):\n')],
+        test="test_talk_is_orthogonal_and_non_addressed_talk_has_no_mass",
+    ),
+    dict(
+        id="M35",
+        guard="rule cross_scene_broad 'scene-set': a multi-scene span goes to its scene set",
+        file="cs2/projections.py",
+        edits=[('            return [(("scene_set", w, scenes), 1.0)]\n',
+                '            return [(("work_node", "broad", w), 1.0)]\n')],
+        test="test_broad_across_scenes_goes_to_its_scene_set",
+    ),
+    dict(
+        id="M36",
+        guard="rule film_level_baseline 'lopo': the scored participant is left out of the rate",
+        file="cs2/baselines.py",
+        edits=[("        if p == participant:\n            continue\n        for r in rows:\n            n += 1\n",
+                "        for r in rows:\n            n += 1\n")],
+        test="test_lopo_nonfilm_rate_excludes_scored_participant",
+    ),
+    dict(
+        id="M37",
+        guard="the HMM baseline applies its fitted stay and next transitions",
+        file="cs2/baselines.py",
+        edits=[("            alpha = ps * alpha + pn * shifted + pj * (1 - alpha) / (n - 1)\n",
+                "            alpha = (1 - alpha) / (n - 1)\n")],
+        test="test_hmm_tfidf_filters_on_recall_words",
+    ),
+    dict(
+        id="M38",
+        guard="the fitted gold-context forecast applies its stay rate",
+        file="cs2/baselines.py",
+        edits=[('            work[prev.work] += rates["stay"]\n', "            work[prev.work] += 0.0\n")],
+        test="test_gold_context_fitted_known_answer",
     ),
     dict(
         id="M16",

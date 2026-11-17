@@ -193,7 +193,7 @@ def test_joint_refused_from_distribution():
     row = ld_of(acc, bins).rows[3]  # the bin holding r3 (broad) and r4 (joint)
     assert not any(is_film(k) for k in row.mass), row.mass
     close(row.mass[("held_out", "joint", "A")], 0.5)
-    close(row.mass[("scene_set", "B", (6, 7))], 0.5 * 0.9)  # b2, b3: two scenes of B
+    # the broad member (b2, b3) is located by its own rule (tested separately)
 
 
 def test_coarsening_commutes_side_states_unchanged():
@@ -1001,6 +1001,104 @@ def test_talk_work_variant_position_only():
     assert type(cells[0].sample).__name__ == "TalkSample"
     r = refs[cells[2].sample.ref]
     assert isinstance(r, PositionReference) and r.resolved_work == "C"
+
+
+def test_frame_fallback_spreads_unassigned_over_the_frame_film():
+    # rule 'frame-film': a row whose words lie in a unit framed 0.8 on B and 0.2 on C spreads
+    # its unassigned mass F(w) = mix(w) + (1 - sum mix) dur(w), scenes by duration within w
+    comp = fixture()
+    dur = B.duration_prior(comp, CFG)
+    fb = B.frame_fallback(dur, {"B": 0.8, "C": 0.2})
+    close(fb.p_work("B"), 0.8)
+    close(fb.p_work("C"), 0.2)
+    close(fb.p_work("A"), 0.0)
+    fb2 = B.frame_fallback(dur, {"B": 0.5})
+    close(fb2.p_work("B"), 0.5 + 0.5 * dur.p_work("B"))
+    close(fb2.p_work("C"), 0.5 * dur.p_work("C"))
+    assert fb2.scene == dur.scene
+    # an abstaining producer whose row is framed on B scores the frame fallback
+    acc = Account(comp, {}, {("P", "s"): cells([(0.5, "u0", Uncovered("u0"))])},
+                  framing_work={("P", "s", "u0"): (("B", 0.8), ("C", 0.2))})
+    from cs2.run import row_frame_mixes
+
+    g = [_gold("P", "s", 0, "specific", "B", {6}, lo=0.0)]
+    mixes = row_frame_mixes(acc, ("P", "s"), g)
+    assert mixes == [{"B": 0.8, "C": 0.2}]
+    ld = LocationDistribution.from_words(acc, acc.words[("P", "s")], [Bin(0, 1)])
+    f = SC.producer_forecasts(ld, dur, CFG, [B.frame_fallback(dur, m) for m in mixes])[0]
+    close(f.p_work("B"), 0.8)
+
+
+def test_null_producer_scores_the_baseline_under_frame_fallback():
+    # no references and no frames: the frame-film fallback is the duration prior itself, so
+    # every term equals the baseline exactly
+    comp = fixture()
+    dur = B.with_nonfilm(B.duration_prior(comp, CFG), 0.07)
+    valid = B.valid_scenes(comp, CFG)
+    words = [(0.2 + i, f"u{i}", Uncovered(f"u{i}")) for i in range(4)]
+    acc = Account(comp, {}, {("P", "s"): cells(words)})
+    gold = [_gold("P", "s", 0, "specific", "C", {8}), _gold("P", "s", 1, "film_only", "B"),
+            _gold("P", "s", 2, "nonfilm", None, nonfilm="off_task"),
+            _gold("P", "s", 3, "specific", "A", {1, 3})]
+    from cs2.run import row_frame_mixes
+
+    mixes = row_frame_mixes(acc, ("P", "s"), gold)
+    assert all(m == {} for m in mixes)
+    fbs = [B.frame_fallback(dur, m) for m in mixes]
+    assert all(f is dur for f in fbs)
+    ld = LocationDistribution.from_words(acc, acc.words[("P", "s")], [Bin(g.lo, g.hi) for g in gold])
+    prod = SC.score_rows(gold, SC.producer_forecasts(ld, dur, CFG, fbs), comp, valid)
+    base = SC.score_rows(gold, [dur] * len(gold), comp, valid)
+    for p, b in zip(prod, base):
+        for t in ("film_bits", "work_bits", "scene_bits", "total_bits"):
+            assert getattr(p, t) == getattr(b, t), (t, getattr(p, t), getattr(b, t))
+
+
+def test_lopo_nonfilm_rate_excludes_scored_participant():
+    gold = {"P1": [_gold("P1", "s", i, "nonfilm", None, nonfilm="gave_up") for i in range(4)],
+            "P2": [_gold("P2", "s", i, "specific", "B", {6}) for i in range(8)]
+            + [_gold("P2", "s", 9, "nonfilm", None, nonfilm="off_task")]}
+    a = CFG["lopo_nonfilm_alpha"]
+    close(B.lopo_nonfilm_rate(gold, "P1", CFG), (1 + a) / (9 + 2 * a))  # P2 only
+    close(B.lopo_nonfilm_rate(gold, "P2", CFG), (4 + a) / (4 + 2 * a))  # P1 only
+
+
+def test_gold_context_fitted_known_answer():
+    comp = fixture()
+    dur = B.duration_prior(comp, CFG)
+    rates = dict(stay=0.6, next=0.3, scene_stay=0.5, scene_next=0.25)
+    rows = [_gold("P", "s", 0, "specific", "B", {6}), _gold("P", "s", 1, "specific", "B", {7})]
+    f = B.gold_context_fitted(comp, rows, CFG, dur, rates)
+    assert f[0] is dur
+    # works in presentation order: A, B, C; previous work B -> stay B 0.6, next C 0.3
+    close(f[1].p_work("B"), 0.6 + 0.1 * dur.p_work("B"))
+    close(f[1].p_work("C"), 0.3 + 0.1 * dur.p_work("C"))
+    # previous top scene 6, next valid scene 7: 0.5 / 0.25, rest by duration
+    close(f[1].scene["B"][7], 0.25 + 0.25 * dur.scene["B"][7])
+    close(math.fsum(f[1].work.values()), 1.0)
+    gold = {"P1": rows, "P2": rows}
+    r = B.fit_gold_context(comp, gold, "P1", CFG)
+    a = CFG["lopo_alpha"]
+    close(r["stay"], (1 + a) / (1 + 3 * a))  # P2's one transition stays in B
+    close(r["scene_next"], (1 + a) / (1 + 3 * a))  # and advances 6 -> 7
+
+
+def test_hmm_tfidf_filters_on_recall_words():
+    comp = fixture()
+    dur = B.duration_prior(comp, CFG)
+    docs = {6: ["dog"], 7: ["cat"], 8: ["sea"], 9: ["sky"], 10: ["sun"], 1: ["pop"],
+            2: ["pip"], 3: ["pap"], 4: ["pup"]}
+    rates = dict(stay=0.7, next=0.2)
+    f = B.hmm_tfidf(comp, [["dog"], [], ["sky"]], docs, CFG, dur, rates)
+    top = lambda fc: max(((w, s, fc.work[w] * p) for w, d in fc.scene.items()  # noqa: E731
+                          for s, p in d.items()), key=lambda t: t[2])[:2]
+    assert top(f[0]) == ("B", 6)  # the emission picks the dog scene
+    assert top(f[1]) == ("B", 6)  # no words: the stay transition keeps it
+    assert top(f[2]) == ("C", 9)  # new evidence moves it
+    for fc in f:
+        close(math.fsum(fc.work.values()), 1.0)
+    order = B.presentation_order(comp, CFG)
+    assert order == [1, 2, 6, 7, 8, 9, 10, 3, 4]  # A@p1, B, C, then A@p2; title scene 5 dropped
 
 
 # ---------------------------------------------------------------- runner
