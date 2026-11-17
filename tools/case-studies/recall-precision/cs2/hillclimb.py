@@ -290,7 +290,7 @@ def main(argv):
     print(out_json)
 
 
-if __name__ == "__main__" and sys.argv[1:2] != ["round2"]:
+if __name__ == "__main__" and sys.argv[1:2] not in (["round2"], ["round3"]):
     main(sys.argv[1:])
 
 
@@ -377,3 +377,108 @@ def round2(out_json):
 
 if __name__ == "__main__" and len(sys.argv) > 2 and sys.argv[1] == "round2":
     round2(Path(sys.argv[2]))
+
+
+# ---------------------------------------------------------------- round 3 (paid; scored cache-only)
+
+FF = C / "filmfestival"
+R3_REF = {1: FF / "stage2-20261117/v1-percall-s1", 2: FF / "stage2-20261117/v1-percall-s2"}
+
+
+def build_r3(A, sessions, k, pass1, out, rules):
+    """A per-call run over the coded sessions only, its pass 2 rebuilt per unit from the full
+    sample-k run (a cache-only replay with v1 reproduces every reference row)."""
+    P.CACHE_ONLY = True
+    seed, salt = SAMPLES[k]
+    acc, ledger, log, _ = P.run(A, sessions, C / "filmfestival/seg/export", out, seed, salt, k,
+                                arm="coverage", rules=rules, layout="per-call", pass1=pass1,
+                                reuse_pass2_from=R3_REF[k])
+    assert all(not c["fresh"] for c in log)
+    return acc, ledger
+
+
+def search_mass(scores, parts, label):
+    """Participant mean of non-film mass on non-film gold rows with this label (None if none)."""
+    out = {}
+    for p in parts:
+        v = [s.nonwork for s in scores if s.participant == p and s.cls == "nonfilm"
+             and s.nonfilm_label == label and s.nonwork is not None]
+        out[p] = float(np.mean(v)) if v else None
+    return out
+
+
+def round3(out_json):
+    state = git_state()
+    cfg = SC.load_config()
+    rules = resolve_rules(cfg)
+    A = D.adapter("filmfestival")
+    comp = A.producer_composition()
+    dev = A.development()
+    sessions = [(p, s) for p in ALL10 for s in A.sessions(p)]
+    work = C / "hillclimb-r3"
+    runs = {"s1": build_r3(A, sessions, 1, "v1", work / "v1-s1", rules),
+            "s2": build_r3(A, sessions, 2, "v1", work / "v1-s2", rules),
+            "v1b": build_r3(A, sessions, 1, "v1b", work / "v1b-s1", rules)}
+    gold = gold_by_participant(A, dev)
+    keys = sorted({(p, g.session) for p, rs in gold.items() for g in rs if p in ALL10})
+    durs, _ = baseline_forecasts(A, comp, gold, cfg, rules)
+    sc = {k: score_map(comp, gold, forecasts(a, comp, gold, keys, durs, cfg, rules), cfg, True)
+          for k, (a, _) in runs.items()}
+    metric = {}
+    for k, s in sc.items():
+        m = summarize(s, ALL10, comp)["terms"]
+        m["memory_search_nonfilm_mass"] = search_mass(s, ALL10, "memory_search")
+        metric[k] = m
+    names = list(TERMS) + ["memory_search_nonfilm_mass"]
+    res = dict(schema="storymodel4s.case-study-2.hillclimb-r3/v1", **state,
+               evidence="development data, engineering numbers; validation = the frozen-six run",
+               lever="pass-1 v1b (search-for-next sentence), per-call sample 1, pass 2 reused "
+               "per unit where the frame film is unchanged",
+               producer_run=str(FF / "round3-20261117/v1b"),
+               reuse=runs["v1b"][1].get("pass2_reuse"), halves={})
+    for half, parts in (("tune", TUNE), ("confirm", CONFIRM)):
+        h = {}
+        for t in names:
+            ps = [p for p in parts if all(metric[k][t][p] is not None for k in metric)]
+            d = [metric["v1b"][t][p] - metric["s1"][t][p] for p in ps]
+            n = [metric["s2"][t][p] - metric["s1"][t][p] for p in ps]
+            band = 2 * float(np.std(n, ddof=1)) / np.sqrt(len(n)) if len(n) > 1 else None
+            h[t] = dict(participants=ps, v1=float(np.mean([metric["s1"][t][p] for p in ps])),
+                        v1b=float(np.mean([metric["v1b"][t][p] for p in ps])),
+                        delta=round(float(np.mean(d)), 4),
+                        band=None if band is None else round(band, 4),
+                        p=round(sign_flip_p(d), 4), per_participant=dict(zip(ps, d)))
+        res["halves"][half] = h
+
+    def ok(h):
+        ms, fb, sb = (h["memory_search_nonfilm_mass"], h["film_bits"], h["scene_bits"])
+        target = ((ms["delta"] > 0 and ms["band"] is not None and ms["delta"] > ms["band"])
+                  or (fb["delta"] < 0 and -fb["delta"] > fb["band"]))
+        return target and not sb["delta"] > sb["band"]
+
+    res["verdict"] = "KEEP" if all(ok(res["halves"][x]) for x in ("tune", "confirm")) else "DROP"
+    # frames that changed: kinds and empty frames on the v1b run against sample 1
+    p1a = json.loads((R3_REF[1] / "pass1.json").read_text())
+    p1b = json.loads((FF / "round3-20261117/v1b/pass1.json").read_text())
+    ch = dict(units=0, frame_emptied=0, frame_film_changed=0, kind_changed=0,
+              memory_search_units_v1=0, memory_search_units_v1b=0,
+              memory_search_empty_v1=0, memory_search_empty_v1b=0)
+    for k, v in p1b.items():
+        for fa, fb_ in zip(p1a[k]["frames"], v["frames"]):
+            ch["units"] += 1
+            top = lambda f: f["frame"][0][0] if f["frame"] else None  # noqa: E731
+            ch["frame_emptied"] += bool(fa["frame"]) and not fb_["frame"]
+            ch["frame_film_changed"] += top(fa) != top(fb_)
+            ch["kind_changed"] += fa["kind"] != fb_["kind"]
+            for tag, f in (("v1", fa), ("v1b", fb_)):
+                if f["kind"] == "memory_search":
+                    ch[f"memory_search_units_{tag}"] += 1
+                    ch[f"memory_search_empty_{tag}"] += not f["frame"]
+    res["frame_changes"] = ch
+    out_json.parent.mkdir(parents=True, exist_ok=True)
+    out_json.write_text(json.dumps(res, indent=1, default=str) + "\n")
+    print(out_json)
+
+
+if __name__ == "__main__" and len(sys.argv) > 2 and sys.argv[1] == "round3":
+    round3(Path(sys.argv[2]))
