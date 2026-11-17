@@ -343,12 +343,10 @@ MUTANTS = [
     ),
     dict(
         id="M39",
-        guard="correction: unframed memory search, giving up and off task are non-film states",
+        guard="correction: unframed memory search and giving up are non-film states",
         file="cs2/ff_producer.py",
-        edits=[('                sample_of = {w: StateSample(uid, kind) for w in wids}\n'
-                '        else:\n            raise ValueError(f"unknown talk rule {talk_rule!r}")\n',
-                '                sample_of = talk_only(uid, wids, "metamemory")\n'
-                '        else:\n            raise ValueError(f"unknown talk rule {talk_rule!r}")\n')],
+        edits=[('            elif kind in ("memory_search", "gave_up", "off_task"):\n                # correction',
+                '            elif kind in ("off_task",):\n                # correction')],
         test="test_non_film_states_are_destinations_not_talk",
     ),
     dict(
