@@ -87,3 +87,6 @@ source projection and account-inference pipeline. All labels are abstract AA/BB/
 The two PP source occurrences remain distinct even though their predicates and row-local keys
 match. The example proves connected construction and computation, not provider accuracy or full
 Scala parity.
+
+[Verification evidence](../evidence/construction-links.json) includes the installed workflow
+and mutation recipes in `port/evidence/construction-links-{installed,mutations}.py`.

@@ -249,6 +249,11 @@ organization path. Do not rebuild it. The recorded evidence is in
 rich relations and independent source/recall construction also have existing consumers.
 These are bounded local implementations, not full Scala parity.
 
+[Row-qualified construction links](construction-links.md) now connect original recorded
+construction to the existing relation engine without caller-generated endpoint IDs. The
+example reuses a source with two recalls and executes projection and inference. This closes
+the local-reference adapter, not the remaining relation vocabulary, grouping or hierarchy.
+
 The full context vocabulary now has a local implementation at `2c4aec1e6`: v5 rich accounts
 and v2 construction add desire, memory, imagination, hypothetical and counterfactual contexts.
 The [context contract](contexts.md) and [evidence](../evidence/contexts.json) record consumer
@@ -263,11 +268,19 @@ records exact checks and review disposition. Work is tracked by `bd-01M7MFZVEDNC
 Mote owns live status. This closes the supplied-observation path, not media-aware assessment,
 acquisition or full clock/anchor coverage.
 
-**Next implementation action:** cross-unit graph construction through the existing rich
-compiler and relation consumers. Relation admission already accepts account IDs; the missing
-construction seam is resolving row-local proposal keys against verified construction receipts,
-without requiring researchers to manufacture IDs. Start with a connected executable relation
-path, then expand containment/grouping. Reuse existing inference and analysis implementations.
+**Cross-unit link checkpoint:** `b6d81b56e` resolves `(row, key)` against original rich
+construction, preserves processing receipts, and feeds existing relation/projection/inference
+consumers. [Evidence](../evidence/construction-links.json) records tests, installed API/CLI
+agreement, mutations and review. Broader connected-graph delivery remains incomplete.
+
+**Next implementation action:** primary narrative containment and grouping. Reuse the existing
+scene and source-projection code where its semantics fit, but preserve the distinction between
+generic part_of and primary hierarchy. Supply checked situation/segment membership, exact
+support containment, a single primary parent, acyclic nesting and declared root/completeness.
+Connect the result to hierarchy queries and numerical source projection. Preserve account
+occurrence identities and input-bound receipts; cover source/recall and native/text support
+explicitly. Do not infer hierarchy from relation labels or observation order. Full temporal and
+causal semantic extensions follow under explicit contracts, alongside the remaining P2–P6 work.
 
 ### The next three executable checkpoints
 

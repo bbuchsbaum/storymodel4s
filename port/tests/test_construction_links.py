@@ -136,6 +136,18 @@ def test_row_local_names_select_distinct_source_and_recall_occurrences_and_prese
             assert ("causal", original.events[0].id, original.states[0].id) in edges
 
 
+@pytest.mark.parametrize("kind", ("part_of", "references"))
+def test_remaining_link_kinds_do_not_invent_primary_hierarchy(kind):
+    request, construction = fixture()
+    result = connect_rich_construction(
+        request, construction, links(request, construction, relations=(relation(kind=kind),))
+    )
+    assert result.status == "admitted" and result.account.relations[0].kind == kind
+    projection = project_source(result.account)
+    assert not any(edge.layer == "hierarchy" for edge in projection.edges)
+    assert any(edge.layer == "reference" for edge in projection.edges) == (kind == "references")
+
+
 @pytest.mark.parametrize("bad", ["entity", "context", "missing", "rejected"])
 def test_non_situation_and_unadmitted_row_references_are_rejected_without_graph_mutation(bad):
     request, construction = fixture()

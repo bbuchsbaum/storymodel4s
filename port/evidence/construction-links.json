@@ -1,0 +1,400 @@
+{
+  "source_commit": "b6d81b56ee2c5e69e6e51da9c8ff8eccb01a3837",
+  "scope": "Verified row/key references from original independent rich construction into existing atomic relation admission, source projection and account inference",
+  "checks": {
+    "full_suite": {
+      "command": ".venv/bin/pytest -q",
+      "cwd": "port",
+      "passed": 827,
+      "seconds": 12.98,
+      "exit_code": 0,
+      "executor": "parent integration",
+      "log_sha256": "f54cdf8e747d0ccbe36844f4ede66497477772979b8a83d1e566ea87d93627f4"
+    },
+    "focused": {
+      "command": ".venv/bin/pytest -q tests/test_construction_links.py",
+      "passed": 14,
+      "seconds": 0.27,
+      "exit_code": 0,
+      "includes_two_followup_cases": "part_of/references positive projection without primary hierarchy"
+    },
+    "mypy": {
+      "source_files": 54,
+      "exit_code": 0
+    },
+    "ruff": {
+      "exit_code": 0
+    },
+    "format": {
+      "files": 133,
+      "exit_code": 0
+    },
+    "prior_worker_suite": {
+      "command": "uv run --project port pytest -q",
+      "cwd": "port",
+      "passed": 825,
+      "seconds": 13.53,
+      "exit_code": 0,
+      "executor": "construction_link_tests worker",
+      "evidence_boundary": "Tool output retained in agent transcript; no durable full-run log"
+    }
+  },
+  "mutations": [
+    {
+      "mutation": "qualified-name",
+      "file": "construction_links.py",
+      "old": "row = resolutions.get(ref.row)",
+      "new": "row = next(iter(resolutions.values()))",
+      "test": "test_row_local_names_select_distinct_source_and_recall_occurrences_and_preserve_graph",
+      "controls": [
+        "test_link_processing_outcomes_and_prompt_export_denial_are_explicit",
+        "test_non_situation_and_unadmitted_row_references_are_rejected_without_graph_mutation[entity]"
+      ],
+      "baseline": "3 passed in 0.22s",
+      "mutant": "1 failed, 2 passed in 0.23s",
+      "compiled": true
+    },
+    {
+      "mutation": "construction-binding",
+      "file": "construction_links.py",
+      "old": "if links.construction_sha256 != construction_sha:",
+      "new": "if False and links.construction_sha256 != construction_sha:",
+      "test": "test_receipts_bind_exact_construction_and_link_bytes_and_revalidate_typed_values",
+      "controls": [
+        "test_link_processing_outcomes_and_prompt_export_denial_are_explicit",
+        "test_non_situation_and_unadmitted_row_references_are_rejected_without_graph_mutation[entity]"
+      ],
+      "baseline": "3 passed in 0.23s",
+      "mutant": "1 failed, 2 passed in 0.24s",
+      "compiled": true
+    },
+    {
+      "mutation": "exact-link-bytes",
+      "file": "construction_links.py",
+      "old": "sha256(links_raw.encode(\"utf-8\")).hexdigest()",
+      "new": "digest(strict_json(links_raw))",
+      "test": "test_receipts_bind_exact_construction_and_link_bytes_and_revalidate_typed_values",
+      "controls": [
+        "test_link_processing_outcomes_and_prompt_export_denial_are_explicit",
+        "test_non_situation_and_unadmitted_row_references_are_rejected_without_graph_mutation[entity]"
+      ],
+      "baseline": "3 passed in 0.23s",
+      "mutant": "1 failed, 2 passed in 0.24s",
+      "compiled": true
+    },
+    {
+      "mutation": "row-boundary",
+      "file": "construction_links.py",
+      "old": "not row.span.start",
+      "new": "False and not row.span.start",
+      "test": "test_row_escaped_and_utf16_split_quotes_are_rejected",
+      "controls": [
+        "test_link_processing_outcomes_and_prompt_export_denial_are_explicit",
+        "test_non_situation_and_unadmitted_row_references_are_rejected_without_graph_mutation[entity]"
+      ],
+      "baseline": "3 passed in 0.22s",
+      "mutant": "1 failed, 2 passed in 0.26s",
+      "compiled": true
+    }
+  ],
+  "installed": {
+    "import_path": "/Users/bbuchsbaum/code/scala/storymodel4s/port/data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "example": {
+      "cross_unit_projection_and_inference": true,
+      "recalls": 2,
+      "source_relations": 2,
+      "source_unchanged": true
+    },
+    "commands": [
+      "connect-rich",
+      "construction-link-prompt",
+      "infer-accounts",
+      "relation-table",
+      "replay-rich",
+      "verify-account-inference",
+      "verify-connected-rich"
+    ],
+    "cli_invocations": 22,
+    "api_cli_equal": true,
+    "denied_before_supplementary_read": true,
+    "artifacts": {
+      "cli-inference-1.json": {
+        "bytes": 92611,
+        "sha256": "5a2fc4e2e333c0c98043e192a0dc4399cd13cec538f17c6faea67e871367af1f"
+      },
+      "cli-inference-2.json": {
+        "bytes": 92587,
+        "sha256": "a89efa7d3a68d936f53d1cdb13cea09a02e8a84965e88bc21ac407f73862d404"
+      },
+      "inference-1.json": {
+        "bytes": 92611,
+        "sha256": "5a2fc4e2e333c0c98043e192a0dc4399cd13cec538f17c6faea67e871367af1f"
+      },
+      "inference-2.json": {
+        "bytes": 92587,
+        "sha256": "a89efa7d3a68d936f53d1cdb13cea09a02e8a84965e88bc21ac407f73862d404"
+      },
+      "inference-spec-1.json": {
+        "bytes": 1330,
+        "sha256": "7e346634db25ab22a7a745fdc94bb538db91f5fed145c756d692021fd933d14b"
+      },
+      "inference-spec-2.json": {
+        "bytes": 1330,
+        "sha256": "7559df89cbcb3377593783c5219b5832d06ecbcc1478b95a7b2157bd165fd741"
+      },
+      "paired-1.json": {
+        "bytes": 11836,
+        "sha256": "aa7a3fdc636806c6feeafe9ee7fd2531956ac449eb3499c0fd160e35b8b49664"
+      },
+      "paired-2.json": {
+        "bytes": 11836,
+        "sha256": "3858b639cb69ecdfad6587f49faad057c47f8a2a35f0bc0a949a1a1d37b35ef7"
+      },
+      "recall-1/account.json": {
+        "bytes": 5211,
+        "sha256": "0fcc6ec64bdc94bfb61c0c573349ebc7555bc9026aef36bc8d8f9b18a44519cf"
+      },
+      "recall-1/cli-account.json": {
+        "bytes": 5211,
+        "sha256": "0fcc6ec64bdc94bfb61c0c573349ebc7555bc9026aef36bc8d8f9b18a44519cf"
+      },
+      "recall-1/cli-connected.json": {
+        "bytes": 11298,
+        "sha256": "ed682b38b0046272e89b615723db4b239540df7a407add31a7273b9779b36509"
+      },
+      "recall-1/cli-construction.json": {
+        "bytes": 5748,
+        "sha256": "550552bfb69d5bf1d7dd56e300e32bb8f3b3e7030524972a495de3d28d898c2d"
+      },
+      "recall-1/cli-prompt.json": {
+        "bytes": 5735,
+        "sha256": "35ac9643dfd8cffb64237ca50f0025bb5b45f6fc8be646b5cab9a7b4f8f1e68c"
+      },
+      "recall-1/cli-relations.json": {
+        "bytes": 865,
+        "sha256": "54c93d21f7c512984e71cbd9a024112bd7ee802e0bdf973f78375a7cd4499a97"
+      },
+      "recall-1/connected.json": {
+        "bytes": 11298,
+        "sha256": "ed682b38b0046272e89b615723db4b239540df7a407add31a7273b9779b36509"
+      },
+      "recall-1/construction.json": {
+        "bytes": 5748,
+        "sha256": "550552bfb69d5bf1d7dd56e300e32bb8f3b3e7030524972a495de3d28d898c2d"
+      },
+      "recall-1/graph-proposals.json": {
+        "bytes": 1236,
+        "sha256": "91daba816a54e15edc30bc568da47c57d9cb1a92838351c27cb4b2a800341806"
+      },
+      "recall-1/link-prompt.json": {
+        "bytes": 5735,
+        "sha256": "35ac9643dfd8cffb64237ca50f0025bb5b45f6fc8be646b5cab9a7b4f8f1e68c"
+      },
+      "recall-1/links.json": {
+        "bytes": 446,
+        "sha256": "a3423a21556ec6c3ecd2edf0b9ecb725b34c5d1a9000aa88b0d3b3eefee8c1db"
+      },
+      "recall-1/recording/import.json": {
+        "bytes": 1675,
+        "sha256": "9fc7921669e0845498339c6304278209ea593072765d075972fc59e3319b261f"
+      },
+      "recall-1/recording/journal.json": {
+        "bytes": 141,
+        "sha256": "40518d46f6906a678993aa64db8f5e4dc33e96dc34f3565f851aea8d4134a6c3"
+      },
+      "recall-1/recording/profile.json": {
+        "bytes": 343,
+        "sha256": "e2495f5ed8d29b323be11df6be4c7f69760bf41a08db568b8d459be24785e0ab"
+      },
+      "recall-1/recording/replies/4b41da9242a3f0c648bcce6f4c1808be79ff3be7098ee73b5f3ea59278d36fdf.json": {
+        "bytes": 1877,
+        "sha256": "edcc84e3320a6f042636cdd5cfe8a833af0b70049f13cf27e4d157596e723a58"
+      },
+      "recall-1/relations.json": {
+        "bytes": 865,
+        "sha256": "54c93d21f7c512984e71cbd9a024112bd7ee802e0bdf973f78375a7cd4499a97"
+      },
+      "recall-1/request.json": {
+        "bytes": 491,
+        "sha256": "a170078cd48da0774fe6612cdb996f62fbbd53e36fdcf2a24937e53f58d459b1"
+      },
+      "recall-2/account.json": {
+        "bytes": 5211,
+        "sha256": "37a7211f15ac33deff51638c07d2cc70e00f3430c07fe765e9d69dace506dac4"
+      },
+      "recall-2/cli-account.json": {
+        "bytes": 5211,
+        "sha256": "37a7211f15ac33deff51638c07d2cc70e00f3430c07fe765e9d69dace506dac4"
+      },
+      "recall-2/cli-connected.json": {
+        "bytes": 11298,
+        "sha256": "f1df41405c8a6897c8c915345d30f671cf209b563699f82788609c9fe2b96db7"
+      },
+      "recall-2/cli-construction.json": {
+        "bytes": 5748,
+        "sha256": "2695f72d38a2ca85b7ef1796c0a4e8505afc9b871e02f363fd57455b5c489905"
+      },
+      "recall-2/cli-prompt.json": {
+        "bytes": 5735,
+        "sha256": "fcf345ec37d4e6288f1822b8f47f21428ee2595f93cf2dca48a9ebb0d9e1d340"
+      },
+      "recall-2/cli-relations.json": {
+        "bytes": 865,
+        "sha256": "3455fa9f98c220abf4b8da6f660b5b25421198fe8dfc114dd38343b9db4761e7"
+      },
+      "recall-2/connected.json": {
+        "bytes": 11298,
+        "sha256": "f1df41405c8a6897c8c915345d30f671cf209b563699f82788609c9fe2b96db7"
+      },
+      "recall-2/construction.json": {
+        "bytes": 5748,
+        "sha256": "2695f72d38a2ca85b7ef1796c0a4e8505afc9b871e02f363fd57455b5c489905"
+      },
+      "recall-2/graph-proposals.json": {
+        "bytes": 1236,
+        "sha256": "2855e599716f7bc21dbbc0e7b5014cb73ddc65ff0dfd28c2945d4d686adc36e7"
+      },
+      "recall-2/link-prompt.json": {
+        "bytes": 5735,
+        "sha256": "fcf345ec37d4e6288f1822b8f47f21428ee2595f93cf2dca48a9ebb0d9e1d340"
+      },
+      "recall-2/links.json": {
+        "bytes": 446,
+        "sha256": "19c30ec8ef98fef8ba84db047cffb5773a0a153efe59635bc0750d0703475a41"
+      },
+      "recall-2/recording/import.json": {
+        "bytes": 1675,
+        "sha256": "83f28a1eb6bacd22250c75127b2956f50c97c77468f4aebaef774add79728906"
+      },
+      "recall-2/recording/journal.json": {
+        "bytes": 141,
+        "sha256": "62f98f0a9a3912d4396348fa09361b01756ce86203ba7a3585a26f5921f92798"
+      },
+      "recall-2/recording/profile.json": {
+        "bytes": 343,
+        "sha256": "64b74364cca0a8d9eb219082247bd5f0777741b2931c0cb62888b179502544ee"
+      },
+      "recall-2/recording/replies/3b4b41ee5e4763086630191d366f1ca21aa970a5d81b3706df3c2c5f3d80c0ef.json": {
+        "bytes": 1877,
+        "sha256": "c2b4125a26aefdc3f8f38d82e81fe4a34f6b44a5f033ced3f820fd783691db61"
+      },
+      "recall-2/relations.json": {
+        "bytes": 865,
+        "sha256": "3455fa9f98c220abf4b8da6f660b5b25421198fe8dfc114dd38343b9db4761e7"
+      },
+      "recall-2/request.json": {
+        "bytes": 491,
+        "sha256": "94738b303401fbb49516573f76592fc55a35f4bbc159de2185a07e0931f64613"
+      },
+      "source/account.json": {
+        "bytes": 7175,
+        "sha256": "5f6b9c0c82f3c841d0eedb3ec3fbad08ff331fadfdb47f04a4435e3d32606f44"
+      },
+      "source/cli-account.json": {
+        "bytes": 7175,
+        "sha256": "5f6b9c0c82f3c841d0eedb3ec3fbad08ff331fadfdb47f04a4435e3d32606f44"
+      },
+      "source/cli-connected.json": {
+        "bytes": 15217,
+        "sha256": "4968ef9816d0e3113eced87b817434c6431e1abb5f9ee62134025429855a624e"
+      },
+      "source/cli-construction.json": {
+        "bytes": 7610,
+        "sha256": "7faebc46ee77624af46f1004891de19812c1eda8e82c8a24a3c83746311ea1b3"
+      },
+      "source/cli-prompt.json": {
+        "bytes": 6719,
+        "sha256": "26444265439461646602460994ab06500ce99ca7d0de3703dbb691e354192e34"
+      },
+      "source/cli-relations.json": {
+        "bytes": 1730,
+        "sha256": "a347f6a4560ac81c509c1166cbeb2cd7d14e8cf65da6ff5718a18ec4f68848cd"
+      },
+      "source/connected.json": {
+        "bytes": 15217,
+        "sha256": "4968ef9816d0e3113eced87b817434c6431e1abb5f9ee62134025429855a624e"
+      },
+      "source/construction.json": {
+        "bytes": 7610,
+        "sha256": "7faebc46ee77624af46f1004891de19812c1eda8e82c8a24a3c83746311ea1b3"
+      },
+      "source/graph-proposals.json": {
+        "bytes": 1826,
+        "sha256": "e61571ebd294e6ddcebca368d45f85a9032aa5cb0436606da916133b0282544b"
+      },
+      "source/link-prompt.json": {
+        "bytes": 6719,
+        "sha256": "26444265439461646602460994ab06500ce99ca7d0de3703dbb691e354192e34"
+      },
+      "source/links.json": {
+        "bytes": 715,
+        "sha256": "db0ba185082ec85481939a7b50bcfeedaa2be171f6802165640426e3fd174eb5"
+      },
+      "source/recording/import.json": {
+        "bytes": 2391,
+        "sha256": "b14652f253cddf66b3f0562ca5dd44f9785d971dd8a31e4b8cac62d4e0860f21"
+      },
+      "source/recording/journal.json": {
+        "bytes": 141,
+        "sha256": "9142c82619d71d482db0d78cca0dbb556bc0f42184d171c75567b62be4600475"
+      },
+      "source/recording/profile.json": {
+        "bytes": 343,
+        "sha256": "70ea00287824c997607d6e26de271860d4b44a87b6d5efdf93af1b922ff48a85"
+      },
+      "source/recording/replies/977bbab76997b0cbda63cfe4e7c8e97316d403dc0b71107f4fdd8fc3d5fec967.json": {
+        "bytes": 2593,
+        "sha256": "3852348575d26f7b1906e7e31b5bde6cb783147ee2cf25e3ef7510705e0710ee"
+      },
+      "source/relations.json": {
+        "bytes": 1730,
+        "sha256": "a347f6a4560ac81c509c1166cbeb2cd7d14e8cf65da6ff5718a18ec4f68848cd"
+      },
+      "source/request.json": {
+        "bytes": 544,
+        "sha256": "7356cdb2c6bd84aae9f0cf6241d0d899313c0fcc4a44492dc39caff99e44453f"
+      },
+      "source-projection.json": {
+        "bytes": 2903,
+        "sha256": "553b7f616beb8e1242c61618519cc29455bac63adbf04dd246e4077b121e5015"
+      }
+    }
+  },
+  "wheel_sha256": "41e4863d37934855e4693158b9c088aa583628993acb6c7b69e7d584ba3ab0a9",
+  "reproduce": [
+    "cd port && .venv/bin/pytest -q tests/test_construction_links.py",
+    "cd port && .venv/bin/python evidence/construction-links-mutations.py",
+    "cd port && UV_CACHE_DIR=./data/uv-cache uv build --out-dir data/dist",
+    "cd port && UV_CACHE_DIR=./data/uv-cache uv venv --python 3.12 data/wheel-env # if absent",
+    "cd port && UV_CACHE_DIR=./data/uv-cache uv pip install --reinstall-package storymodel-pilot --python data/wheel-env/bin/python data/dist/storymodel_pilot-0.1.0-py3-none-any.whl",
+    "cd port && .venv/bin/python evidence/construction-links-installed.py"
+  ],
+  "cold_review": {
+    "commit": "b6d81b56ee2c5e69e6e51da9c8ff8eccb01a3837",
+    "base": "2409e7a99",
+    "verdict": "no BLOCK found",
+    "independent_focused_tests": {
+      "passed": 12,
+      "failed": 0
+    },
+    "independent_probe_checks": 25,
+    "notes": [
+      "Read-only production review; only review evidence created.",
+      "Full suite, wheel qualification and guard mutations not independently rerun.",
+      "Exact export removed after qualification; regenerate with git archive of reviewed SHA.",
+      "Parent working-tree follow-up tests excluded from this exact-commit review."
+    ]
+  },
+  "remaining": [
+    "Full temporal and causal vocabulary and scoped/epistemic semantics",
+    "Primary narrative hierarchy and recall grouping",
+    "Native-media link construction",
+    "Remaining P2-P6 working capabilities"
+  ],
+  "claim_boundary": "Local engineering integration on supplied abstract controls; not provider accuracy, executed Scala parity, calibrated inference or full port completion",
+  "reproduction_script_sha256": {
+    "construction-links-installed.py": "77e34ce41e926fbdb4d561476fa12d14554199fb189142e0365988ef20a5ede0",
+    "construction-links-mutations.py": "e66760bc8a750a4bcab88122f480e72aba9377fc142afb57369301963e898226"
+  },
+  "shared_memory": "shared-memory/projects/storymodel4s/2026-11-17-story-model-verified-cross-unit-construction-links-70f592c1"
+}
