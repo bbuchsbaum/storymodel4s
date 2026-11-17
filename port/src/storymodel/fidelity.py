@@ -6,6 +6,13 @@ from typing import Any, Literal, Self
 
 from pydantic import model_validator
 
+from .context_fidelity import (
+    ContextAccounting,
+    ContextEvidence,
+    check_context_accounting,
+    context_questions,
+)
+from .held_identity import resolve_attributed_identity
 from .model import (
     Assessment,
     Binding,
@@ -27,6 +34,9 @@ from .rich_account import SupportedAccount, require_text_account, validate_suppo
 from .serialization import canonical, digest, strict_json
 
 RECIPE: Literal["unit-only-conditional-fidelity/v1"] = "unit-only-conditional-fidelity/v1"
+CONTEXT_RECIPE: Literal["context-evidence-conditional-fidelity/v2"] = (
+    "context-evidence-conditional-fidelity/v2"
+)
 
 
 class SourceQuote(Model):
@@ -107,7 +117,7 @@ class _Question:
     hypothesis: Hypothesis
 
 
-def _questions(request: "FidelityRequest") -> tuple[_Question, ...]:
+def _questions(request: "_FidelityRequestFields") -> tuple[_Question, ...]:
     details = {d.id: d for d in request.account.details if d.unit == request.unit}
     questions = []
     for binding in request.account.bindings:
@@ -133,10 +143,10 @@ def _questions(request: "FidelityRequest") -> tuple[_Question, ...]:
     )
 
 
-class FidelityRequest(Model):
-    """A full account snapshot fixes the pending hypotheses; the prompt omits previous grades."""
+class _FidelityRequestFields(Model):
+    """Common pending-slot checks for explicitly versioned fidelity input conditions."""
 
-    schema_version: Literal["storymodel.fidelity-request/v1"] = "storymodel.fidelity-request/v1"
+    schema_version: str = "storymodel.fidelity-request/v1"
     account: SupportedAccount
     unit: Name
     interpretation: Literal["narrative", "referent"] = "referent"
@@ -159,14 +169,49 @@ class FidelityRequest(Model):
         return self
 
 
-def validate_fidelity_request(value: FidelityRequest | str | bytes) -> FidelityRequest:
-    """Revalidate nested relationships before prompt construction or admission."""
-    request = (
-        _validate_instance(FidelityRequest, value)
-        if isinstance(value, FidelityRequest)
-        else FidelityRequest.model_validate_json(canonical(strict_json(value)))
-    )
+class FidelityRequest(_FidelityRequestFields):
+    """A full account snapshot fixes the pending hypotheses; the prompt omits previous grades."""
+
+    schema_version: Literal["storymodel.fidelity-request/v1"] = "storymodel.fidelity-request/v1"
+
+
+class ContextFidelityRequest(_FidelityRequestFields):
+    """Explicitly expand evidence to linked situations, contexts and recorded identity witnesses."""
+
+    schema_version: Literal["storymodel.fidelity-request/v2"] = "storymodel.fidelity-request/v2"
+    context_evidence: ContextEvidence
+
+
+FidelityInput = FidelityRequest | ContextFidelityRequest
+
+
+def fidelity_recipe(request: FidelityInput) -> str:
+    """Name the actual information condition used by a checked request."""
+    return CONTEXT_RECIPE if isinstance(request, ContextFidelityRequest) else RECIPE
+
+
+def validate_fidelity_request(value: FidelityInput | str | bytes) -> FidelityInput:
+    """Revalidate nested relationships and contextual recordings before consumption."""
+    request: FidelityInput
+    if isinstance(value, (FidelityRequest, ContextFidelityRequest)):
+        request = _validate_instance(type(value), value)
+    else:
+        parsed = strict_json(value)
+        if not isinstance(parsed, dict):
+            raise ValueError("fidelity request must be an object")
+        cls = (
+            ContextFidelityRequest
+            if parsed.get("schema_version") == "storymodel.fidelity-request/v2"
+            else FidelityRequest
+        )
+        request = cls.model_validate_json(canonical(parsed))
     require_text_account(request.account)
+    if isinstance(request, ContextFidelityRequest):
+        resolve_attributed_identity(
+            request.account,
+            request.context_evidence.identity_annotations,
+            request.context_evidence.holder_proposals,
+        )
     return request
 
 
@@ -175,14 +220,23 @@ def prepare_fidelity(
     unit: str,
     *,
     interpretation: Literal["narrative", "referent"] = "referent",
-) -> FidelityRequest:
+    context_evidence: ContextEvidence | None = None,
+) -> FidelityInput:
     """Select only absent/pending grades; references and other assessment statuses stay fixed."""
-    return FidelityRequest(
-        account=require_text_account(account), unit=unit, interpretation=interpretation
-    )
+    checked = require_text_account(account)
+    if context_evidence is not None:
+        return validate_fidelity_request(
+            ContextFidelityRequest(
+                account=checked,
+                unit=unit,
+                interpretation=interpretation,
+                context_evidence=_validate_instance(ContextEvidence, context_evidence),
+            )
+        )
+    return FidelityRequest(account=checked, unit=unit, interpretation=interpretation)
 
 
-def fidelity_request_digest(value: FidelityRequest) -> str:
+def fidelity_request_digest(value: FidelityInput) -> str:
     """Bind the complete private snapshot, including prior decisions hidden from the prompt."""
     return digest(validate_fidelity_request(value).model_dump(mode="json"))
 
@@ -195,7 +249,21 @@ class FidelityReply(Model):
     assessments: tuple[FidelityProposal, ...] = ()
 
 
-def fidelity_prompt(value: FidelityRequest) -> str:
+class ContextFidelityProposal(FidelityProposal):
+    """One v2 grade explicitly accounts for its context and identity dependencies."""
+
+    context_accounting: ContextAccounting
+
+
+class ContextFidelityReply(Model):
+    """Contextual replies have a separate wire contract from unit-only grading."""
+
+    schema_version: Literal["storymodel.fidelity-proposal/v2"] = "storymodel.fidelity-proposal/v2"
+    packet_sha256: Digest
+    assessments: tuple[ContextFidelityProposal, ...] = ()
+
+
+def fidelity_prompt(value: FidelityInput) -> str:
     """Show claim content and verbatim local recall, source and hypotheses, never prior grades."""
     request = validate_fidelity_request(value)
     account = request.account
@@ -259,6 +327,39 @@ def fidelity_prompt(value: FidelityRequest) -> str:
             "order or previous grades are supplied. Do not output probabilities."
         ),
     }
+    if isinstance(request, ContextFidelityRequest):
+        views = context_questions(
+            account,
+            tuple((f"a{i}", q.detail, q.hypothesis) for i, q in enumerate(_questions(request))),
+            request.context_evidence,
+        )
+        payload["recipe"] = CONTEXT_RECIPE
+        payload["schema"] = ContextFidelityReply.model_json_schema()
+        payload["context_evidence"] = views
+        payload["input_condition"] = (
+            "one recall unit plus explicitly linked situations, ancestor contexts, holder "
+            "candidates and account-derived document-local identity; evidence can extend "
+            "outside the recall unit; unrelated recall situations and previous grades are withheld"
+        )
+        payload["instruction"] = (
+            str(payload["instruction"])
+            .replace("fidelity-proposal/v1", "fidelity-proposal/v2")
+            .replace(
+                "Use only this recall unit; no neighbors, global order or previous grades "
+                "are supplied.",
+                "Use the declared expanded context evidence; unrelated recall, global order "
+                "and previous grades are withheld.",
+            )
+            + " For each question consider every supplied context alias exactly once. Declare "
+            "required_holders and required_mentions, and explain their relevance or why unresolved "
+            "dependencies are not needed. An unresolved or withheld required dependency permits "
+            "only noncompleted status or completed/unverifiable; never infer contradiction from "
+            "missing attribution. Reported, believed or intended content is not root-world fact. "
+            "Document-local identity aliases do not establish identity or inequality between "
+            "source and recall. Context/holder background excerpts cannot replace hypothesis-owned "
+            "source quotes for a grade. No recorded situation placement is a gap, "
+            "not narrated-world placement."
+        )
     return canonical({"packet_sha256": digest(payload), **payload})
 
 
@@ -272,11 +373,11 @@ class FidelityDecision(Model):
     reason: Name
 
 
-class FidelityResult(Model):
+class _FidelityResultFields(Model):
     """An input-bound receipt retains the full account with only lawful pending-slot updates."""
 
-    schema_version: Literal["storymodel.fidelity-result/v1"] = "storymodel.fidelity-result/v1"
-    recipe: Literal["unit-only-conditional-fidelity/v1"] = RECIPE
+    schema_version: str = "storymodel.fidelity-result/v1"
+    recipe: str = RECIPE
     request_sha256: Digest
     prompt_sha256: Digest
     response_sha256: Digest
@@ -284,7 +385,25 @@ class FidelityResult(Model):
     decisions: tuple[FidelityDecision, ...]
 
 
-def resolve_fidelity(value: FidelityRequest, raw: str) -> FidelityResult:
+class FidelityResult(_FidelityResultFields):
+    """An input-bound receipt retains the full account with only lawful pending-slot updates."""
+
+    schema_version: Literal["storymodel.fidelity-result/v1"] = "storymodel.fidelity-result/v1"
+    recipe: Literal["unit-only-conditional-fidelity/v1"] = RECIPE
+
+
+class ContextFidelityResult(_FidelityResultFields):
+    """Context accounting survives admission alongside unchanged reference and graph content."""
+
+    schema_version: Literal["storymodel.fidelity-result/v2"] = "storymodel.fidelity-result/v2"
+    recipe: Literal["context-evidence-conditional-fidelity/v2"] = CONTEXT_RECIPE
+    context_accounting: dict[Name, ContextAccounting]
+
+
+FidelityOutput = FidelityResult | ContextFidelityResult
+
+
+def resolve_fidelity(value: FidelityInput, raw: str) -> FidelityOutput:
     """Admit each grade atomically; missing/invalid work preserves existing reference and grades."""
     request = validate_fidelity_request(value)
     prompt = fidelity_prompt(request)
@@ -295,7 +414,8 @@ def resolve_fidelity(value: FidelityRequest, raw: str) -> FidelityResult:
         "assessments",
     }:
         raise ValueError("fidelity proposal requires explicit schema, digest and assessments")
-    if parsed["schema_version"] != "storymodel.fidelity-proposal/v1":
+    version = "v2" if isinstance(request, ContextFidelityRequest) else "v1"
+    if parsed["schema_version"] != f"storymodel.fidelity-proposal/{version}":
         raise ValueError("unsupported fidelity proposal schema")
     if parsed["packet_sha256"] != strict_json(prompt)["packet_sha256"]:
         raise ValueError("fidelity proposal belongs to another prompt")
@@ -304,19 +424,21 @@ def resolve_fidelity(value: FidelityRequest, raw: str) -> FidelityResult:
         raise ValueError("fidelity assessments must be an array")
     questions = {f"a{i}": q for i, q in enumerate(_questions(request))}
     proposals: dict[str, Any] = {}
-    for item in rows:
+    for row in rows:
         if (
-            not isinstance(item, dict)
-            or not isinstance(item.get("hypothesis"), str)
-            or item["hypothesis"] not in questions
-            or item["hypothesis"] in proposals
+            not isinstance(row, dict)
+            or not isinstance(row.get("hypothesis"), str)
+            or row["hypothesis"] not in questions
+            or row["hypothesis"] in proposals
         ):
             raise ValueError("foreign or duplicate local fidelity question")
-        proposals[item["hypothesis"]] = item
+        proposals[row["hypothesis"]] = row
     account = request.account
     targets = {u.id: u for u in account.units if u.kind != "recall"}
     documents = {d.id: d for d in account.documents if d.side == "source"}
     updates: dict[tuple[str, str], dict[str, Assessment]] = {}
+    context_reviews: dict[str, ContextAccounting] = {}
+    context_views = strict_json(prompt).get("context_evidence", {})
     decisions = []
     for key, q in questions.items():
         status: Literal["admitted", "rejected", "not-attempted"]
@@ -324,11 +446,26 @@ def resolve_fidelity(value: FidelityRequest, raw: str) -> FidelityResult:
             status, reason = "not-attempted", "no conditional assessment supplied"
         else:
             try:
-                item = FidelityProposal.model_validate_json(canonical(proposals[key]))
+                item: FidelityProposal
+                if isinstance(request, ContextFidelityRequest):
+                    contextual = ContextFidelityProposal.model_validate_json(
+                        canonical(proposals[key])
+                    )
+                    check_context_accounting(
+                        contextual.context_accounting,
+                        context_views[key],
+                        contextual.status,
+                        contextual.grade,
+                    )
+                    item = contextual
+                else:
+                    item = FidelityProposal.model_validate_json(canonical(proposals[key]))
                 assessment = _conditional_assessment(q.hypothesis, item, targets, documents)
                 updates.setdefault((q.detail.id, q.binding.reference.interpretation), {})[
                     q.hypothesis.id
                 ] = assessment
+                if isinstance(item, ContextFidelityProposal):
+                    context_reviews[key] = item.context_accounting
                 status, reason = "admitted", item.reason
             except ValueError as error:
                 status, reason = "rejected", str(error)
@@ -362,7 +499,7 @@ def resolve_fidelity(value: FidelityRequest, raw: str) -> FidelityResult:
             update={
                 "bindings": tuple(bindings),
                 "recipe": Recipe(
-                    name=RECIPE,
+                    name=fidelity_recipe(request),
                     input_sha256=tuple(
                         dict.fromkeys(
                             [
@@ -376,18 +513,24 @@ def resolve_fidelity(value: FidelityRequest, raw: str) -> FidelityResult:
             }
         )
     )
-    return FidelityResult(
+    result_fields = dict(
         request_sha256=request_sha,
         prompt_sha256=sha256(prompt.encode("utf-8")).hexdigest(),
         response_sha256=response_sha,
         account=output,
         decisions=tuple(decisions),
     )
+    if isinstance(request, ContextFidelityRequest):
+        return ContextFidelityResult.model_validate(
+            result_fields | {"context_accounting": context_reviews}
+        )
+    return FidelityResult.model_validate(result_fields)
 
 
-def verify_fidelity(value: FidelityRequest, raw: str, receipt: FidelityResult) -> FidelityResult:
+def verify_fidelity(value: FidelityInput, raw: str, receipt: FidelityOutput) -> FidelityOutput:
     """Recompute all decisions and account updates from the original request and exact response."""
-    checked = _validate_instance(FidelityResult, receipt)
+    cls = ContextFidelityResult if isinstance(receipt, ContextFidelityResult) else FidelityResult
+    checked = _validate_instance(cls, receipt)
     expected = resolve_fidelity(value, raw)
     if checked != expected:
         raise ValueError("fidelity result differs from recorded inputs")

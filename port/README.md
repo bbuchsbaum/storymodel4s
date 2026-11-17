@@ -31,6 +31,9 @@ and an evidence/context inspection table over independently built graphs.
 [Story-world chronology](docs/chronology.md) retains scoped interval claims, checks cited
 structural derivations, and connects explicit precedence to account-derived inference.
 
+[Context-aware fidelity](docs/context-fidelity.md) adds checked holder and identity evidence
+under an explicit expanded input condition, preserving the unit-only profile.
+
 The [port roadmap](docs/roadmap.md) defines the next phases toward full working capability.
 [Source-account construction](docs/source-construction.md) and the connected
 [rich-detail workflow](docs/rich-detail-workflow.md) now provide reusable source graphs and

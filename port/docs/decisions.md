@@ -377,3 +377,15 @@ using playback time as story chronology, accepting a structural label as proof, 
 lifting root facts into a belief. V3 projection exposes explicit narrated before/meets edges
 to existing text inference; native queries do not imply native inference qualification.
 [Contract](chronology.md).
+
+## Context-aware conditional fidelity (P3, 2026-11-17)
+
+Provisional implementation choice: sibling v1/v2 request/reply/result contracts share fidelity
+slot selection, source-quote validation, updates and recording machinery. V2 recomputes exact
+identity/holder recordings and renders a bounded contextual projection; it explicitly expands
+the recall input condition beyond the unit. Per-question declared dependencies gate grades when
+holders or mention identities are unresolved or withheld. Rejected alternatives: silently
+changing unit-only prompts, trusting derived sidecars, treating all missing holders as false
+recall, automatically certifying a dependency-free semantic judgment, expanding all referent
+members into the prompt, or creating another account/assessment engine. Source grade citations
+remain hypothesis-owned even when attribution background is broader. [Contract](context-fidelity.md).

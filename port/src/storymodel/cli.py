@@ -37,6 +37,7 @@ from .construction_links import (
     construction_link_prompt,
     verify_connected_construction,
 )
+from .context_fidelity import ContextEvidence
 from .demo import example_account
 from .detail_admission import detail_prompt, prepare_details
 from .detail_workflow import (
@@ -414,6 +415,8 @@ def main(argv: list[str] | None = None) -> int:
         "--interpretation", choices=("narrative", "referent"), default="referent"
     )
     fidelity_prepare.add_argument("--expected-sha256")
+    fidelity_prepare.add_argument("--identity-annotations")
+    fidelity_prepare.add_argument("--holder-proposals")
     fidelity_prepare.add_argument("--output")
     for command in ("fidelity-prompt", "import-fidelity", "replay-fidelity"):
         fidelity_command = commands.add_parser(
@@ -968,9 +971,24 @@ def main(argv: list[str] | None = None) -> int:
             )
             if fidelity_account.export_permission != "allowed":
                 raise PermissionError("producer denies fidelity export")
+            if (args.identity_annotations is None) != (args.holder_proposals is None):
+                raise ValueError("contextual fidelity requires both identity and holder recordings")
+            context_evidence = (
+                None
+                if args.identity_annotations is None
+                else ContextEvidence(
+                    identity_annotations=Path(args.identity_annotations).read_text(
+                        encoding="utf-8"
+                    ),
+                    holder_proposals=Path(args.holder_proposals).read_text(encoding="utf-8"),
+                )
+            )
             emit(
                 prepare_fidelity(
-                    fidelity_account, args.unit, interpretation=args.interpretation
+                    fidelity_account,
+                    args.unit,
+                    interpretation=args.interpretation,
+                    context_evidence=context_evidence,
                 ).model_dump(mode="json"),
                 args.output,
             )

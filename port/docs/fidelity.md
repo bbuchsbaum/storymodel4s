@@ -112,3 +112,10 @@ The new request/reply/result/recording envelopes are `/v1`; their account field 
 existing schema. Direct-mapping schemas, prompt bytes, recipes and result behavior remain
 unchanged. The old `direct_mapping.SourceQuote` and `FidelityProposal` imports remain available
 as aliases to the shared definitions.
+
+## Explicit contextual profile
+
+The opt-in [context-aware profile](context-fidelity.md) adds verified context/holder and
+attributed identity evidence through the same update and recording engine. It declares its
+expanded recall evidence condition and checks per-question dependency accounting. It does
+not change the unit-only v1 behavior described above.

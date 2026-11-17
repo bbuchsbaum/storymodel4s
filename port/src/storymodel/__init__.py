@@ -47,6 +47,7 @@ from .construction_links import (
     construction_link_prompt,
     verify_connected_construction,
 )
+from .context_fidelity import ContextAccounting, ContextEvidence
 from .detail_admission import admit_details, detail_prompt, prepare_details, verify_details
 from .detail_workflow import DetailRecording, import_details, replay_details
 from .direct_mapping import mapping_prompt, prepare_mapping, resolve_mapping, verify_mapping
@@ -232,6 +233,8 @@ __all__ = [
     "Analysis",
     "ClaimQuestion",
     "FidelityRecording",
+    "ContextAccounting",
+    "ContextEvidence",
     "fidelity_prompt",
     "prepare_fidelity",
     "resolve_fidelity",

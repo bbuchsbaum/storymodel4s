@@ -1,0 +1,3622 @@
+{
+  "evidence": {
+    "additionalProperties": false,
+    "description": "Exact recorded interpretations are recomputed, never trusted as derived identity results.",
+    "properties": {
+      "identity_annotations": {
+        "minLength": 1,
+        "title": "Identity Annotations",
+        "type": "string"
+      },
+      "holder_proposals": {
+        "minLength": 1,
+        "title": "Holder Proposals",
+        "type": "string"
+      }
+    },
+    "required": [
+      "identity_annotations",
+      "holder_proposals"
+    ],
+    "title": "ContextEvidence",
+    "type": "object"
+  },
+  "accounting": {
+    "additionalProperties": false,
+    "description": "The assessor declares the context and identity dependencies of one conditional judgment.",
+    "properties": {
+      "considered_contexts": {
+        "items": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "title": "Considered Contexts",
+        "type": "array"
+      },
+      "required_holders": {
+        "default": [],
+        "items": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "title": "Required Holders",
+        "type": "array"
+      },
+      "required_mentions": {
+        "default": [],
+        "items": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "title": "Required Mentions",
+        "type": "array"
+      },
+      "reason": {
+        "minLength": 1,
+        "title": "Reason",
+        "type": "string"
+      }
+    },
+    "required": [
+      "considered_contexts",
+      "reason"
+    ],
+    "title": "ContextAccounting",
+    "type": "object"
+  },
+  "request": {
+    "$defs": {
+      "Account": {
+        "additionalProperties": false,
+        "description": "One validated paired account; absent information stays absent.",
+        "properties": {
+          "schema_version": {
+            "default": "storymodel.account/v1",
+            "enum": [
+              "storymodel.account/v1",
+              "storymodel.account/v2",
+              "storymodel.account/v3"
+            ],
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/$defs/Document"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "units": {
+            "items": {
+              "$ref": "#/$defs/Unit"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "contexts": {
+            "items": {
+              "$ref": "#/$defs/Context"
+            },
+            "title": "Contexts",
+            "type": "array"
+          },
+          "entities": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Entity"
+            },
+            "title": "Entities",
+            "type": "array"
+          },
+          "events": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Event"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "relations": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Relation"
+            },
+            "title": "Relations",
+            "type": "array"
+          },
+          "details": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Detail"
+            },
+            "title": "Details",
+            "type": "array"
+          },
+          "inventories": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Inventory"
+            },
+            "title": "Inventories",
+            "type": "array"
+          },
+          "bindings": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Binding"
+            },
+            "title": "Bindings",
+            "type": "array"
+          },
+          "recipe": {
+            "$ref": "#/$defs/Recipe"
+          },
+          "export_permission": {
+            "default": "denied",
+            "enum": [
+              "allowed",
+              "denied"
+            ],
+            "title": "Export Permission",
+            "type": "string"
+          }
+        },
+        "required": [
+          "documents",
+          "units",
+          "contexts",
+          "recipe"
+        ],
+        "title": "Account",
+        "type": "object"
+      },
+      "AnchoredContext": {
+        "additionalProperties": false,
+        "description": "An old context kind with native evidence stays disjoint from the legacy text record.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "reported",
+              "believed",
+              "intended"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Parent"
+          },
+          "evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "side",
+          "kind",
+          "evidence"
+        ],
+        "title": "AnchoredContext",
+        "type": "object"
+      },
+      "Assessment": {
+        "additionalProperties": false,
+        "description": "Fidelity is conditional on one explicit reference hypothesis.",
+        "properties": {
+          "hypothesis": {
+            "minLength": 1,
+            "title": "Hypothesis",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "completed",
+              "unavailable",
+              "refused"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "grade": {
+            "anyOf": [
+              {
+                "enum": [
+                  "supported",
+                  "gist-detail-error",
+                  "contradicted",
+                  "recaller-inference",
+                  "external",
+                  "invented",
+                  "unverifiable",
+                  "misread"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Grade"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "enum": [
+                  "minor",
+                  "major"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Severity"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reason"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Support"
+            },
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "hypothesis",
+          "status"
+        ],
+        "title": "Assessment",
+        "type": "object"
+      },
+      "Binding": {
+        "additionalProperties": false,
+        "description": "Reference and conditional fidelity attach to an already admitted recall detail.",
+        "properties": {
+          "detail": {
+            "minLength": 1,
+            "title": "Detail",
+            "type": "string"
+          },
+          "reference": {
+            "$ref": "#/$defs/Reference"
+          },
+          "assessments": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Assessment"
+            },
+            "title": "Assessments",
+            "type": "array"
+          }
+        },
+        "required": [
+          "detail",
+          "reference"
+        ],
+        "title": "Binding",
+        "type": "object"
+      },
+      "Circumstance": {
+        "additionalProperties": false,
+        "description": "An evidenced time or manner phrase is not a measured time or an entity referent.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "situation": {
+            "minLength": 1,
+            "title": "Situation",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "time",
+              "manner"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "situation",
+          "kind",
+          "label",
+          "evidence"
+        ],
+        "title": "Circumstance",
+        "type": "object"
+      },
+      "Context": {
+        "additionalProperties": false,
+        "description": "Narrated worlds and attributed content remain separate on each account side.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "narrated",
+              "reported",
+              "believed",
+              "intended"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Parent"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Support"
+            },
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "side",
+          "kind"
+        ],
+        "title": "Context",
+        "type": "object"
+      },
+      "ContextEvidence": {
+        "additionalProperties": false,
+        "description": "Exact recorded interpretations are recomputed, never trusted as derived identity results.",
+        "properties": {
+          "identity_annotations": {
+            "minLength": 1,
+            "title": "Identity Annotations",
+            "type": "string"
+          },
+          "holder_proposals": {
+            "minLength": 1,
+            "title": "Holder Proposals",
+            "type": "string"
+          }
+        },
+        "required": [
+          "identity_annotations",
+          "holder_proposals"
+        ],
+        "title": "ContextEvidence",
+        "type": "object"
+      },
+      "Detail": {
+        "additionalProperties": false,
+        "description": "Recall content has occurrence identity independent of its later fidelity assessment.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "unit": {
+            "minLength": 1,
+            "title": "Unit",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "event",
+              "participant",
+              "attribute",
+              "temporal",
+              "spatial",
+              "perceptual",
+              "dialogue",
+              "mental",
+              "relation",
+              "knowledge",
+              "discourse"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "content": {
+            "minLength": 1,
+            "title": "Content",
+            "type": "string"
+          },
+          "support": {
+            "$ref": "#/$defs/Support"
+          },
+          "address": {
+            "enum": [
+              "target",
+              "other",
+              "personal",
+              "general",
+              "unresolved",
+              "extended"
+            ],
+            "title": "Address",
+            "type": "string"
+          },
+          "discourse": {
+            "default": "content",
+            "enum": [
+              "content",
+              "commentary",
+              "inference",
+              "repair",
+              "repetition"
+            ],
+            "title": "Discourse",
+            "type": "string"
+          },
+          "event": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Event"
+          }
+        },
+        "required": [
+          "unit",
+          "kind",
+          "content",
+          "support",
+          "address"
+        ],
+        "title": "Detail",
+        "type": "object"
+      },
+      "Document": {
+        "additionalProperties": false,
+        "description": "A named source edition or recall session and its exact canonical text.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          },
+          "canonicalization": {
+            "const": "identity/v1",
+            "default": "identity/v1",
+            "title": "Canonicalization",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "side",
+          "text",
+          "sha256"
+        ],
+        "title": "Document",
+        "type": "object"
+      },
+      "Entity": {
+        "additionalProperties": false,
+        "description": "Document-local identity; v2 permits recall origins without source identity claims.\n\n``source_document`` is the retained wire name for the origin document, preserving IDs.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "source_document": {
+            "minLength": 1,
+            "title": "Source Document",
+            "type": "string"
+          },
+          "label": {
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "source_document",
+          "label",
+          "evidence"
+        ],
+        "title": "Entity",
+        "type": "object"
+      },
+      "Event": {
+        "additionalProperties": false,
+        "description": "An occurrence can group many details without making each detail an event.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "context": {
+            "minLength": 1,
+            "title": "Context",
+            "type": "string"
+          },
+          "predicate": {
+            "minLength": 1,
+            "title": "Predicate",
+            "type": "string"
+          },
+          "participants": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Participation"
+            },
+            "title": "Participants",
+            "type": "array"
+          },
+          "evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "side",
+          "context",
+          "predicate",
+          "evidence"
+        ],
+        "title": "Event",
+        "type": "object"
+      },
+      "ExtendedContext": {
+        "additionalProperties": false,
+        "description": "Additional v5 context kinds keep holderless possibility distinct from unattributed minds.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "desire",
+              "memory",
+              "imagination",
+              "hypothetical",
+              "counterfactual"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Parent"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "side",
+          "kind"
+        ],
+        "title": "ExtendedContext",
+        "type": "object"
+      },
+      "Hypothesis": {
+        "additionalProperties": false,
+        "description": "A single, joint, broad or external reference; no invented probability.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "single",
+              "joint",
+              "broad",
+              "external"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "targets": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Targets",
+            "type": "array"
+          },
+          "external": {
+            "anyOf": [
+              {
+                "enum": [
+                  "personal",
+                  "general",
+                  "other_episode"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "External"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "Hypothesis",
+        "type": "object"
+      },
+      "Inventory": {
+        "additionalProperties": false,
+        "description": "Explicit extraction completeness; zero details alone says nothing about processing.",
+        "properties": {
+          "unit": {
+            "minLength": 1,
+            "title": "Unit",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "completed",
+              "not-attempted",
+              "failed",
+              "search-limited"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "unit",
+          "status"
+        ],
+        "title": "Inventory",
+        "type": "object"
+      },
+      "MediaSource": {
+        "additionalProperties": false,
+        "description": "One fingerprinted edition stream on a declared primary clock, independent of its text.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          },
+          "edition": {
+            "minLength": 1,
+            "title": "Edition",
+            "type": "string"
+          },
+          "stream": {
+            "minLength": 1,
+            "title": "Stream",
+            "type": "string"
+          },
+          "clock": {
+            "minLength": 1,
+            "title": "Clock",
+            "type": "string"
+          },
+          "axis_kind": {
+            "default": "edition-playback",
+            "enum": [
+              "edition-playback",
+              "annotation-timeline"
+            ],
+            "title": "Axis Kind",
+            "type": "string"
+          },
+          "stream_kind": {
+            "enum": [
+              "picture",
+              "audio"
+            ],
+            "title": "Stream Kind",
+            "type": "string"
+          },
+          "start_tick": {
+            "title": "Start Tick",
+            "type": "string"
+          },
+          "end_tick": {
+            "title": "End Tick",
+            "type": "string"
+          },
+          "seconds_per_tick": {
+            "title": "Seconds Per Tick",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "side",
+          "sha256",
+          "edition",
+          "stream",
+          "clock",
+          "stream_kind",
+          "start_tick",
+          "end_tick",
+          "seconds_per_tick"
+        ],
+        "title": "MediaSource",
+        "type": "object"
+      },
+      "Participation": {
+        "additionalProperties": false,
+        "description": "An evidenced role assignment, distinct from entity identity.",
+        "properties": {
+          "entity": {
+            "minLength": 1,
+            "title": "Entity",
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "agent",
+              "patient",
+              "speaker",
+              "recipient",
+              "experiencer",
+              "location"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "entity",
+          "role",
+          "evidence"
+        ],
+        "title": "Participation",
+        "type": "object"
+      },
+      "PlaybackSupport": {
+        "additionalProperties": false,
+        "description": "Canonical interval union plus explicit points on one complete media-source identity.",
+        "properties": {
+          "source": {
+            "minLength": 1,
+            "title": "Source",
+            "type": "string"
+          },
+          "intervals": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/TickInterval"
+            },
+            "title": "Intervals",
+            "type": "array"
+          },
+          "points": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Points",
+            "type": "array"
+          }
+        },
+        "required": [
+          "source"
+        ],
+        "title": "PlaybackSupport",
+        "type": "object"
+      },
+      "Recipe": {
+        "additionalProperties": false,
+        "description": "A named derivation and its input digests, with no credential material.",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "input_sha256": {
+            "items": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Input Sha256",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "input_sha256"
+        ],
+        "title": "Recipe",
+        "type": "object"
+      },
+      "Reference": {
+        "additionalProperties": false,
+        "description": "Reference processing status and reference outcome are orthogonal.",
+        "properties": {
+          "status": {
+            "enum": [
+              "attempted",
+              "not-attempted",
+              "failed",
+              "search-limited"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "interpretation": {
+            "default": "referent",
+            "enum": [
+              "narrative",
+              "referent"
+            ],
+            "title": "Interpretation",
+            "type": "string"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "enum": [
+                  "resolved",
+                  "alternative",
+                  "unresolved"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Outcome"
+          },
+          "hypotheses": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Hypothesis"
+            },
+            "title": "Hypotheses",
+            "type": "array"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "Reference",
+        "type": "object"
+      },
+      "Relation": {
+        "additionalProperties": false,
+        "description": "Typed, evidenced relationships between contextualized occurrences.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "part_of",
+              "before",
+              "causes",
+              "references"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "source": {
+            "minLength": 1,
+            "title": "Source",
+            "type": "string"
+          },
+          "target": {
+            "minLength": 1,
+            "title": "Target",
+            "type": "string"
+          },
+          "context": {
+            "minLength": 1,
+            "title": "Context",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "kind",
+          "source",
+          "target",
+          "context",
+          "evidence"
+        ],
+        "title": "Relation",
+        "type": "object"
+      },
+      "RichAccount": {
+        "additionalProperties": false,
+        "description": "One graph: v5 adds contexts, v6 native evidence and v7 retained temporal claims.",
+        "properties": {
+          "schema_version": {
+            "default": "storymodel.account/v4",
+            "enum": [
+              "storymodel.account/v4",
+              "storymodel.account/v5",
+              "storymodel.account/v6",
+              "storymodel.account/v7"
+            ],
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/$defs/Document"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "units": {
+            "items": {
+              "$ref": "#/$defs/Unit"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "contexts": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Context"
+                },
+                {
+                  "$ref": "#/$defs/ExtendedContext"
+                },
+                {
+                  "$ref": "#/$defs/AnchoredContext"
+                }
+              ]
+            },
+            "title": "Contexts",
+            "type": "array"
+          },
+          "entities": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Entity"
+            },
+            "title": "Entities",
+            "type": "array"
+          },
+          "events": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Event"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "relations": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Relation"
+            },
+            "title": "Relations",
+            "type": "array"
+          },
+          "details": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Detail"
+            },
+            "title": "Details",
+            "type": "array"
+          },
+          "inventories": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Inventory"
+            },
+            "title": "Inventories",
+            "type": "array"
+          },
+          "bindings": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Binding"
+            },
+            "title": "Bindings",
+            "type": "array"
+          },
+          "recipe": {
+            "$ref": "#/$defs/Recipe"
+          },
+          "export_permission": {
+            "default": "denied",
+            "enum": [
+              "allowed",
+              "denied"
+            ],
+            "title": "Export Permission",
+            "type": "string"
+          },
+          "states": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/State"
+            },
+            "title": "States",
+            "type": "array"
+          },
+          "circumstances": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Circumstance"
+            },
+            "title": "Circumstances",
+            "type": "array"
+          },
+          "media_sources": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/MediaSource"
+            },
+            "title": "Media Sources",
+            "type": "array"
+          },
+          "temporal_relations": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/TemporalClaim"
+            },
+            "title": "Temporal Relations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "documents",
+          "units",
+          "contexts",
+          "recipe"
+        ],
+        "title": "RichAccount",
+        "type": "object"
+      },
+      "Span": {
+        "additionalProperties": false,
+        "description": "Half-open canonical UTF-16 support, never ordinary Python character indices.",
+        "properties": {
+          "start": {
+            "minimum": 0,
+            "title": "Start",
+            "type": "integer"
+          },
+          "end": {
+            "minimum": 0,
+            "title": "End",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "Span",
+        "type": "object"
+      },
+      "State": {
+        "additionalProperties": false,
+        "description": "A contextual condition is distinct from an event, with explicit unknown truth attributes.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "context": {
+            "minLength": 1,
+            "title": "Context",
+            "type": "string"
+          },
+          "predicate": {
+            "minLength": 1,
+            "title": "Predicate",
+            "type": "string"
+          },
+          "participants": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Participation"
+            },
+            "title": "Participants",
+            "type": "array"
+          },
+          "evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          },
+          "polarity": {
+            "default": "unknown",
+            "enum": [
+              "positive",
+              "negative",
+              "unknown"
+            ],
+            "title": "Polarity",
+            "type": "string"
+          },
+          "modality": {
+            "default": "unknown",
+            "enum": [
+              "asserted",
+              "possible",
+              "probable",
+              "necessary",
+              "intended",
+              "desired",
+              "counterfactual",
+              "reported",
+              "unknown"
+            ],
+            "title": "Modality",
+            "type": "string"
+          }
+        },
+        "required": [
+          "side",
+          "context",
+          "predicate",
+          "evidence"
+        ],
+        "title": "State",
+        "type": "object"
+      },
+      "Support": {
+        "additionalProperties": false,
+        "description": "Discontinuous evidence in exactly one named document.",
+        "properties": {
+          "document": {
+            "minLength": 1,
+            "title": "Document",
+            "type": "string"
+          },
+          "spans": {
+            "items": {
+              "$ref": "#/$defs/Span"
+            },
+            "minItems": 1,
+            "title": "Spans",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document",
+          "spans"
+        ],
+        "title": "Support",
+        "type": "object"
+      },
+      "TemporalClaim": {
+        "additionalProperties": false,
+        "description": "An attributed ordering claim retains its evidence and declared epistemic basis.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "source": {
+            "minLength": 1,
+            "title": "Source",
+            "type": "string"
+          },
+          "target": {
+            "minLength": 1,
+            "title": "Target",
+            "type": "string"
+          },
+          "relation": {
+            "enum": [
+              "before",
+              "meets",
+              "overlaps",
+              "during",
+              "contains",
+              "starts",
+              "finishes",
+              "equal",
+              "unclear",
+              "after",
+              "met-by",
+              "overlapped-by",
+              "started-by",
+              "finished-by"
+            ],
+            "title": "Relation",
+            "type": "string"
+          },
+          "context": {
+            "minLength": 1,
+            "title": "Context",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "surface-explicit",
+              "linguistically-entailed",
+              "world-knowledge-inferred",
+              "structurally-derived",
+              "hypothesized",
+              "human-adjudicated"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "premises": {
+            "default": [],
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Premises",
+            "type": "array"
+          },
+          "origin": {
+            "minLength": 1,
+            "title": "Origin",
+            "type": "string"
+          },
+          "procedure": {
+            "minLength": 1,
+            "title": "Procedure",
+            "type": "string"
+          },
+          "adjudicator": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Adjudicator"
+          }
+        },
+        "required": [
+          "source",
+          "target",
+          "relation",
+          "context",
+          "status",
+          "origin",
+          "procedure"
+        ],
+        "title": "TemporalClaim",
+        "type": "object"
+      },
+      "TickInterval": {
+        "additionalProperties": false,
+        "description": "A positive half-open native interval; integer strings survive JSON without rounding.",
+        "properties": {
+          "start": {
+            "title": "Start",
+            "type": "string"
+          },
+          "end": {
+            "title": "End",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "TickInterval",
+        "type": "object"
+      },
+      "Unit": {
+        "additionalProperties": false,
+        "description": "An occurrence anchored in a source or recall document.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "row",
+              "scene",
+              "recall"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Support"
+              },
+              {
+                "$ref": "#/$defs/PlaybackSupport"
+              }
+            ],
+            "title": "Support"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Parent"
+          }
+        },
+        "required": [
+          "kind",
+          "support"
+        ],
+        "title": "Unit",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Explicitly expand evidence to linked situations, contexts and recorded identity witnesses.",
+    "properties": {
+      "schema_version": {
+        "const": "storymodel.fidelity-request/v2",
+        "default": "storymodel.fidelity-request/v2",
+        "title": "Schema Version",
+        "type": "string"
+      },
+      "account": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Account"
+          },
+          {
+            "$ref": "#/$defs/RichAccount"
+          }
+        ],
+        "title": "Account"
+      },
+      "unit": {
+        "minLength": 1,
+        "title": "Unit",
+        "type": "string"
+      },
+      "interpretation": {
+        "default": "referent",
+        "enum": [
+          "narrative",
+          "referent"
+        ],
+        "title": "Interpretation",
+        "type": "string"
+      },
+      "context_evidence": {
+        "$ref": "#/$defs/ContextEvidence"
+      }
+    },
+    "required": [
+      "account",
+      "unit",
+      "context_evidence"
+    ],
+    "title": "ContextFidelityRequest",
+    "type": "object"
+  },
+  "reply": {
+    "$defs": {
+      "ContextAccounting": {
+        "additionalProperties": false,
+        "description": "The assessor declares the context and identity dependencies of one conditional judgment.",
+        "properties": {
+          "considered_contexts": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Considered Contexts",
+            "type": "array"
+          },
+          "required_holders": {
+            "default": [],
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Required Holders",
+            "type": "array"
+          },
+          "required_mentions": {
+            "default": [],
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Required Mentions",
+            "type": "array"
+          },
+          "reason": {
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "considered_contexts",
+          "reason"
+        ],
+        "title": "ContextAccounting",
+        "type": "object"
+      },
+      "ContextFidelityProposal": {
+        "additionalProperties": false,
+        "description": "One v2 grade explicitly accounts for its context and identity dependencies.",
+        "properties": {
+          "hypothesis": {
+            "minLength": 1,
+            "title": "Hypothesis",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "completed",
+              "unavailable",
+              "refused"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "grade": {
+            "anyOf": [
+              {
+                "enum": [
+                  "supported",
+                  "gist-detail-error",
+                  "contradicted",
+                  "recaller-inference",
+                  "external",
+                  "invented",
+                  "unverifiable",
+                  "misread"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Grade"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "enum": [
+                  "minor",
+                  "major"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Severity"
+          },
+          "reason": {
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/SourceQuote"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "context_accounting": {
+            "$ref": "#/$defs/ContextAccounting"
+          }
+        },
+        "required": [
+          "hypothesis",
+          "status",
+          "reason",
+          "context_accounting"
+        ],
+        "title": "ContextFidelityProposal",
+        "type": "object"
+      },
+      "SourceQuote": {
+        "additionalProperties": false,
+        "description": "Exact source support at global UTF-16 coordinates, checked against a hypothesis.",
+        "properties": {
+          "document": {
+            "minLength": 1,
+            "title": "Document",
+            "type": "string"
+          },
+          "span": {
+            "$ref": "#/$defs/Span"
+          },
+          "text": {
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "document",
+          "span",
+          "text"
+        ],
+        "title": "SourceQuote",
+        "type": "object"
+      },
+      "Span": {
+        "additionalProperties": false,
+        "description": "Half-open canonical UTF-16 support, never ordinary Python character indices.",
+        "properties": {
+          "start": {
+            "minimum": 0,
+            "title": "Start",
+            "type": "integer"
+          },
+          "end": {
+            "minimum": 0,
+            "title": "End",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "Span",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Contextual replies have a separate wire contract from unit-only grading.",
+    "properties": {
+      "schema_version": {
+        "const": "storymodel.fidelity-proposal/v2",
+        "default": "storymodel.fidelity-proposal/v2",
+        "title": "Schema Version",
+        "type": "string"
+      },
+      "packet_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Packet Sha256",
+        "type": "string"
+      },
+      "assessments": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/ContextFidelityProposal"
+        },
+        "title": "Assessments",
+        "type": "array"
+      }
+    },
+    "required": [
+      "packet_sha256"
+    ],
+    "title": "ContextFidelityReply",
+    "type": "object"
+  },
+  "result": {
+    "$defs": {
+      "Account": {
+        "additionalProperties": false,
+        "description": "One validated paired account; absent information stays absent.",
+        "properties": {
+          "schema_version": {
+            "default": "storymodel.account/v1",
+            "enum": [
+              "storymodel.account/v1",
+              "storymodel.account/v2",
+              "storymodel.account/v3"
+            ],
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/$defs/Document"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "units": {
+            "items": {
+              "$ref": "#/$defs/Unit"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "contexts": {
+            "items": {
+              "$ref": "#/$defs/Context"
+            },
+            "title": "Contexts",
+            "type": "array"
+          },
+          "entities": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Entity"
+            },
+            "title": "Entities",
+            "type": "array"
+          },
+          "events": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Event"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "relations": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Relation"
+            },
+            "title": "Relations",
+            "type": "array"
+          },
+          "details": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Detail"
+            },
+            "title": "Details",
+            "type": "array"
+          },
+          "inventories": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Inventory"
+            },
+            "title": "Inventories",
+            "type": "array"
+          },
+          "bindings": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Binding"
+            },
+            "title": "Bindings",
+            "type": "array"
+          },
+          "recipe": {
+            "$ref": "#/$defs/Recipe"
+          },
+          "export_permission": {
+            "default": "denied",
+            "enum": [
+              "allowed",
+              "denied"
+            ],
+            "title": "Export Permission",
+            "type": "string"
+          }
+        },
+        "required": [
+          "documents",
+          "units",
+          "contexts",
+          "recipe"
+        ],
+        "title": "Account",
+        "type": "object"
+      },
+      "AnchoredContext": {
+        "additionalProperties": false,
+        "description": "An old context kind with native evidence stays disjoint from the legacy text record.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "reported",
+              "believed",
+              "intended"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Parent"
+          },
+          "evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "side",
+          "kind",
+          "evidence"
+        ],
+        "title": "AnchoredContext",
+        "type": "object"
+      },
+      "Assessment": {
+        "additionalProperties": false,
+        "description": "Fidelity is conditional on one explicit reference hypothesis.",
+        "properties": {
+          "hypothesis": {
+            "minLength": 1,
+            "title": "Hypothesis",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "completed",
+              "unavailable",
+              "refused"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "grade": {
+            "anyOf": [
+              {
+                "enum": [
+                  "supported",
+                  "gist-detail-error",
+                  "contradicted",
+                  "recaller-inference",
+                  "external",
+                  "invented",
+                  "unverifiable",
+                  "misread"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Grade"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "enum": [
+                  "minor",
+                  "major"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Severity"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reason"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Support"
+            },
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "hypothesis",
+          "status"
+        ],
+        "title": "Assessment",
+        "type": "object"
+      },
+      "Binding": {
+        "additionalProperties": false,
+        "description": "Reference and conditional fidelity attach to an already admitted recall detail.",
+        "properties": {
+          "detail": {
+            "minLength": 1,
+            "title": "Detail",
+            "type": "string"
+          },
+          "reference": {
+            "$ref": "#/$defs/Reference"
+          },
+          "assessments": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Assessment"
+            },
+            "title": "Assessments",
+            "type": "array"
+          }
+        },
+        "required": [
+          "detail",
+          "reference"
+        ],
+        "title": "Binding",
+        "type": "object"
+      },
+      "Circumstance": {
+        "additionalProperties": false,
+        "description": "An evidenced time or manner phrase is not a measured time or an entity referent.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "situation": {
+            "minLength": 1,
+            "title": "Situation",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "time",
+              "manner"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "situation",
+          "kind",
+          "label",
+          "evidence"
+        ],
+        "title": "Circumstance",
+        "type": "object"
+      },
+      "Context": {
+        "additionalProperties": false,
+        "description": "Narrated worlds and attributed content remain separate on each account side.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "narrated",
+              "reported",
+              "believed",
+              "intended"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Parent"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Support"
+            },
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "side",
+          "kind"
+        ],
+        "title": "Context",
+        "type": "object"
+      },
+      "ContextAccounting": {
+        "additionalProperties": false,
+        "description": "The assessor declares the context and identity dependencies of one conditional judgment.",
+        "properties": {
+          "considered_contexts": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Considered Contexts",
+            "type": "array"
+          },
+          "required_holders": {
+            "default": [],
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Required Holders",
+            "type": "array"
+          },
+          "required_mentions": {
+            "default": [],
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Required Mentions",
+            "type": "array"
+          },
+          "reason": {
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "considered_contexts",
+          "reason"
+        ],
+        "title": "ContextAccounting",
+        "type": "object"
+      },
+      "Detail": {
+        "additionalProperties": false,
+        "description": "Recall content has occurrence identity independent of its later fidelity assessment.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "unit": {
+            "minLength": 1,
+            "title": "Unit",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "event",
+              "participant",
+              "attribute",
+              "temporal",
+              "spatial",
+              "perceptual",
+              "dialogue",
+              "mental",
+              "relation",
+              "knowledge",
+              "discourse"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "content": {
+            "minLength": 1,
+            "title": "Content",
+            "type": "string"
+          },
+          "support": {
+            "$ref": "#/$defs/Support"
+          },
+          "address": {
+            "enum": [
+              "target",
+              "other",
+              "personal",
+              "general",
+              "unresolved",
+              "extended"
+            ],
+            "title": "Address",
+            "type": "string"
+          },
+          "discourse": {
+            "default": "content",
+            "enum": [
+              "content",
+              "commentary",
+              "inference",
+              "repair",
+              "repetition"
+            ],
+            "title": "Discourse",
+            "type": "string"
+          },
+          "event": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Event"
+          }
+        },
+        "required": [
+          "unit",
+          "kind",
+          "content",
+          "support",
+          "address"
+        ],
+        "title": "Detail",
+        "type": "object"
+      },
+      "Document": {
+        "additionalProperties": false,
+        "description": "A named source edition or recall session and its exact canonical text.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          },
+          "canonicalization": {
+            "const": "identity/v1",
+            "default": "identity/v1",
+            "title": "Canonicalization",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "side",
+          "text",
+          "sha256"
+        ],
+        "title": "Document",
+        "type": "object"
+      },
+      "Entity": {
+        "additionalProperties": false,
+        "description": "Document-local identity; v2 permits recall origins without source identity claims.\n\n``source_document`` is the retained wire name for the origin document, preserving IDs.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "source_document": {
+            "minLength": 1,
+            "title": "Source Document",
+            "type": "string"
+          },
+          "label": {
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "source_document",
+          "label",
+          "evidence"
+        ],
+        "title": "Entity",
+        "type": "object"
+      },
+      "Event": {
+        "additionalProperties": false,
+        "description": "An occurrence can group many details without making each detail an event.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "context": {
+            "minLength": 1,
+            "title": "Context",
+            "type": "string"
+          },
+          "predicate": {
+            "minLength": 1,
+            "title": "Predicate",
+            "type": "string"
+          },
+          "participants": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Participation"
+            },
+            "title": "Participants",
+            "type": "array"
+          },
+          "evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "side",
+          "context",
+          "predicate",
+          "evidence"
+        ],
+        "title": "Event",
+        "type": "object"
+      },
+      "ExtendedContext": {
+        "additionalProperties": false,
+        "description": "Additional v5 context kinds keep holderless possibility distinct from unattributed minds.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "desire",
+              "memory",
+              "imagination",
+              "hypothetical",
+              "counterfactual"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Parent"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "side",
+          "kind"
+        ],
+        "title": "ExtendedContext",
+        "type": "object"
+      },
+      "FidelityDecision": {
+        "additionalProperties": false,
+        "description": "Every requested hypothesis gets an admission outcome without altering reference status.",
+        "properties": {
+          "detail": {
+            "minLength": 1,
+            "title": "Detail",
+            "type": "string"
+          },
+          "hypothesis": {
+            "minLength": 1,
+            "title": "Hypothesis",
+            "type": "string"
+          },
+          "local_key": {
+            "minLength": 1,
+            "title": "Local Key",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "admitted",
+              "rejected",
+              "not-attempted"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "reason": {
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "detail",
+          "hypothesis",
+          "local_key",
+          "status",
+          "reason"
+        ],
+        "title": "FidelityDecision",
+        "type": "object"
+      },
+      "Hypothesis": {
+        "additionalProperties": false,
+        "description": "A single, joint, broad or external reference; no invented probability.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "single",
+              "joint",
+              "broad",
+              "external"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "targets": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Targets",
+            "type": "array"
+          },
+          "external": {
+            "anyOf": [
+              {
+                "enum": [
+                  "personal",
+                  "general",
+                  "other_episode"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "External"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "Hypothesis",
+        "type": "object"
+      },
+      "Inventory": {
+        "additionalProperties": false,
+        "description": "Explicit extraction completeness; zero details alone says nothing about processing.",
+        "properties": {
+          "unit": {
+            "minLength": 1,
+            "title": "Unit",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "completed",
+              "not-attempted",
+              "failed",
+              "search-limited"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "unit",
+          "status"
+        ],
+        "title": "Inventory",
+        "type": "object"
+      },
+      "MediaSource": {
+        "additionalProperties": false,
+        "description": "One fingerprinted edition stream on a declared primary clock, independent of its text.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          },
+          "edition": {
+            "minLength": 1,
+            "title": "Edition",
+            "type": "string"
+          },
+          "stream": {
+            "minLength": 1,
+            "title": "Stream",
+            "type": "string"
+          },
+          "clock": {
+            "minLength": 1,
+            "title": "Clock",
+            "type": "string"
+          },
+          "axis_kind": {
+            "default": "edition-playback",
+            "enum": [
+              "edition-playback",
+              "annotation-timeline"
+            ],
+            "title": "Axis Kind",
+            "type": "string"
+          },
+          "stream_kind": {
+            "enum": [
+              "picture",
+              "audio"
+            ],
+            "title": "Stream Kind",
+            "type": "string"
+          },
+          "start_tick": {
+            "title": "Start Tick",
+            "type": "string"
+          },
+          "end_tick": {
+            "title": "End Tick",
+            "type": "string"
+          },
+          "seconds_per_tick": {
+            "title": "Seconds Per Tick",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "side",
+          "sha256",
+          "edition",
+          "stream",
+          "clock",
+          "stream_kind",
+          "start_tick",
+          "end_tick",
+          "seconds_per_tick"
+        ],
+        "title": "MediaSource",
+        "type": "object"
+      },
+      "Participation": {
+        "additionalProperties": false,
+        "description": "An evidenced role assignment, distinct from entity identity.",
+        "properties": {
+          "entity": {
+            "minLength": 1,
+            "title": "Entity",
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "agent",
+              "patient",
+              "speaker",
+              "recipient",
+              "experiencer",
+              "location"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "entity",
+          "role",
+          "evidence"
+        ],
+        "title": "Participation",
+        "type": "object"
+      },
+      "PlaybackSupport": {
+        "additionalProperties": false,
+        "description": "Canonical interval union plus explicit points on one complete media-source identity.",
+        "properties": {
+          "source": {
+            "minLength": 1,
+            "title": "Source",
+            "type": "string"
+          },
+          "intervals": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/TickInterval"
+            },
+            "title": "Intervals",
+            "type": "array"
+          },
+          "points": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Points",
+            "type": "array"
+          }
+        },
+        "required": [
+          "source"
+        ],
+        "title": "PlaybackSupport",
+        "type": "object"
+      },
+      "Recipe": {
+        "additionalProperties": false,
+        "description": "A named derivation and its input digests, with no credential material.",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "input_sha256": {
+            "items": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Input Sha256",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "input_sha256"
+        ],
+        "title": "Recipe",
+        "type": "object"
+      },
+      "Reference": {
+        "additionalProperties": false,
+        "description": "Reference processing status and reference outcome are orthogonal.",
+        "properties": {
+          "status": {
+            "enum": [
+              "attempted",
+              "not-attempted",
+              "failed",
+              "search-limited"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "interpretation": {
+            "default": "referent",
+            "enum": [
+              "narrative",
+              "referent"
+            ],
+            "title": "Interpretation",
+            "type": "string"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "enum": [
+                  "resolved",
+                  "alternative",
+                  "unresolved"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Outcome"
+          },
+          "hypotheses": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Hypothesis"
+            },
+            "title": "Hypotheses",
+            "type": "array"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "Reference",
+        "type": "object"
+      },
+      "Relation": {
+        "additionalProperties": false,
+        "description": "Typed, evidenced relationships between contextualized occurrences.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "part_of",
+              "before",
+              "causes",
+              "references"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "source": {
+            "minLength": 1,
+            "title": "Source",
+            "type": "string"
+          },
+          "target": {
+            "minLength": 1,
+            "title": "Target",
+            "type": "string"
+          },
+          "context": {
+            "minLength": 1,
+            "title": "Context",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "kind",
+          "source",
+          "target",
+          "context",
+          "evidence"
+        ],
+        "title": "Relation",
+        "type": "object"
+      },
+      "RichAccount": {
+        "additionalProperties": false,
+        "description": "One graph: v5 adds contexts, v6 native evidence and v7 retained temporal claims.",
+        "properties": {
+          "schema_version": {
+            "default": "storymodel.account/v4",
+            "enum": [
+              "storymodel.account/v4",
+              "storymodel.account/v5",
+              "storymodel.account/v6",
+              "storymodel.account/v7"
+            ],
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/$defs/Document"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "units": {
+            "items": {
+              "$ref": "#/$defs/Unit"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "contexts": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Context"
+                },
+                {
+                  "$ref": "#/$defs/ExtendedContext"
+                },
+                {
+                  "$ref": "#/$defs/AnchoredContext"
+                }
+              ]
+            },
+            "title": "Contexts",
+            "type": "array"
+          },
+          "entities": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Entity"
+            },
+            "title": "Entities",
+            "type": "array"
+          },
+          "events": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Event"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "relations": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Relation"
+            },
+            "title": "Relations",
+            "type": "array"
+          },
+          "details": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Detail"
+            },
+            "title": "Details",
+            "type": "array"
+          },
+          "inventories": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Inventory"
+            },
+            "title": "Inventories",
+            "type": "array"
+          },
+          "bindings": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Binding"
+            },
+            "title": "Bindings",
+            "type": "array"
+          },
+          "recipe": {
+            "$ref": "#/$defs/Recipe"
+          },
+          "export_permission": {
+            "default": "denied",
+            "enum": [
+              "allowed",
+              "denied"
+            ],
+            "title": "Export Permission",
+            "type": "string"
+          },
+          "states": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/State"
+            },
+            "title": "States",
+            "type": "array"
+          },
+          "circumstances": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Circumstance"
+            },
+            "title": "Circumstances",
+            "type": "array"
+          },
+          "media_sources": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/MediaSource"
+            },
+            "title": "Media Sources",
+            "type": "array"
+          },
+          "temporal_relations": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/TemporalClaim"
+            },
+            "title": "Temporal Relations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "documents",
+          "units",
+          "contexts",
+          "recipe"
+        ],
+        "title": "RichAccount",
+        "type": "object"
+      },
+      "Span": {
+        "additionalProperties": false,
+        "description": "Half-open canonical UTF-16 support, never ordinary Python character indices.",
+        "properties": {
+          "start": {
+            "minimum": 0,
+            "title": "Start",
+            "type": "integer"
+          },
+          "end": {
+            "minimum": 0,
+            "title": "End",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "Span",
+        "type": "object"
+      },
+      "State": {
+        "additionalProperties": false,
+        "description": "A contextual condition is distinct from an event, with explicit unknown truth attributes.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "context": {
+            "minLength": 1,
+            "title": "Context",
+            "type": "string"
+          },
+          "predicate": {
+            "minLength": 1,
+            "title": "Predicate",
+            "type": "string"
+          },
+          "participants": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Participation"
+            },
+            "title": "Participants",
+            "type": "array"
+          },
+          "evidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          },
+          "polarity": {
+            "default": "unknown",
+            "enum": [
+              "positive",
+              "negative",
+              "unknown"
+            ],
+            "title": "Polarity",
+            "type": "string"
+          },
+          "modality": {
+            "default": "unknown",
+            "enum": [
+              "asserted",
+              "possible",
+              "probable",
+              "necessary",
+              "intended",
+              "desired",
+              "counterfactual",
+              "reported",
+              "unknown"
+            ],
+            "title": "Modality",
+            "type": "string"
+          }
+        },
+        "required": [
+          "side",
+          "context",
+          "predicate",
+          "evidence"
+        ],
+        "title": "State",
+        "type": "object"
+      },
+      "Support": {
+        "additionalProperties": false,
+        "description": "Discontinuous evidence in exactly one named document.",
+        "properties": {
+          "document": {
+            "minLength": 1,
+            "title": "Document",
+            "type": "string"
+          },
+          "spans": {
+            "items": {
+              "$ref": "#/$defs/Span"
+            },
+            "minItems": 1,
+            "title": "Spans",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document",
+          "spans"
+        ],
+        "title": "Support",
+        "type": "object"
+      },
+      "TemporalClaim": {
+        "additionalProperties": false,
+        "description": "An attributed ordering claim retains its evidence and declared epistemic basis.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "source": {
+            "minLength": 1,
+            "title": "Source",
+            "type": "string"
+          },
+          "target": {
+            "minLength": 1,
+            "title": "Target",
+            "type": "string"
+          },
+          "relation": {
+            "enum": [
+              "before",
+              "meets",
+              "overlaps",
+              "during",
+              "contains",
+              "starts",
+              "finishes",
+              "equal",
+              "unclear",
+              "after",
+              "met-by",
+              "overlapped-by",
+              "started-by",
+              "finished-by"
+            ],
+            "title": "Relation",
+            "type": "string"
+          },
+          "context": {
+            "minLength": 1,
+            "title": "Context",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "surface-explicit",
+              "linguistically-entailed",
+              "world-knowledge-inferred",
+              "structurally-derived",
+              "hypothesized",
+              "human-adjudicated"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Support"
+                },
+                {
+                  "$ref": "#/$defs/PlaybackSupport"
+                }
+              ]
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "premises": {
+            "default": [],
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Premises",
+            "type": "array"
+          },
+          "origin": {
+            "minLength": 1,
+            "title": "Origin",
+            "type": "string"
+          },
+          "procedure": {
+            "minLength": 1,
+            "title": "Procedure",
+            "type": "string"
+          },
+          "adjudicator": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Adjudicator"
+          }
+        },
+        "required": [
+          "source",
+          "target",
+          "relation",
+          "context",
+          "status",
+          "origin",
+          "procedure"
+        ],
+        "title": "TemporalClaim",
+        "type": "object"
+      },
+      "TickInterval": {
+        "additionalProperties": false,
+        "description": "A positive half-open native interval; integer strings survive JSON without rounding.",
+        "properties": {
+          "start": {
+            "title": "Start",
+            "type": "string"
+          },
+          "end": {
+            "title": "End",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "TickInterval",
+        "type": "object"
+      },
+      "Unit": {
+        "additionalProperties": false,
+        "description": "An occurrence anchored in a source or recall document.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "row",
+              "scene",
+              "recall"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Support"
+              },
+              {
+                "$ref": "#/$defs/PlaybackSupport"
+              }
+            ],
+            "title": "Support"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Parent"
+          }
+        },
+        "required": [
+          "kind",
+          "support"
+        ],
+        "title": "Unit",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "description": "Context accounting survives admission alongside unchanged reference and graph content.",
+    "properties": {
+      "schema_version": {
+        "const": "storymodel.fidelity-result/v2",
+        "default": "storymodel.fidelity-result/v2",
+        "title": "Schema Version",
+        "type": "string"
+      },
+      "recipe": {
+        "const": "context-evidence-conditional-fidelity/v2",
+        "default": "context-evidence-conditional-fidelity/v2",
+        "title": "Recipe",
+        "type": "string"
+      },
+      "request_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Request Sha256",
+        "type": "string"
+      },
+      "prompt_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Prompt Sha256",
+        "type": "string"
+      },
+      "response_sha256": {
+        "pattern": "^[0-9a-f]{64}$",
+        "title": "Response Sha256",
+        "type": "string"
+      },
+      "account": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Account"
+          },
+          {
+            "$ref": "#/$defs/RichAccount"
+          }
+        ],
+        "title": "Account"
+      },
+      "decisions": {
+        "items": {
+          "$ref": "#/$defs/FidelityDecision"
+        },
+        "title": "Decisions",
+        "type": "array"
+      },
+      "context_accounting": {
+        "additionalProperties": {
+          "$ref": "#/$defs/ContextAccounting"
+        },
+        "propertyNames": {
+          "minLength": 1
+        },
+        "title": "Context Accounting",
+        "type": "object"
+      }
+    },
+    "required": [
+      "request_sha256",
+      "prompt_sha256",
+      "response_sha256",
+      "account",
+      "decisions",
+      "context_accounting"
+    ],
+    "title": "ContextFidelityResult",
+    "type": "object"
+  }
+}

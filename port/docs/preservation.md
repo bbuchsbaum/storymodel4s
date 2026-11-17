@@ -607,3 +607,30 @@ Remaining: richer causal/referential/entity relations, calibrated credence, auto
 proposal generation, measured clock maps, temporal trajectory classifiers and native numerical
 mapping/assessment. Native tables/queries are real consumers, but do not establish those later
 capabilities. [Contract](chronology.md).
+
+## P3 context-aware conditional fidelity
+
+The existing Scala `align/claimassessment.scala` separates unresolved context from support and
+contradiction, but checks attributed ownership rather than semantic entailment. The Python
+holder/identity path previously stopped at inspection. The contextual fidelity profile connects
+those checked outputs to the existing pending-slot update and recorded execution path. It is
+a deliberate integration improvement, not a claim of an already connected Scala equivalent.
+
+Python entry points remain `prepare_fidelity`, `fidelity_prompt`, `resolve_fidelity`, import/replay
+and verification. `ContextEvidence` opts into v2; the v1 schemas/prompt/result/recordings remain
+unchanged. V2 recomputes exact identity and holder recordings, renders hypothesis-contained source
+situations and explicitly linked recall situations with their contextual evidence, then validates
+per-question dependency accounting. Named holders do not automatically resolve plural,
+unknown-number or addressee identity. Unresolved or withheld required dependencies cannot support
+a substantive grade; declared context-independent judgments remain possible and attributed.
+
+`tests/test_context_fidelity.py` supplies independent positive/refusal controls for missing
+placement, expanded recall evidence, unrelated/private data withholding, unresolved holders and
+mentions, withheld referent members, foreign accounting and preservation of protected bindings.
+`examples/context_fidelity_workflow.py` runs real construction/detail/mapping/recording producers
+for one unchanged source and two recalls, saving all three fidelity outcomes and analysis views.
+The installed and mutation scripts are under `evidence/context-fidelity-*.py`.
+
+Retained limits: text-only evidence; hypothesis-owned grade citations; attributed semantic
+dependence and grades, not certified truth; no cross-document identity bridge, generic neighboring
+recall profile, native assessment or reassessment-history operation. [Contract](context-fidelity.md).

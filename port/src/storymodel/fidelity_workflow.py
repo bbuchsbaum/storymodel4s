@@ -7,10 +7,11 @@ from typing import Literal
 from .artifacts import publish_json
 from .execution import RecordedRun, RunProfile
 from .fidelity import (
-    RECIPE,
-    FidelityRequest,
-    FidelityResult,
+    ContextFidelityRequest,
+    FidelityInput,
+    FidelityOutput,
     fidelity_prompt,
+    fidelity_recipe,
     fidelity_request_digest,
     resolve_fidelity,
     validate_fidelity_request,
@@ -28,30 +29,34 @@ class FidelityRecording(Model):
     reply: str
 
 
-def _exportable(request: FidelityRequest) -> FidelityRequest:
+def _exportable(request: FidelityInput) -> FidelityInput:
     checked = validate_fidelity_request(request)
     if checked.account.export_permission != "allowed":
         raise PermissionError("producer denies graded fidelity export")
     return checked
 
 
-def _profile(request: FidelityRequest) -> RunProfile:
+def _profile(request: FidelityInput) -> RunProfile:
     return RunProfile(
         provider="imported-text",
-        model="supplied-conditional-fidelity/v1",
+        model=(
+            "supplied-conditional-fidelity/v2"
+            if isinstance(request, ContextFidelityRequest)
+            else "supplied-conditional-fidelity/v1"
+        ),
         endpoint="offline:import",
         max_tokens=8192,
-        recipe=RECIPE,
+        recipe=fidelity_recipe(request),
         input_sha256=(fidelity_request_digest(request),),
     )
 
 
-def _prompt(request: FidelityRequest) -> str:
+def _prompt(request: FidelityInput) -> str:
     """Render a provider-facing prompt only after its account has granted export."""
     return fidelity_prompt(_exportable(request))
 
 
-def read_fidelity_request(path: Path, *, expected_sha256: str | None = None) -> FidelityRequest:
+def read_fidelity_request(path: Path, *, expected_sha256: str | None = None) -> FidelityInput:
     """Read a strict fidelity request, optionally pinned to externally supplied bytes."""
     raw = path.read_bytes()
     if expected_sha256 is not None and sha256(raw).hexdigest() != expected_sha256:
@@ -59,7 +64,7 @@ def read_fidelity_request(path: Path, *, expected_sha256: str | None = None) -> 
     return validate_fidelity_request(raw)
 
 
-def import_fidelity(value: FidelityRequest, recording: FidelityRecording, root: Path) -> None:
+def import_fidelity(value: FidelityInput, recording: FidelityRecording, root: Path) -> None:
     """Store imported raw text before parse; this path never invokes a provider."""
     request = _exportable(value)
     supplied = _validate_instance(FidelityRecording, recording)
@@ -73,11 +78,11 @@ def import_fidelity(value: FidelityRequest, recording: FidelityRecording, root: 
 
 
 def replay_fidelity(
-    value: FidelityRequest,
+    value: FidelityInput,
     root: Path,
     *,
     expected_import_sha256: str | None = None,
-) -> FidelityResult:
+) -> FidelityOutput:
     """Resolve the raw response offline after checking its request and cache bindings."""
     request = _exportable(value)
     raw_import = (root / "import.json").read_bytes()
