@@ -313,3 +313,14 @@ document-local identities through a foreign holder. Rejected alternatives: chang
 identity schema semantics, mutating account entity IDs, leaving candidate references pointed
 at obsolete classes, recursively bootstrapping first-person holders, and inventing addressees
 or speaker-group membership. [Contract](held-identity.md).
+
+## Full context vocabulary (P2, 2026-11-17)
+
+Provisional implementation choice: one rich account model accepts v4/v5; a disjoint context
+record adds the five retained kinds without widening legacy Context or v1 proposal schemas.
+An opt-in v2 constructor shares the existing graph admission engine. Reject a second account
+hierarchy, silent v1 prompt changes, holder fields in occurrence identity and labeling
+holderless frames as unknown speakers. Use the nearest holder-bearing ancestor, stopping at
+an unresolved held frame; preserve Python's refusal of ambiguous actual placements. Explicit
+upgrade changes the recipe/version, not graph IDs. Combined schemas describe both versions;
+runtime validation proves their cross-field relationships. [Contract](contexts.md).

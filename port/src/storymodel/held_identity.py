@@ -6,7 +6,7 @@ from pydantic import Field, model_validator
 
 from .attribution import AttributionResult, resolve_context_holders, verify_attribution
 from .identity import MentionAnnotation, OpenIdentityReason
-from .model import Identified, Model, Name, State, Support, _validate_instance
+from .model import Identified, Model, Name, State, Support, _holder_scope, _validate_instance
 from .rich_account import SupportedAccount, validate_supported_account
 from .serialization import strict_json
 
@@ -83,8 +83,9 @@ def resolve_attributed_identity(
     """Attach explicitly singular first-person mentions to their unique placed context's holder.
 
     Holders come only from the first pass, never from newly attached first-person mentions.
-    Unknown number, plural speakers and addressees stay open. Multiple placements do not
-    license choosing a deepest, nearest or most convenient context.
+    Unknown number, plural speakers and addressees stay open. Holderless frames are skipped
+    to the nearest held ancestor; an unresolved held frame stops that lookup. Multiple
+    placements do not license choosing a deepest, nearest or most convenient placement.
     """
     account = validate_supported_account(value)
     checked = (
@@ -97,6 +98,7 @@ def resolve_attributed_identity(
     parsed = strict_json(identity_annotations)
     supplied = {item["mention"]: item for item in parsed["mentions"]}
     entities = {e.id: e for e in account.entities}
+    context_records = {c.id: c for c in account.contexts}
     holders = {h.context: h for h in checked.holders}
     base_referents = {r.id: r for r in base.referents}
     placements: dict[str, set[str]] = {}
@@ -116,7 +118,10 @@ def resolve_attributed_identity(
             if len(contexts) != 1:
                 decision = decision.model_copy(update={"reason": "ambiguous-context"})
             else:
-                holder = holders[contexts[0]]
+                holder_scope = _holder_scope(contexts[0], context_records)
+                # The verified base pass admits this branch only when a held scope exists.
+                assert holder_scope is not None
+                holder = holders[holder_scope]
                 if holder.referent is None:
                     decision = decision.model_copy(update={"reason": "holder-unresolved"})
                 elif (

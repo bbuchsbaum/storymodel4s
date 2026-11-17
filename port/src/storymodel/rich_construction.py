@@ -12,12 +12,14 @@ from ._admission import (
     ContextProposal,
     EntityProposal,
     EventProposal,
+    ExtendedContextProposal,
     Quote,
     RichUnresolvedClaim,
     StateProposal,
     admit_graph,
 )
 from .model import (
+    AnyContext,
     Context,
     Digest,
     Document,
@@ -38,21 +40,24 @@ from .serialization import canonical, digest, strict_json
 from .source import SourceRow
 
 RECIPE: Literal["rich-extractive-admission/v1"] = "rich-extractive-admission/v1"
+RECIPE_V2: Literal["rich-extractive-admission/v2"] = "rich-extractive-admission/v2"
 
 
 class RichConstructionRequest(Model):
     """One exact source or recall document with caller-supplied, UTF-16 observation rows."""
 
-    schema_version: Literal["storymodel.rich-construction-request/v1"] = (
-        "storymodel.rich-construction-request/v1"
-    )
-    recipe: Literal["rich-extractive-admission/v1"] = RECIPE
+    schema_version: Literal[
+        "storymodel.rich-construction-request/v1", "storymodel.rich-construction-request/v2"
+    ] = "storymodel.rich-construction-request/v1"
+    recipe: Literal["rich-extractive-admission/v1", "rich-extractive-admission/v2"] = RECIPE
     document: Document
     rows: tuple[SourceRow, ...] = Field(min_length=1)
     export_permission: Literal["allowed", "denied"] = "denied"
 
     @model_validator(mode="after")
     def anchored(self) -> Self:
+        if self.schema_version.rsplit("/", 1)[-1] != self.recipe.rsplit("/", 1)[-1]:
+            raise ValueError("construction request version and recipe differ")
         if len({row.key for row in self.rows}) != len(self.rows):
             raise ValueError("duplicate rich construction row key")
         if any(left.span.end > right.span.start for left, right in zip(self.rows, self.rows[1:])):
@@ -83,9 +88,16 @@ def prepare_rich_construction(
     rows: Iterable[SourceRow],
     *,
     export_permission: Literal["allowed", "denied"] = "denied",
+    full_contexts: bool = False,
 ) -> RichConstructionRequest:
     """Anchor source or recall observations without normalizing their text or clocks."""
+    if not isinstance(full_contexts, bool):
+        raise ValueError("full_contexts must be a Boolean")
     return RichConstructionRequest(
+        schema_version="storymodel.rich-construction-request/v2"
+        if full_contexts
+        else "storymodel.rich-construction-request/v1",
+        recipe=RECIPE_V2 if full_contexts else RECIPE,
         document=Document.create(key, side, text),
         rows=tuple(rows),
         export_permission=export_permission,
@@ -101,13 +113,13 @@ class CircumstanceProposal(Model):
     evidence: Quote
 
 
-class RichRowProposal(Model):
+class _RichRowFields(Model):
     """Atomic rich graph claims, or an explicit row-local processing outcome."""
 
     row: Name
     status: Literal["completed", "unsupported", "not-attempted", "failed", "search-limited"]
     reason: str | None = None
-    contexts: tuple[ContextProposal, ...] = ()
+    contexts: tuple[ContextProposal | ExtendedContextProposal, ...] = ()
     entities: tuple[EntityProposal, ...] = ()
     events: tuple[EventProposal, ...] = ()
     states: tuple[StateProposal, ...] = ()
@@ -135,11 +147,28 @@ class RichRowProposal(Model):
         return self
 
 
+class RichRowProposal(_RichRowFields):
+    """Atomic rich graph claims, or an explicit row-local processing outcome."""
+
+    contexts: tuple[ContextProposal, ...] = ()
+
+
+class RichRowProposalV2(_RichRowFields):
+    """The full context vocabulary uses the same atomic row and scope admission rules."""
+
+
 class RichConstructionProposal(Model):
     """Provider-facing envelope whose graph keys remain row-local and untrusted."""
 
     schema_version: Literal["storymodel.rich-construction-proposal/v1"]
     rows: tuple[RichRowProposal, ...]
+
+
+class RichConstructionProposalV2(Model):
+    """Explicit v2 proposals include additional held and holderless context families."""
+
+    schema_version: Literal["storymodel.rich-construction-proposal/v2"]
+    rows: tuple[RichRowProposalV2, ...]
 
 
 class RichRowResolution(Model):
@@ -154,16 +183,25 @@ class RichRowResolution(Model):
 
 
 class RichConstructionResult(Model):
-    """A receipted v4 graph and complete row accounting, not a semantic truth claim."""
+    """A receipted rich graph and complete row accounting, not a semantic truth claim."""
 
-    schema_version: Literal["storymodel.rich-construction-result/v1"] = (
-        "storymodel.rich-construction-result/v1"
-    )
-    recipe: Literal["rich-extractive-admission/v1"] = RECIPE
+    schema_version: Literal[
+        "storymodel.rich-construction-result/v1", "storymodel.rich-construction-result/v2"
+    ] = "storymodel.rich-construction-result/v1"
+    recipe: Literal["rich-extractive-admission/v1", "rich-extractive-admission/v2"] = RECIPE
     request_sha256: Digest
     response_sha256: Digest
     account: RichAccount
     resolutions: tuple[RichRowResolution, ...]
+
+    @model_validator(mode="after")
+    def version_matches(self) -> Self:
+        version = self.schema_version.rsplit("/", 1)[-1]
+        if self.recipe.rsplit("/", 1)[-1] != version or self.account.schema_version != (
+            "storymodel.account/v5" if version == "v2" else "storymodel.account/v4"
+        ):
+            raise ValueError("construction result version, recipe and account differ")
+        return self
 
 
 def compile_rich_construction(value: RichConstructionRequest, raw: str) -> RichConstructionResult:
@@ -171,11 +209,20 @@ def compile_rich_construction(value: RichConstructionRequest, raw: str) -> RichC
     request = validate_rich_construction_request(value)
     request_sha = rich_construction_request_digest(request)
     response_sha = sha256(raw.encode()).hexdigest()
+    full_contexts = request.schema_version == "storymodel.rich-construction-request/v2"
+    account_version: Literal["storymodel.account/v4", "storymodel.account/v5"] = (
+        "storymodel.account/v5" if full_contexts else "storymodel.account/v4"
+    )
     parsed = strict_json(raw)
     if (
         not isinstance(parsed, dict)
         or set(parsed) != {"schema_version", "rows"}
-        or parsed["schema_version"] != "storymodel.rich-construction-proposal/v1"
+        or parsed["schema_version"]
+        != (
+            "storymodel.rich-construction-proposal/v2"
+            if full_contexts
+            else "storymodel.rich-construction-proposal/v1"
+        )
         or not isinstance(parsed["rows"], list)
     ):
         raise ValueError("invalid rich construction proposal envelope")
@@ -189,7 +236,7 @@ def compile_rich_construction(value: RichConstructionRequest, raw: str) -> RichC
 
     document = request.document
     root = Context(side=document.side, kind="narrated")
-    contexts = [root]
+    contexts: list[AnyContext] = [root]
     entities: list[Entity] = []
     events: list[Event] = []
     states: list[State] = []
@@ -215,7 +262,11 @@ def compile_rich_construction(value: RichConstructionRequest, raw: str) -> RichC
             )
             continue
         try:
-            proposal = RichRowProposal.model_validate_json(canonical(supplied[row.key]))
+            proposal: RichRowProposal | RichRowProposalV2 = (
+                RichRowProposalV2.model_validate_json(canonical(supplied[row.key]))
+                if full_contexts
+                else RichRowProposal.model_validate_json(canonical(supplied[row.key]))
+            )
             graph = admit_graph(
                 document,
                 unit,
@@ -251,6 +302,7 @@ def compile_rich_construction(value: RichConstructionRequest, raw: str) -> RichC
                     )
                 )
             candidate = RichAccount(
+                schema_version=account_version,
                 documents=(document,),
                 units=tuple(units),
                 contexts=(*contexts, *graph.contexts),
@@ -260,7 +312,7 @@ def compile_rich_construction(value: RichConstructionRequest, raw: str) -> RichC
                 circumstances=(*circumstances, *row_circumstances),
                 inventories=tuple(inventories),
                 recipe=Recipe(
-                    name=RECIPE, input_sha256=(document.sha256, request_sha, response_sha)
+                    name=request.recipe, input_sha256=(document.sha256, request_sha, response_sha)
                 ),
                 export_permission=request.export_permission,
             )
@@ -302,6 +354,7 @@ def compile_rich_construction(value: RichConstructionRequest, raw: str) -> RichC
             )
         )
     account = RichAccount(
+        schema_version=account_version,
         documents=(document,),
         units=tuple(units),
         contexts=tuple(contexts),
@@ -310,10 +363,16 @@ def compile_rich_construction(value: RichConstructionRequest, raw: str) -> RichC
         states=tuple(states),
         circumstances=tuple(circumstances),
         inventories=tuple(inventories),
-        recipe=Recipe(name=RECIPE, input_sha256=(document.sha256, request_sha, response_sha)),
+        recipe=Recipe(
+            name=request.recipe, input_sha256=(document.sha256, request_sha, response_sha)
+        ),
         export_permission=request.export_permission,
     )
     return RichConstructionResult(
+        schema_version="storymodel.rich-construction-result/v2"
+        if full_contexts
+        else "storymodel.rich-construction-result/v1",
+        recipe=request.recipe,
         request_sha256=request_sha,
         response_sha256=response_sha,
         account=account,
@@ -324,7 +383,7 @@ def compile_rich_construction(value: RichConstructionRequest, raw: str) -> RichC
 def verify_rich_construction(
     value: RichConstructionRequest, raw: str, result: RichConstructionResult
 ) -> RichConstructionResult:
-    """Recompute the row receipts and v4 graph rather than trusting a copied result."""
+    """Recompute row receipts and the rich graph rather than trusting a copied result."""
     checked = _validate_instance(RichConstructionResult, result)
     expected = compile_rich_construction(value, raw)
     if checked != expected:

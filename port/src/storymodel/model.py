@@ -7,7 +7,7 @@ Public consumers call ``validate_account`` even when given an existing Python ob
 from __future__ import annotations
 
 import hashlib
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from typing import Annotated, Any, ClassVar, Literal, Self
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field, model_validator
@@ -137,6 +137,34 @@ class Context(Identified):
     kind: Literal["narrated", "reported", "believed", "intended"]
     parent: str | None = None
     evidence: tuple[Support, ...] = ()
+
+
+class ExtendedContext(Identified):
+    """Additional v5 context kinds keep holderless possibility distinct from unattributed minds."""
+
+    namespace: ClassVar[str] = "context"
+    side: Side
+    kind: Literal["desire", "memory", "imagination", "hypothetical", "counterfactual"]
+    parent: str | None = None
+    evidence: tuple[Support, ...] = ()
+
+
+AnyContext = Context | ExtendedContext
+
+
+def _has_holder(context: AnyContext) -> bool:
+    return context.kind in ("reported", "believed", "intended", "desire", "memory", "imagination")
+
+
+def _holder_scope(context_id: str, contexts: Mapping[str, AnyContext]) -> str | None:
+    """Find the nearest holder-bearing frame in an already validated context hierarchy."""
+    current: str | None = context_id
+    while current is not None:
+        context = contexts[current]
+        if _has_holder(context):
+            return current
+        current = context.parent
+    return None
 
 
 class Inventory(Model):
@@ -430,7 +458,7 @@ class _AccountFields(Model):
     schema_version: str = "storymodel.account/v1"
     documents: tuple[Document, ...]
     units: tuple[Unit, ...]
-    contexts: tuple[Context, ...]
+    contexts: tuple[AnyContext, ...]
     entities: tuple[Entity, ...] = ()
     events: tuple[Event, ...] = ()
     relations: tuple[Relation, ...] = ()
@@ -486,6 +514,11 @@ class _AccountFields(Model):
             inventoried.add(inventory_unit.id)
 
         for context in contexts.values():
+            if (
+                isinstance(context, ExtendedContext)
+                and self.schema_version != "storymodel.account/v5"
+            ):
+                raise ValueError("extended context kinds require account v5")
             for evidence in context.evidence:
                 support(evidence, context.side)
             if context.kind == "narrated":
@@ -503,7 +536,7 @@ class _AccountFields(Model):
         for side in ("source", "recall"):
             narrated = sum(c.kind == "narrated" and c.side == side for c in contexts.values())
             present = any(document.side == side for document in docs.values())
-            if self.schema_version.endswith(("/v3", "/v4")):
+            if self.schema_version.endswith(("/v3", "/v4", "/v5")):
                 if present and narrated != 1:
                     raise ValueError("each present account side needs exactly one narrated world")
                 if not present and any(context.side == side for context in contexts.values()):
@@ -615,6 +648,7 @@ class Account(_AccountFields):
     schema_version: Literal[
         "storymodel.account/v1", "storymodel.account/v2", "storymodel.account/v3"
     ] = "storymodel.account/v1"
+    contexts: tuple[Context, ...]
 
 
 def validate_account(value: Account | str | bytes) -> Account:

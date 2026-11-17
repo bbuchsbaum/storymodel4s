@@ -80,7 +80,13 @@ from .reconstruction import (
     verify_reconstruction,
 )
 from .relations import admit_relations, relation_table, verify_relations
-from .rich_account import RichAccount, pair_rich_accounts, situation_table, upgrade_account
+from .rich_account import (
+    RichAccount,
+    pair_rich_accounts,
+    situation_table,
+    upgrade_account,
+    upgrade_context_account,
+)
 from .rich_construction import compile_rich_construction, prepare_rich_construction
 from .rich_workflow import RichRecording, import_rich, replay_rich
 from .scenes import SceneGroup, group_source_rows, verify_scene_grouping
@@ -100,6 +106,7 @@ from .source_workflow import SourceRecording, import_source, replay_source
 __version__ = "0.1.0"
 
 __all__ = [
+    "upgrade_context_account",
     "attributed_identity_roles",
     "resolve_attributed_identity",
     "verify_attributed_identity",

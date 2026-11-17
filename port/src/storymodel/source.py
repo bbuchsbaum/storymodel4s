@@ -206,7 +206,7 @@ def compile_source(value: SourceRequest, raw: str) -> SourceResult:
             make_account(
                 (document,),
                 units=(unit,),
-                contexts=(root, *graph.contexts),
+                contexts=(root, *graph.legacy_contexts()),
                 entities=graph.entities,
                 events=graph.events,
             )
@@ -215,7 +215,7 @@ def compile_source(value: SourceRequest, raw: str) -> SourceResult:
                 SourceRowResolution(row=row.key, unit=unit.id, status="rejected", reason=str(error))
             )
             continue
-        contexts.extend(graph.contexts)
+        contexts.extend(graph.legacy_contexts())
         entities.extend(graph.entities)
         events.extend(graph.events)
         status: Literal["admitted", "partial", "unsupported", "not-attempted", "failed"] = (

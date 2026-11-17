@@ -193,15 +193,18 @@ def main(argv: list[str] | None = None) -> int:
     details_replay.add_argument("--account-only", action="store_true")
     details_replay.add_argument("--output")
     rich_prepare = commands.add_parser(
-        "prepare-rich", help="prepare anchored v4 graph construction"
+        "prepare-rich", help="prepare anchored rich graph construction"
     )
     rich_prepare.add_argument("text")
     rich_prepare.add_argument("rows")
     rich_prepare.add_argument("--document-key", required=True)
     rich_prepare.add_argument("--side", required=True, choices=("source", "recall"))
     rich_prepare.add_argument("--allow-export", action="store_true")
+    rich_prepare.add_argument(
+        "--full-contexts", action="store_true", help="include mental and holderless contexts"
+    )
     rich_prepare.add_argument("--output")
-    rich_contract = commands.add_parser("rich-prompt", help="render the v4 construction contract")
+    rich_contract = commands.add_parser("rich-prompt", help="render the rich construction contract")
     rich_contract.add_argument("request")
     rich_contract.add_argument("--output")
     rich_import = commands.add_parser(
@@ -210,7 +213,7 @@ def main(argv: list[str] | None = None) -> int:
     rich_import.add_argument("request")
     rich_import.add_argument("reply")
     rich_import.add_argument("recording")
-    rich_replay = commands.add_parser("replay-rich", help="construct a v4 account offline")
+    rich_replay = commands.add_parser("replay-rich", help="construct a rich account offline")
     rich_replay.add_argument("request")
     rich_replay.add_argument("recording")
     rich_replay.add_argument("--expected-import-sha256")
@@ -843,6 +846,7 @@ def main(argv: list[str] | None = None) -> int:
                 Path(args.text).read_bytes().decode("utf-8"),
                 tuple(SourceRow.model_validate_json(canonical(row)) for row in row_values),
                 export_permission="allowed" if args.allow_export else "denied",
+                full_contexts=args.full_contexts,
             )
             emit(rich_request.model_dump(mode="json"), args.output)
         elif args.command == "situation-table":

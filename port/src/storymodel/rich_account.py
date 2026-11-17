@@ -1,4 +1,4 @@
-"""Explicit v4 accounts share graph checks while legacy wire records remain unchanged."""
+"""Explicit rich account versions share graph checks while legacy wire records stay readable."""
 
 from typing import Any, ClassVar, Literal, Self
 
@@ -34,9 +34,11 @@ class Circumstance(Identified):
 
 
 class RichAccount(_AccountFields):
-    """V4 adds states and circumstances without silently changing old snapshots or prompts."""
+    """Rich snapshots share one graph; v5 explicitly adds the full context vocabulary to v4."""
 
-    schema_version: Literal["storymodel.account/v4"] = "storymodel.account/v4"
+    schema_version: Literal["storymodel.account/v4", "storymodel.account/v5"] = (
+        "storymodel.account/v4"
+    )
     states: tuple[State, ...] = ()
     circumstances: tuple[Circumstance, ...] = ()
 
@@ -64,7 +66,7 @@ class RichAccount(_AccountFields):
 
 
 def validate_rich_account(value: RichAccount | str | bytes) -> RichAccount:
-    """Recheck copied objects and complete graph relationships at every v4 consumer boundary."""
+    """Recheck copied objects, version vocabulary and graph relationships at public boundaries."""
     if isinstance(value, RichAccount):
         return _validate_instance(RichAccount, value)
     return RichAccount.model_validate_json(canonical(strict_json(value)))
@@ -83,7 +85,7 @@ def validate_supported_account(value: SupportedAccount | str | bytes) -> Support
     if not isinstance(parsed, dict):
         raise ValueError("account must be a JSON object")
     raw = canonical(parsed)
-    if parsed.get("schema_version") == "storymodel.account/v4":
+    if parsed.get("schema_version") in ("storymodel.account/v4", "storymodel.account/v5"):
         return validate_rich_account(raw)
     return validate_account(raw)
 
@@ -106,13 +108,17 @@ def upgrade_account(value: Account) -> RichAccount:
 
 
 def pair_rich_accounts(source: RichAccount, recall: RichAccount) -> RichAccount:
-    """Join independent v4 snapshots and retain every graph collection, including new families."""
+    """Join independent rich snapshots, preserving every collection and promoting any v5 input."""
     left, right = validate_rich_account(source), validate_rich_account(recall)
     for account, side in ((left, "source"), (right, "recall")):
         if not account.documents or any(d.side != side for d in account.documents):
             raise ValueError(f"rich pairing requires a {side}-only account")
     a, b = left.model_dump(mode="json"), right.model_dump(mode="json")
-    output: dict[str, Any] = {"schema_version": "storymodel.account/v4"}
+    output: dict[str, Any] = {
+        "schema_version": "storymodel.account/v5"
+        if "storymodel.account/v5" in (left.schema_version, right.schema_version)
+        else "storymodel.account/v4"
+    }
     # Every other graph field is a collection. New fields must be preserved or explicitly
     # handled here; an unknown scalar fails instead of silently disappearing during pairing.
     for name in RichAccount.model_fields:
@@ -133,6 +139,27 @@ def pair_rich_accounts(source: RichAccount, recall: RichAccount) -> RichAccount:
         "allowed" if left.export_permission == right.export_permission == "allowed" else "denied"
     )
     return validate_rich_account(canonical(output))
+
+
+def upgrade_context_account(value: RichAccount) -> RichAccount:
+    """Explicitly move a v4 snapshot to v5 vocabulary without changing graph occurrences."""
+    account = validate_rich_account(value)
+    if account.schema_version != "storymodel.account/v4":
+        raise ValueError("context upgrade requires a v4 account")
+    return validate_rich_account(
+        account.model_copy(
+            update={
+                "schema_version": "storymodel.account/v5",
+                "recipe": Recipe(
+                    name="upgrade-account-v4-to-v5/v1",
+                    input_sha256=(
+                        *(d.sha256 for d in account.documents),
+                        digest(account.model_dump(mode="json")),
+                    ),
+                ),
+            }
+        )
+    )
 
 
 class ParticipantRow(Participation):

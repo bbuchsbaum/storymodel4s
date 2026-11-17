@@ -32,7 +32,7 @@ The deterministic rule uses every candidate's verified identity:
 | All candidates resolve to one identity class | `named`, with that referent ID |
 | Proposal missing | `not-attempted` |
 | Explicit processing outcome | `not-attempted`, `failed` or `unsupported`, with its reason |
-| Narrated-world context | `not-applicable`; a holder proposal for it is invalid |
+| Narrated, hypothetical or counterfactual context | `not-applicable`; a holder proposal for it is invalid |
 
 Several mentions of the same referent are one holder. A readable candidate beside an unreadable
 candidate does not justify picking the readable one. Candidate order does not affect the result.
@@ -58,12 +58,12 @@ storymodel verify-attribution account.json identity-annotations.json holder-prop
 storymodel attribution-table account.json identity-annotations.json holder-proposals.json holders.json --output rows.json
 ```
 
-This profile supports the existing `reported`, `believed` and `intended` text contexts in
-accounts v1–v4, using the existing identity resolver's capabilities and limits. It does not
-silently widen old construction prompts or wire schemas. Additional Scala context families
-(desire, memory, imagination, hypothetical and counterfactual), playback attribution,
-automatic chart/quotation candidate discovery and attribution-aware assessment remain required
-work. [Attributed identity](held-identity.md) now consumes holders in a separate second pass;
+This profile supports `reported`, `believed` and `intended` text contexts in legacy accounts
+and adds `desire`, `memory` and `imagination` in [v5 accounts](contexts.md). Hypothetical and
+counterfactual frames are explicitly holderless. Existing construction prompts remain unchanged;
+the full vocabulary uses an opt-in v2 construction contract. Playback attribution, automatic
+chart/quotation candidate discovery and attribution-aware assessment remain required work.
+[Attributed identity](held-identity.md) consumes holders in a separate second pass;
 the example saves it alongside the unchanged base result, where first-person identity remains
 open. Addressee and plural-group inference are still unavailable. No claims are promoted to narrated-world
 truth, and no extraction accuracy or executed Scala runtime parity is claimed.

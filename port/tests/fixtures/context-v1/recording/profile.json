@@ -1,0 +1,1 @@
+{"endpointSha256":"fa70540acd0a6a6f60d4338068dce8590985fc2d4eec1d005d9a603ab208fa94","inputSha256":["da0fe967cf6d0a644efec3470b244397d4c1039631239e4579b7b4f0893cd031"],"maxTokens":8192,"model":"supplied-rich-construction/v1","provider":"imported-text","recipe":"rich-extractive-admission/v1","schema":"storymodel.port.recorded-run-profile/v1"}

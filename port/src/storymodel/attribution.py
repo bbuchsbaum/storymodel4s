@@ -7,7 +7,7 @@ from pydantic import model_validator
 
 from .identity import IdentityResult, MentionIdentity, resolve_text_identity
 from .model import (
-    Context,
+    AnyContext,
     Digest,
     Evidence,
     Model,
@@ -15,6 +15,7 @@ from .model import (
     Participation,
     State,
     Support,
+    _has_holder,
     _validate_instance,
     contained_in,
 )
@@ -108,7 +109,7 @@ def resolve_context_holders(
 ) -> AttributionResult:
     """Collapse all candidate mentions by verified identity; one open candidate forces abstention.
 
-    This text profile accepts proposals for reported, believed and intended contexts. It
+    This text profile accepts proposals only for holder-bearing contexts. It
     validates evidence ownership, not semantic entailment or automatic speaker discovery.
     Invalid proposals refuse the batch; omitted contexts remain explicitly unattempted.
     """
@@ -123,7 +124,7 @@ def resolve_context_holders(
     by_context = {p.context: p for p in supplied.contexts}
     for supplied_proposal in supplied.contexts:
         context = contexts.get(supplied_proposal.context)
-        if context is None or context.kind == "narrated":
+        if context is None or not _has_holder(context):
             raise ValueError("holder proposal requires an existing holder-bearing context")
         if supplied_proposal.status != "completed":
             continue
@@ -146,7 +147,7 @@ def resolve_context_holders(
     holders: list[ContextHolder] = []
     for context in sorted(account.contexts, key=lambda c: c.id):
         proposal = by_context.get(context.id)
-        if context.kind == "narrated":
+        if not _has_holder(context):
             holders.append(ContextHolder(context=context.id, status="not-applicable"))
         elif proposal is None:
             holders.append(
@@ -214,7 +215,7 @@ class AttributedSituation(Model):
     situation: Name
     kind: Literal["event", "state"]
     predicate: Name
-    context: Context
+    context: AnyContext
     holder: ContextHolder
     participants: tuple[Participation, ...]
     evidence: Evidence

@@ -1028,6 +1028,62 @@
         "title": "ContextHolder",
         "type": "object"
       },
+      "ExtendedContext": {
+        "additionalProperties": false,
+        "description": "Additional v5 context kinds keep holderless possibility distinct from unattributed minds.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "desire",
+              "memory",
+              "imagination",
+              "hypothetical",
+              "counterfactual"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Parent"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Support"
+            },
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "side",
+          "kind"
+        ],
+        "title": "ExtendedContext",
+        "type": "object"
+      },
       "MentionIdentity": {
         "additionalProperties": false,
         "description": "One occurrence's identity outcome; open mentions receive no invented referent.",
@@ -1234,7 +1290,15 @@
         "type": "string"
       },
       "context": {
-        "$ref": "#/$defs/Context"
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Context"
+          },
+          {
+            "$ref": "#/$defs/ExtendedContext"
+          }
+        ],
+        "title": "Context"
       },
       "holder": {
         "$ref": "#/$defs/ContextHolder"

@@ -1,4 +1,4 @@
-"""Offline recorded construction of v4 source or recall graphs using the common executor."""
+"""Offline recorded construction of rich source or recall graphs using the common executor."""
 
 from hashlib import sha256
 from pathlib import Path
@@ -8,8 +8,8 @@ from .artifacts import publish_json
 from .execution import RecordedRun, RunProfile
 from .model import Digest, Model, Name, _validate_instance
 from .rich_construction import (
-    RECIPE,
     RichConstructionProposal,
+    RichConstructionProposalV2,
     RichConstructionRequest,
     RichConstructionResult,
     compile_rich_construction,
@@ -37,22 +37,52 @@ def _checked(value: RichConstructionRequest) -> RichConstructionRequest:
 def rich_prompt(value: RichConstructionRequest) -> str:
     """Render the explicitly versioned constructor contract without changing legacy prompts."""
     request = _checked(value)
+    full_contexts = request.schema_version == "storymodel.rich-construction-request/v2"
     return canonical(
         {
-            "recipe": RECIPE,
+            "recipe": request.recipe,
             "request": request.model_dump(mode="json"),
-            "schema": RichConstructionProposal.model_json_schema(),
+            "schema": (
+                RichConstructionProposalV2.model_json_schema()
+                if full_contexts
+                else RichConstructionProposal.model_json_schema()
+            ),
             "instruction": (
-                "Return rich-construction-proposal/v1 with explicit schema_version and every row. "
-                "Use exact quoted UTF-16 evidence, local proposal keys, and the deepest declared "
-                "context scope. Narrated is the root; do not promote attributed content to it. "
-                "States represent conditions, events occurrences; declare state polarity "
-                "and modality, using unknown when unavailable. Location is a participant role of "
-                "an existing local entity. Circumstances are literal time/manner phrases "
-                "within the named situation evidence; do not interpret them as measured clocks, "
-                "dates or durations. No cross-document identity or recall-to-source binding is "
-                "inferred. State unsupported/failed/unattempted/search-limited work explicitly. "
-                "This profile constructs graph claims, not recall detail inventories."
+                (
+                    "Return rich-construction-proposal/v2 with explicit schema_version and "
+                    "every row. Use exact quoted UTF-16 evidence and row-local proposal keys. "
+                    "Narrated is the root. Context scopes must nest strictly or be disjoint; "
+                    "every situation stays in its deepest declared scope. Do not promote "
+                    "attributed content to root-world fact. Additional context kinds are "
+                    "desire, memory, imagination, hypothetical and counterfactual. "
+                    "Hypothetical and counterfactual frames have no holder; do not treat them "
+                    "as unknown speakers. States represent conditions, events occurrences; "
+                    "declare state polarity and modality, using unknown when unavailable. "
+                    "Location is a participant role of an existing local entity. Circumstances "
+                    "are literal time/manner phrases within the situation evidence, not measured "
+                    "clocks, dates or durations. No cross-document identity or recall-to-source "
+                    "binding is inferred. State unsupported/failed/unattempted/search-limited "
+                    "work explicitly. This profile constructs graph claims, not recall detail "
+                    "inventories."
+                )
+                if full_contexts
+                else (
+                    "Return rich-construction-proposal/v1 with explicit schema_version and "
+                    "every row. "
+                    "Use exact quoted UTF-16 evidence, local proposal keys, and the deepest "
+                    "declared "
+                    "context scope. Narrated is the root; do not promote attributed content to it. "
+                    "States represent conditions, events occurrences; declare state polarity "
+                    "and modality, using unknown when unavailable. Location is a participant "
+                    "role of "
+                    "an existing local entity. Circumstances are literal time/manner phrases "
+                    "within the named situation evidence; do not interpret them as measured "
+                    "clocks, "
+                    "dates or durations. No cross-document identity or recall-to-source binding is "
+                    "inferred. State unsupported/failed/unattempted/search-limited work "
+                    "explicitly. "
+                    "This profile constructs graph claims, not recall detail inventories."
+                )
             ),
         }
     )
@@ -61,10 +91,12 @@ def rich_prompt(value: RichConstructionRequest) -> str:
 def _profile(request: RichConstructionRequest) -> RunProfile:
     return RunProfile(
         provider="imported-text",
-        model="supplied-rich-construction/v1",
+        model="supplied-rich-construction/v2"
+        if request.schema_version == "storymodel.rich-construction-request/v2"
+        else "supplied-rich-construction/v1",
         endpoint="offline:import",
         max_tokens=8192,
-        recipe=RECIPE,
+        recipe=request.recipe,
         input_sha256=(digest(request.model_dump(mode="json")),),
     )
 

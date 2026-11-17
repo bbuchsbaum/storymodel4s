@@ -41,8 +41,11 @@ mention stays `outside-held-context`.
 | Holder absent, unresolved or unprocessed | Open `holder-unresolved`; detailed cause remains upstream |
 | Holder belongs to a different document | Open `holder-document-mismatch`; do not merge document-local classes |
 
-An inner context uses its own holder; no implicit parent inheritance is performed. Holders
-are resolved from the unchanged first pass: introducing mentions and resolved third-person
+An inner holder-bearing context uses its own holder; an unresolved holder blocks attachment.
+In [v5 accounts](contexts.md), hypothetical/counterfactual frames have no holder and lookup
+skips them to the nearest holder-bearing ancestor. It never skips an unresolved held frame
+to find a more convenient ancestor. Holders are resolved from the unchanged first pass:
+introducing mentions and resolved third-person
 pronouns. Newly attached first-person mentions cannot become holder evidence in the same run.
 Self-reference or a chain of first-person holders therefore does not bootstrap a new identity.
 This preserves Scala's two-pass rule, rather than introducing an unqualified iterative method.
@@ -72,6 +75,6 @@ storymodel attributed-identity-roles account.json identity-annotations.json hold
 
 This does not infer addressees, plural speaker-group membership or unknown grammatical number.
 Scala's richer number acquisition and third-person number compatibility remain owed, as do
-additional context kinds, automatic holder candidate discovery, playback and attribution-aware
+automatic holder candidate discovery, playback and attribution-aware
 assessment. Existing first-pass identity APIs and schemas remain unchanged. The engineering
 controls establish conditional behavior, not semantic accuracy or full Scala parity.

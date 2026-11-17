@@ -216,13 +216,19 @@ def _resolve_unit(
         schema_version="storymodel.account/v2",
         documents=(document,),
         units=(unit,),
-        contexts=(Context(side="source", kind="narrated"), root, *graph.contexts),
+        contexts=(Context(side="source", kind="narrated"), root, *graph.legacy_contexts()),
         entities=graph.entities,
         events=graph.events,
         details=tuple(details.values()),
         recipe=Recipe(name=RECIPE, input_sha256=(document.sha256,)),
     )
-    return (graph.contexts, graph.entities, graph.events, tuple(details.values()), accepted)
+    return (
+        graph.legacy_contexts(),
+        graph.entities,
+        graph.events,
+        tuple(details.values()),
+        accepted,
+    )
 
 
 def resolve_extraction(value: ExtractionRequest, raw: str) -> ExtractionResult:

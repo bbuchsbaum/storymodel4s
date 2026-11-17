@@ -6,10 +6,12 @@ from dataclasses import dataclass
 from typing import Literal
 
 from .model import (
+    AnyContext,
     Context,
     Document,
     Entity,
     Event,
+    ExtendedContext,
     Model,
     Name,
     Participation,
@@ -34,6 +36,16 @@ class ContextProposal(Model):
 
     key: Name
     kind: Literal["reported", "believed", "intended"]
+    parent: Name
+    cue: Quote
+    scope: Quote
+
+
+class ExtendedContextProposal(Model):
+    """V2 construction adds explicit mental and holderless frames with the same scope contract."""
+
+    key: Name
+    kind: Literal["desire", "memory", "imagination", "hypothetical", "counterfactual"]
     parent: Name
     cue: Quote
     scope: Quote
@@ -130,11 +142,20 @@ def _overlap(a: Span, b: Span) -> bool:
 
 @dataclass(frozen=True)
 class AdmittedGraph:
-    contexts: tuple[Context, ...]
+    contexts: tuple[AnyContext, ...]
     entities: tuple[Entity, ...]
     events: tuple[Event, ...]
     accepted: dict[str, str]
     states: tuple[State, ...] = ()
+
+    def legacy_contexts(self) -> tuple[Context, ...]:
+        """Narrow only after checking, so legacy constructors cannot discard an extended frame."""
+        result = []
+        for context in self.contexts:
+            if not isinstance(context, Context):
+                raise ValueError("legacy construction cannot consume extended contexts")
+            result.append(context)
+        return tuple(result)
 
 
 def admit_graph(
@@ -142,7 +163,7 @@ def admit_graph(
     unit: Unit,
     root: Context,
     *,
-    context_proposals_input: tuple[ContextProposal, ...],
+    context_proposals_input: tuple[ContextProposal | ExtendedContextProposal, ...],
     entity_proposals_input: tuple[EntityProposal, ...],
     event_proposals_input: tuple[EventProposal, ...],
     unresolved: tuple[UnresolvedClaim | RichUnresolvedClaim, ...],
@@ -176,7 +197,7 @@ def admit_graph(
     for claim in unresolved:
         evidence(claim.evidence)
     context_proposals = {c.key: c for c in context_proposals_input}
-    contexts = {ROOT: root}
+    contexts: dict[str, AnyContext] = {ROOT: root}
     pending = dict(context_proposals)
     while pending:
         ready = sorted(k for k, c in pending.items() if c.parent in contexts)
@@ -192,15 +213,17 @@ def admit_graph(
                 or c.scope.span == context_proposals[c.parent].scope.span
             ):
                 raise ValueError("nested context must have a strictly narrower scope within parent")
-            contexts[key] = Context(
-                side=document.side,
-                kind=c.kind,
-                parent=contexts[c.parent].id,
-                evidence=(cue,),
-            )
+            if isinstance(c, ExtendedContextProposal):
+                contexts[key] = ExtendedContext(
+                    side=document.side, kind=c.kind, parent=contexts[c.parent].id, evidence=(cue,)
+                )
+            else:
+                contexts[key] = Context(
+                    side=document.side, kind=c.kind, parent=contexts[c.parent].id, evidence=(cue,)
+                )
     # A scope must be a tree: overlapping siblings or undeclared spatial nesting is ambiguous.
     ordered = sorted(context_proposals_input, key=lambda c: (c.scope.span.start, -c.scope.span.end))
-    stack: list[ContextProposal] = []
+    stack: list[ContextProposal | ExtendedContextProposal] = []
     for c in ordered:
         while stack and stack[-1].scope.span.end <= c.scope.span.start:
             stack.pop()

@@ -21,6 +21,7 @@ from .model import (
     Name,
     State,
     Support,
+    _holder_scope,
     _validate_instance,
     contained_in,
 )
@@ -250,15 +251,18 @@ def resolve_text_identity(value: SupportedAccount, raw: str) -> IdentityResult:
         if current_annotation is None or current_annotation.form != "pronominal":
             continue
         if current_annotation.person != "third":
-            # No accepted placement/holder contract exists yet; nearby speaker roles are not it.
-            kinds = {context_by_id[c].kind for c in mention_contexts.get(mention, ())}
+            # The base pass records placement eligibility; the explicit second pass uses holders.
+            held = {
+                _holder_scope(c, context_by_id) is not None
+                for c in mention_contexts.get(mention, ())
+            }
             reasons[mention] = (
                 "context-unknown"
-                if not kinds
+                if not held
                 else "outside-held-context"
-                if kinds == {"narrated"}
+                if held == {False}
                 else "holder-not-supplied"
-                if "narrated" not in kinds
+                if held == {True}
                 else "ambiguous-context"
             )
             continue

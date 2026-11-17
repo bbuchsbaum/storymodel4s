@@ -487,3 +487,26 @@ upstream result. Deliberate correction: unknown number remains open rather than 
 as singular. Ambiguous placements and cross-document holder identity refuse attachment.
 [Contract](held-identity.md). Addressee/group inference, richer number acquisition and
 third-person compatibility, full context vocabulary, playback and assessment remain owed.
+
+## P2 full context vocabulary (2026-11-17)
+
+Reference: `story/nodes.scala` ContextKind/heldBy and `document/compiler.scala` speechHolderOf
+nearest held step, with the existing context placement and two-pass identity suites.
+Python extends one `RichAccount` model to v5 with disjoint additional context records and an
+explicit v2 recorded constructor. Mote: `bd-01M7ME0KMK58W71YTPKTD7FEGY`.
+
+Desire, memory and imagination accept checked holder proposals; hypothetical and counterfactual
+are holderless. Identity skips holderless ancestors but stops at unresolved held frames.
+The existing Python refusal of ambiguous actual placements is retained, rather than Scala's
+first-placement selection. Context IDs remain unchanged under explicit v4-to-v5 upgrade.
+Pairing preserves every collection, selects v5 for any v5 input and keeps independent sides.
+Public JSON/object boundaries enforce vocabulary versions. The pre-change v1 recording and
+prompt replay unchanged; legacy Account/Context/proposal schemas are frozen.
+
+The [example](../examples/context_workflow.py) constructs one source and two recalls, derives
+holders/identity, admits details and runs local alignment with non-root diagnostics. Every new
+kind has a producer and inspection consumer. Combined rich JSON Schemas broaden; cross-field
+version correlations remain runtime checks. [Contract](contexts.md). Playback, automatic form/
+holder acquisition, attribution-aware assessment and other P2–P6 obligations remain owed.
+Earlier gap lists above are historical slice boundaries; this entry closes their context-kind
+gap only. No executed Scala runtime comparison or semantic accuracy is claimed.

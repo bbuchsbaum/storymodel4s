@@ -436,6 +436,62 @@
         "title": "Event",
         "type": "object"
       },
+      "ExtendedContext": {
+        "additionalProperties": false,
+        "description": "Additional v5 context kinds keep holderless possibility distinct from unattributed minds.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "desire",
+              "memory",
+              "imagination",
+              "hypothetical",
+              "counterfactual"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Parent"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Support"
+            },
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "side",
+          "kind"
+        ],
+        "title": "ExtendedContext",
+        "type": "object"
+      },
       "Hypothesis": {
         "additionalProperties": false,
         "description": "A single, joint, broad or external reference; no invented probability.",
@@ -712,11 +768,14 @@
       },
       "RichAccount": {
         "additionalProperties": false,
-        "description": "V4 adds states and circumstances without silently changing old snapshots or prompts.",
+        "description": "Rich snapshots share one graph; v5 explicitly adds the full context vocabulary to v4.",
         "properties": {
           "schema_version": {
-            "const": "storymodel.account/v4",
             "default": "storymodel.account/v4",
+            "enum": [
+              "storymodel.account/v4",
+              "storymodel.account/v5"
+            ],
             "title": "Schema Version",
             "type": "string"
           },
@@ -736,7 +795,14 @@
           },
           "contexts": {
             "items": {
-              "$ref": "#/$defs/Context"
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Context"
+                },
+                {
+                  "$ref": "#/$defs/ExtendedContext"
+                }
+              ]
             },
             "title": "Contexts",
             "type": "array"
@@ -1466,6 +1532,62 @@
         "title": "Event",
         "type": "object"
       },
+      "ExtendedContext": {
+        "additionalProperties": false,
+        "description": "Additional v5 context kinds keep holderless possibility distinct from unattributed minds.",
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "source",
+              "recall"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "desire",
+              "memory",
+              "imagination",
+              "hypothetical",
+              "counterfactual"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Parent"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/Support"
+            },
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "side",
+          "kind"
+        ],
+        "title": "ExtendedContext",
+        "type": "object"
+      },
       "Hypothesis": {
         "additionalProperties": false,
         "description": "A single, joint, broad or external reference; no invented probability.",
@@ -1782,11 +1904,14 @@
       },
       "RichAccount": {
         "additionalProperties": false,
-        "description": "V4 adds states and circumstances without silently changing old snapshots or prompts.",
+        "description": "Rich snapshots share one graph; v5 explicitly adds the full context vocabulary to v4.",
         "properties": {
           "schema_version": {
-            "const": "storymodel.account/v4",
             "default": "storymodel.account/v4",
+            "enum": [
+              "storymodel.account/v4",
+              "storymodel.account/v5"
+            ],
             "title": "Schema Version",
             "type": "string"
           },
@@ -1806,7 +1931,14 @@
           },
           "contexts": {
             "items": {
-              "$ref": "#/$defs/Context"
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Context"
+                },
+                {
+                  "$ref": "#/$defs/ExtendedContext"
+                }
+              ]
             },
             "title": "Contexts",
             "type": "array"
