@@ -222,3 +222,15 @@ nonpending assessments. Rejected alternatives: converting fixed-question claim s
 grades, remapping during assessment, overwriting prior judgments, copying the validator, or
 silently relaxing evidence ownership to reproduce a whole-film study script. Neighbor-aware and
 cross-target graded assessment remain explicit future contracts. See [fidelity](fidelity.md).
+
+## Explicit source scene grouping and correspondence control (2026-11-17)
+
+Provisional implementation choice: group existing unparented source rows into exact-support
+scene containers before pairing. Return an input-bound receipt with old-to-new row IDs because
+parent membership is already part of unit identity. Preserve non-unit graph collections and
+expose the resulting account to existing mapping/analysis consumers. Rejected alternatives:
+manually building internal units in every workflow, using a hull that invents gap evidence,
+changing the existing identity rule, or silently rewriting paired/mapped artifacts. This is a
+small source grouping operation; full narrative hierarchy remains owed. The connected
+[correspondence control](correspondence-workflow.md) executes both reference routes separately
+and records which results are computed versus scripted.

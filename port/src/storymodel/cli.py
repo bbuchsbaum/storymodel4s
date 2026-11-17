@@ -53,6 +53,7 @@ from .relations import admit_relations, relation_table
 from .rich_account import RichAccount, situation_table, validate_rich_account
 from .rich_construction import prepare_rich_construction
 from .rich_workflow import RichRecording, import_rich, read_rich_request, replay_rich, rich_prompt
+from .scenes import SceneGroup, group_source_rows
 from .sequence import infer_sequence, validate_sequence, verify_sequence
 from .source import SourceRow, prepare_source
 from .source_workflow import (
@@ -268,6 +269,14 @@ def main(argv: list[str] | None = None) -> int:
     relation_inspect.add_argument("account")
     relation_inspect.add_argument("--expected-sha256")
     relation_inspect.add_argument("--output")
+    scene_group = commands.add_parser(
+        "group-source-rows", help="group source rows with explicit identity remapping"
+    )
+    scene_group.add_argument("account")
+    scene_group.add_argument("groups")
+    scene_group.add_argument("--expected-sha256")
+    scene_group.add_argument("--account-only", action="store_true")
+    scene_group.add_argument("--output")
     fidelity_prepare = commands.add_parser(
         "prepare-fidelity", help="prepare a separate graded review of pending hypotheses"
     )
@@ -359,6 +368,23 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "schema":
             emit(
                 {"account": Account.model_json_schema(), "analysis": Analysis.model_json_schema()},
+                args.output,
+            )
+        elif args.command == "group-source-rows":
+            scene_account = read_supported_account(
+                Path(args.account), expected_sha256=args.expected_sha256
+            )
+            if scene_account.export_permission != "allowed":
+                raise PermissionError("producer denies scene grouping export")
+            scene_data = strict_json(Path(args.groups).read_bytes())
+            if not isinstance(scene_data, list):
+                raise ValueError("scene groups must be a JSON array")
+            scene_groups = tuple(
+                SceneGroup.model_validate_json(canonical(group)) for group in scene_data
+            )
+            grouped = group_source_rows(scene_account, scene_groups)
+            emit(
+                (grouped.account if args.account_only else grouped).model_dump(mode="json"),
                 args.output,
             )
         elif args.command == "prepare-fidelity":

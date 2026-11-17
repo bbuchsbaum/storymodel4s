@@ -349,3 +349,25 @@ and full P3 correspondence remain owed. No question count is presented as accura
   does not convert fixed-question assessments into grades, infer semantic truth, establish
   assessor accuracy or finish recurring-scene correspondence. Event/episode targets, remaining
   semantic channels and reassessment history remain owed.
+
+## Recurring-cast correspondence and source scene grouping
+
+- **Actual path:** `examples/correspondence_workflow.py` constructs source and recall accounts,
+  uses new `group_source_rows`, admits details, computes sparse structural diagnostics, replays
+  direct mapping and conditional graded fidelity, and consumes results with `project` and
+  separate fixed-question claim accounting. Two reordered recalls reuse the same source.
+- **Behavior checked:** repeated cast with different actions, repeated actions with different
+  manner, role swaps, changed manner, joint/broad/alternative references, explicit external
+  destinations, revisits with distinct occurrence IDs, and unit-only prompt equality under
+  reordering. Graph absence remains not-attempted; it is not converted to unresolved/external.
+- **Source grouping:** uses the existing row/scene and parent contract from `Unit`; exact unions
+  preserve gaps, prior membership is not overwritten, and the receipt exposes reidentified row
+  IDs. Source-only preconditions prevent implicit migration of already mapped accounts. Full
+  Scala `story` hierarchy remains a separate retained capability, not claimed by this helper.
+- **Consumer evidence:** recorded source-row coverage is present/present/uncertain/absent.
+  Removing definite supported credit leaves uncertainty; incomplete inventory withholds absence.
+  Fidelity changes do not change address or recall classification. Original source bytes,
+  non-unit graph collections and existing reference choices survive the full path.
+- **Limits:** the sparse reference algorithm is executed; direct-reference and grading replies
+  are scripted engineering controls, not an accuracy comparison. Semantic/embedding channels,
+  event/episode grain, richer graph families and whole-film/neighbor-aware assessment remain owed.
