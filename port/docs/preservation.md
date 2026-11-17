@@ -553,3 +553,24 @@ It does not claim Scala's complete candidate/gap taxonomy or relation algebra: c
 relations, deeper shared temporal scopes, causal epistemic/cross-context semantics, generic
 entity relations, primary hierarchy, native links and grouping remain owed. Generic part_of
 never becomes primary containment. No new Scala execution or semantic accuracy is claimed.
+
+## Primary narrative hierarchy and computational grouping
+
+Bead `bd-01M7MMADTJKM1AJ0C6A7MMGK7Y`: [primary hierarchy](hierarchy.md) constructs nested
+source/recall groups from explicit account-bound membership. New segments derive exact text/
+native support unions and stable member-based identity; original account occurrences stay
+unchanged. Checked queries and v2 source projection/local evidence consume the same hierarchy.
+
+Scala references: `story/hierarchy.scala` primary parents/roots/ancestors/descendants/situations;
+`story/relations.scala` primary containment separate from generic relations; `StoryValidator`
+hierarchy section and `ValidatorSuite` root, empty-segment, reachability, cycle, level and
+single-parent cases. Python derives levels and improves text containment from a hull check to
+exact-union containment. Existing unit-parent assertions remain binding. Partial forests retain
+roots/unrooted anchors and a reason; structural completeness never certifies upstream extraction.
+
+Acceptance witnesses: independent expected tree/query results, native gaps/points/foreign axes,
+occurrence/label stability, incomplete and invalid forests, saved artifact forgery refusal,
+generated segment nomination/scoring and independently calculated hierarchy transition weights.
+Preserve v1 projection replay; qualify installed API/CLI through one source and two recalls.
+Auxiliary membership, boundary beliefs, summary/credence semantics, native numerical consumers
+and full relation vocabulary remain owed; none is excluded by this slice.

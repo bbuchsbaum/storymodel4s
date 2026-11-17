@@ -8,11 +8,12 @@ from __future__ import annotations
 
 import math
 from collections import defaultdict
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal, Self
 
-from pydantic import Field
+from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, model_validator
 
-from .model import Digest, Model, Name, _validate_instance, contained_in, text_evidence
+from .hierarchy import HierarchySpec, build_hierarchy
+from .model import Digest, Model, Name, Support, _validate_instance, contained_in, text_evidence
 from .rich_account import SupportedAccount, require_text_account
 from .sequence import (
     Finite,
@@ -70,13 +71,32 @@ class SemanticLink(Model):
 class SourceProjectionPolicy(Model):
     """Declare scoring coordinates and primary containment instead of inferring either silently."""
 
-    recipe: Literal["account-source-layers/v1"] = "account-source-layers/v1"
+    recipe: Literal["account-source-layers/v1", "account-source-layers/v2"] = (
+        "account-source-layers/v1"
+    )
+    hierarchy: HierarchySpec | None = None
     scoring_documents: tuple[Name, ...] = ()
     # Each situation has at most one declared primary row parent. Row/scene parents
     # already live in the account. Generic situation part_of is deliberately not read.
     memberships: dict[Name, Name] = Field(default_factory=dict)
     entity_fanout: Annotated[int, Field(ge=0)] = 8
     semantic_links: tuple[SemanticLink, ...] = ()
+
+    @model_validator(mode="after")
+    def hierarchy_contract(self) -> Self:
+        if self.recipe == "account-source-layers/v1":
+            if "hierarchy" in self.model_fields_set or self.hierarchy is not None:
+                raise ValueError("hierarchy field requires source projection v2")
+        elif self.hierarchy is None or self.memberships:
+            raise ValueError("projection v2 requires hierarchy and forbids legacy memberships")
+        return self
+
+    @model_serializer(mode="wrap")
+    def historical_wire(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        data: dict[str, Any] = handler(self)
+        if self.recipe == "account-source-layers/v1":
+            data.pop("hierarchy", None)
+        return data
 
 
 class SourceNode(Model):
@@ -100,7 +120,9 @@ class SourceLayerEdge(SemanticLink):
 class SourceProjection(Model):
     """An account-bound derived snapshot; consumers recompute it before using saved values."""
 
-    schema_version: Literal["storymodel.source-projection/v1"] = "storymodel.source-projection/v1"
+    schema_version: Literal[
+        "storymodel.source-projection/v1", "storymodel.source-projection/v2"
+    ] = "storymodel.source-projection/v1"
     account_sha256: Digest
     policy: SourceProjectionPolicy
     nodes: tuple[SourceNode, ...]
@@ -191,9 +213,9 @@ def _cover(edges: set[tuple[str, str]]) -> set[tuple[str, str]]:
     return kept
 
 
-def project_source(
+def _project_source_and_supports(
     account: SupportedAccount, policy: SourceProjectionPolicy | None = None
-) -> SourceProjection:
+) -> tuple[SourceProjection, dict[str, tuple[Support, ...]]]:
     """Project source structure without accepting recall-dependent source construction.
 
     Multi-document situations retain explicit relations but have no single text position
@@ -244,11 +266,20 @@ def project_source(
             remaining[parent] -= 1
             if remaining[parent] == 0:
                 leaves.append(parent)
-    nodes = []
-    for anchor in sorted(parents):
-        support = text_evidence(
+    supports = {
+        anchor: text_evidence(
             situations[anchor].evidence if anchor in situations else (units[anchor].support,)
         )
+        for anchor in parents
+    }
+    if selected.hierarchy is not None:
+        hierarchy = build_hierarchy(checked, selected.hierarchy)
+        parents = {n.anchor: n.parent for n in hierarchy.nodes}
+        levels = {n.anchor: n.level for n in hierarchy.nodes}
+        supports = {n.anchor: text_evidence(n.evidence) for n in hierarchy.nodes}
+    nodes = []
+    for anchor in sorted(parents):
+        support = supports[anchor]
         documents = {s.document for s in support}
         document = next(iter(documents)) if len(documents) == 1 else None
         onset = min(s.start for item in support for s in item.spans) if document else None
@@ -329,7 +360,12 @@ def project_source(
             raise ValueError("semantic links require known unique source pairs")
         seen.add(key)
         add("semantic", link.source, link.target, link.weight)
-    return SourceProjection(
+    result = SourceProjection(
+        schema_version=(
+            "storymodel.source-projection/v2"
+            if selected.hierarchy is not None
+            else "storymodel.source-projection/v1"
+        ),
         account_sha256=digest(checked.model_dump(mode="json")),
         policy=selected,
         nodes=tuple(nodes),
@@ -338,6 +374,15 @@ def project_source(
             for (layer, a, b), w in sorted(edges.items())
         ),
     )
+
+    return result, supports
+
+
+def project_source(
+    account: SupportedAccount, policy: SourceProjectionPolicy | None = None
+) -> SourceProjection:
+    """Project checked source structure; v2 consumes explicit identity-preserving hierarchy."""
+    return _project_source_and_supports(account, policy)[0]
 
 
 def verify_source_projection(

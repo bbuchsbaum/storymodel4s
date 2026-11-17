@@ -352,3 +352,15 @@ Reject caller-manufactured IDs, first-match label resolution, trusting copied ac
 implicit before edges from adjacency and a second relation validator. Existing bounded relation
 semantics stay versioned; full Scala temporal/causal/hierarchy behavior remains owed.
 [Contract](construction-links.md).
+
+## Primary narrative hierarchy (P2/P4, 2026-11-17)
+
+Provisional implementation choice: an account-bound grouping artifact derives segments from
+resolved members and exact support unions; membership never changes occurrence identity.
+Retain existing Unit.parent edges and reject conflicting declarations. Derived levels and
+strict text-union containment correct caller-controlled levels and hull-based acceptance.
+V2 source projection and local evidence share its segment/support catalog; v1 receipts stay
+stable. Rejected alternatives: account v7 solely for derived grouping, rewriting Unit.parent,
+a second graph model, manually supplied group supports, silently combining competing hierarchy
+policies, and an inspection-only artifact with no computational consumer. Auxiliary membership
+and boundary beliefs remain owed. [Contract](hierarchy.md).

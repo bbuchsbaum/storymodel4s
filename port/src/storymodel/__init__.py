@@ -53,6 +53,20 @@ from .held_identity import (
     resolve_attributed_identity,
     verify_attributed_identity,
 )
+from .hierarchy import (
+    HierarchyGroup,
+    HierarchyNode,
+    HierarchyQuery,
+    HierarchyRef,
+    HierarchyResult,
+    HierarchySegment,
+    HierarchySpec,
+    SituationMembership,
+    build_hierarchy,
+    prepare_hierarchy,
+    query_hierarchy,
+    verify_hierarchy,
+)
 from .identity import identity_role_table, resolve_text_identity, verify_identity
 from .local_evidence import (
     LocalEvidenceSpec,
@@ -126,6 +140,18 @@ from .source_workflow import SourceRecording, import_source, replay_source
 __version__ = "0.1.0"
 
 __all__ = [
+    "HierarchyGroup",
+    "HierarchyNode",
+    "HierarchyQuery",
+    "HierarchyRef",
+    "HierarchyResult",
+    "HierarchySegment",
+    "HierarchySpec",
+    "SituationMembership",
+    "build_hierarchy",
+    "prepare_hierarchy",
+    "query_hierarchy",
+    "verify_hierarchy",
     "MediaSource",
     "PlaybackSupport",
     "TickInterval",

@@ -176,6 +176,138 @@
         "title": "FillTarget",
         "type": "object"
       },
+      "HierarchyGroup": {
+        "additionalProperties": false,
+        "description": "An explicit grouping proposal; its exact support is derived from its members.",
+        "properties": {
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "scene",
+              "episode",
+              "story",
+              "arc"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/$defs/HierarchyRef"
+            },
+            "minItems": 1,
+            "title": "Members",
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "kind",
+          "members"
+        ],
+        "title": "HierarchyGroup",
+        "type": "object"
+      },
+      "HierarchyRef": {
+        "additionalProperties": false,
+        "description": "Resolve an actual account anchor or a proposal-local group name, never a text label.",
+        "properties": {
+          "kind": {
+            "enum": [
+              "anchor",
+              "group"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "key"
+        ],
+        "title": "HierarchyRef",
+        "type": "object"
+      },
+      "HierarchySpec": {
+        "additionalProperties": false,
+        "description": "Account-bound primary grouping; partial construction is distinct from a complete tree.",
+        "properties": {
+          "schema_version": {
+            "const": "storymodel.hierarchy-spec/v1",
+            "default": "storymodel.hierarchy-spec/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "account_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Account Sha256",
+            "type": "string"
+          },
+          "groups": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/HierarchyGroup"
+            },
+            "title": "Groups",
+            "type": "array"
+          },
+          "memberships": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/SituationMembership"
+            },
+            "title": "Memberships",
+            "type": "array"
+          },
+          "completeness": {
+            "default": "complete",
+            "enum": [
+              "complete",
+              "partial"
+            ],
+            "title": "Completeness",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reason"
+          },
+          "expected_root": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/HierarchyRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "account_sha256"
+        ],
+        "title": "HierarchySpec",
+        "type": "object"
+      },
       "ReconstructionDecision": {
         "additionalProperties": false,
         "description": "Raw state maximum, raw anchor maximum and chosen-anchor mass are distinct values.",
@@ -558,6 +690,28 @@
         "title": "SequenceState",
         "type": "object"
       },
+      "SituationMembership": {
+        "additionalProperties": false,
+        "description": "Place an existing semantic occurrence within an observed unit's exact support.",
+        "properties": {
+          "situation": {
+            "minLength": 1,
+            "title": "Situation",
+            "type": "string"
+          },
+          "unit": {
+            "minLength": 1,
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "situation",
+          "unit"
+        ],
+        "title": "SituationMembership",
+        "type": "object"
+      },
       "SourceLayerEdge": {
         "additionalProperties": false,
         "description": "A sparse directed edge keeps its scientific relation layer explicit.",
@@ -690,8 +844,11 @@
         "description": "An account-bound derived snapshot; consumers recompute it before using saved values.",
         "properties": {
           "schema_version": {
-            "const": "storymodel.source-projection/v1",
             "default": "storymodel.source-projection/v1",
+            "enum": [
+              "storymodel.source-projection/v1",
+              "storymodel.source-projection/v2"
+            ],
             "title": "Schema Version",
             "type": "string"
           },
@@ -732,10 +889,24 @@
         "description": "Declare scoring coordinates and primary containment instead of inferring either silently.",
         "properties": {
           "recipe": {
-            "const": "account-source-layers/v1",
             "default": "account-source-layers/v1",
+            "enum": [
+              "account-source-layers/v1",
+              "account-source-layers/v2"
+            ],
             "title": "Recipe",
             "type": "string"
+          },
+          "hierarchy": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/HierarchySpec"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           },
           "scoring_documents": {
             "default": [],
@@ -963,6 +1134,138 @@
           "mass"
         ],
         "title": "FlowStep",
+        "type": "object"
+      },
+      "HierarchyGroup": {
+        "additionalProperties": false,
+        "description": "An explicit grouping proposal; its exact support is derived from its members.",
+        "properties": {
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "scene",
+              "episode",
+              "story",
+              "arc"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/$defs/HierarchyRef"
+            },
+            "minItems": 1,
+            "title": "Members",
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "kind",
+          "members"
+        ],
+        "title": "HierarchyGroup",
+        "type": "object"
+      },
+      "HierarchyRef": {
+        "additionalProperties": false,
+        "description": "Resolve an actual account anchor or a proposal-local group name, never a text label.",
+        "properties": {
+          "kind": {
+            "enum": [
+              "anchor",
+              "group"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "key": {
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "key"
+        ],
+        "title": "HierarchyRef",
+        "type": "object"
+      },
+      "HierarchySpec": {
+        "additionalProperties": false,
+        "description": "Account-bound primary grouping; partial construction is distinct from a complete tree.",
+        "properties": {
+          "schema_version": {
+            "const": "storymodel.hierarchy-spec/v1",
+            "default": "storymodel.hierarchy-spec/v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "account_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Account Sha256",
+            "type": "string"
+          },
+          "groups": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/HierarchyGroup"
+            },
+            "title": "Groups",
+            "type": "array"
+          },
+          "memberships": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/SituationMembership"
+            },
+            "title": "Memberships",
+            "type": "array"
+          },
+          "completeness": {
+            "default": "complete",
+            "enum": [
+              "complete",
+              "partial"
+            ],
+            "title": "Completeness",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reason"
+          },
+          "expected_root": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/HierarchyRef"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "account_sha256"
+        ],
+        "title": "HierarchySpec",
         "type": "object"
       },
       "LocalCell": {
@@ -1997,6 +2300,28 @@
         "title": "SequenceTransition",
         "type": "object"
       },
+      "SituationMembership": {
+        "additionalProperties": false,
+        "description": "Place an existing semantic occurrence within an observed unit's exact support.",
+        "properties": {
+          "situation": {
+            "minLength": 1,
+            "title": "Situation",
+            "type": "string"
+          },
+          "unit": {
+            "minLength": 1,
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "situation",
+          "unit"
+        ],
+        "title": "SituationMembership",
+        "type": "object"
+      },
       "SourceLayerEdge": {
         "additionalProperties": false,
         "description": "A sparse directed edge keeps its scientific relation layer explicit.",
@@ -2129,8 +2454,11 @@
         "description": "An account-bound derived snapshot; consumers recompute it before using saved values.",
         "properties": {
           "schema_version": {
-            "const": "storymodel.source-projection/v1",
             "default": "storymodel.source-projection/v1",
+            "enum": [
+              "storymodel.source-projection/v1",
+              "storymodel.source-projection/v2"
+            ],
             "title": "Schema Version",
             "type": "string"
           },
@@ -2171,10 +2499,24 @@
         "description": "Declare scoring coordinates and primary containment instead of inferring either silently.",
         "properties": {
           "recipe": {
-            "const": "account-source-layers/v1",
             "default": "account-source-layers/v1",
+            "enum": [
+              "account-source-layers/v1",
+              "account-source-layers/v2"
+            ],
             "title": "Recipe",
             "type": "string"
+          },
+          "hierarchy": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/HierarchySpec"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           },
           "scoring_documents": {
             "default": [],

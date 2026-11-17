@@ -171,6 +171,11 @@ def test_group_identity_is_bottom_up_and_legacy_parents_remain_unchanged():
         prepare_hierarchy(account, (leaf, wrapped), completeness="partial", reason="synthetic"),
     )
     assert alone.groups[leaf.key] == together.groups[leaf.key]
+    renamed = leaf.model_copy(update={"key": "renamed"})
+    relabeled = build_hierarchy(
+        account, prepare_hierarchy(account, (renamed,), completeness="partial", reason="synthetic")
+    )
+    assert relabeled.groups["renamed"] == alone.groups[leaf.key]
     assert account.model_dump(mode="json") == before
     assert account.units[1].parent == scene.id
     # A new membership cannot silently override an established legacy parent.
@@ -257,9 +262,10 @@ def test_v2_projection_exposes_generated_segments_and_local_evidence_can_score_t
 
 
 def test_membership_refuses_a_same_document_gap_outside_its_parent_support():
-    document = Document.create("gap", "source", "AA BB")
+    document = Document.create("gap", "source", "AA BB CC")
     root = Context(side="source", kind="narrated")
-    left, right = _support(document, 0, 2), _support(document, 3, 5)
+    left = Support(document=document.id, spans=(Span(start=0, end=2), Span(start=6, end=8)))
+    right = _support(document, 3, 5)
     event = Event(side="source", context=root.id, predicate="BB", evidence=(right,))
     account = make_account(
         (document,), units=(Unit(kind="row", support=left),), contexts=(root,), events=(event,)
@@ -377,10 +383,11 @@ def test_hierarchy_cli_and_schema_snapshot(tmp_path, capsys):
     }
 
 
-def test_native_hierarchy_retains_interval_gaps_points_and_refuses_foreign_axis():
+@pytest.mark.parametrize("side", ["source", "recall"])
+def test_native_hierarchy_retains_interval_gaps_points_and_refuses_foreign_axis(side):
     media = MediaSource(
         key="native",
-        side="source",
+        side=side,
         sha256="a" * 64,
         edition="edition",
         stream="picture",
@@ -390,7 +397,7 @@ def test_native_hierarchy_retains_interval_gaps_points_and_refuses_foreign_axis(
         end_tick="40",
         seconds_per_tick="1/2",
     )
-    root = Context(side="source", kind="narrated")
+    root = Context(side=side, kind="narrated")
     first = PlaybackSupport(
         source=media.id,
         intervals=(TickInterval(start="0", end="5"), TickInterval(start="20", end="25")),
@@ -398,7 +405,7 @@ def test_native_hierarchy_retains_interval_gaps_points_and_refuses_foreign_axis(
     )
     second = PlaybackSupport(source=media.id, intervals=(TickInterval(start="5", end="10"),))
     events = tuple(
-        Event(side="source", context=root.id, predicate=name, evidence=(support,))
+        Event(side=side, context=root.id, predicate=name, evidence=(support,))
         for name, support in (("AA", first), ("BB", second))
     )
     account = validate_rich_account(
@@ -424,8 +431,8 @@ def test_native_hierarchy_retains_interval_gaps_points_and_refuses_foreign_axis(
     )
     assert segment.evidence[0].points == ("2", "10")
     foreign = MediaSource(
-        key="native",
-        side="source",
+        key="other-native",
+        side=side,
         sha256="a" * 64,
         edition="edition",
         stream="picture",
@@ -436,7 +443,7 @@ def test_native_hierarchy_retains_interval_gaps_points_and_refuses_foreign_axis(
         seconds_per_tick="1/2",
     )
     alien = Event(
-        side="source",
+        side=side,
         context=root.id,
         predicate="CC",
         evidence=(PlaybackSupport(source=foreign.id, points=("2",)),),
@@ -448,6 +455,43 @@ def test_native_hierarchy_retains_interval_gaps_points_and_refuses_foreign_axis(
             completeness="partial",
             reason="axis",
         )
+
+    # Register both clocks lawfully: hierarchy still cannot treat equal ticks as one axis.
+    two_axes = validate_rich_account(
+        account.model_copy(
+            update={
+                "media_sources": (media, foreign),
+                "events": (*events, alien),
+                "units": (
+                    Unit(
+                        kind="row" if side == "source" else "recall",
+                        support=PlaybackSupport(
+                            source=foreign.id, intervals=(TickInterval(start="0", end="30"),)
+                        ),
+                    ),
+                ),
+            }
+        )
+    )
+    with pytest.raises(ValueError, match="contain all exact child support"):
+        prepare_hierarchy(
+            two_axes,
+            memberships=(SituationMembership(situation=events[0].id, unit=two_axes.units[0].id),),
+            completeness="partial",
+            reason="incompatible clocks",
+        )
+    all_origins = HierarchyGroup(
+        key="both",
+        kind="story",
+        members=tuple(
+            HierarchyRef(kind="anchor", key=a.id) for a in (*two_axes.events, *two_axes.units)
+        ),
+    )
+    both = build_hierarchy(two_axes, prepare_hierarchy(two_axes, (all_origins,)))
+    assert {support.source for support in both.segments[0].evidence} == {media.id, foreign.id}
+    assert set(query_hierarchy(two_axes, both, both.root).situations) == {
+        e.id for e in two_axes.events
+    }
 
 
 def test_deep_groups_iterate_and_v1_v2_policy_boundaries_are_strict():
@@ -461,7 +505,7 @@ def test_deep_groups_iterate_and_v1_v2_policy_boundaries_are_strict():
         HierarchyGroup(
             key=f"g{n}", kind="story", members=(HierarchyRef(kind="group", key=f"g{n - 1}"),)
         )
-        for n in range(1, 80)
+        for n in range(1, 1050)
     )
     spec = prepare_hierarchy(
         account,
@@ -471,7 +515,7 @@ def test_deep_groups_iterate_and_v1_v2_policy_boundaries_are_strict():
         reason="other roots remain explicit",
     )
     result = build_hierarchy(account, spec)
-    assert len(query_hierarchy(account, result, events[0].id).ancestors) == 81
+    assert len(query_hierarchy(account, result, events[0].id).ancestors) == 1051
     v1 = SourceProjectionPolicy()
     assert "hierarchy" not in json.loads(v1.model_dump_json())
     with pytest.raises(ValueError):

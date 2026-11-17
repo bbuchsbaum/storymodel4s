@@ -64,6 +64,13 @@ from .held_identity import (
     resolve_attributed_identity,
     verify_attributed_identity,
 )
+from .hierarchy import (
+    HierarchyResult,
+    HierarchySpec,
+    build_hierarchy,
+    query_hierarchy,
+    verify_hierarchy,
+)
 from .identity import IdentityResult, identity_role_table, resolve_text_identity
 from .intake_workflow import prepare_time_study_files
 from .local_evidence import (
@@ -478,6 +485,20 @@ def main(argv: list[str] | None = None) -> int:
     )
     sequence_check.add_argument("request")
     sequence_check.add_argument("result")
+    for name in ("build-hierarchy", "verify-hierarchy", "query-hierarchy"):
+        hierarchy = commands.add_parser(name, help="construct or inspect checked primary hierarchy")
+        hierarchy.add_argument("account")
+        hierarchy.add_argument("--expected-sha256")
+        if name == "query-hierarchy":
+            hierarchy.add_argument("result")
+            hierarchy.add_argument("anchor")
+            hierarchy.add_argument("--level", type=int)
+        else:
+            hierarchy.add_argument("spec")
+            if name == "verify-hierarchy":
+                hierarchy.add_argument("result")
+        if name != "verify-hierarchy":
+            hierarchy.add_argument("--output")
     for name in ("build-source-sequence", "verify-source-sequence"):
         source_sequence = commands.add_parser(
             name, help="derive or verify source graph transitions"
@@ -764,6 +785,43 @@ def main(argv: list[str] | None = None) -> int:
                 {"account": Account.model_json_schema(), "analysis": Analysis.model_json_schema()},
                 args.output,
             )
+        elif args.command in ("build-hierarchy", "verify-hierarchy", "query-hierarchy"):
+            hierarchy_account = read_supported_account(
+                Path(args.account), expected_sha256=args.expected_sha256
+            )
+            if (
+                args.command != "verify-hierarchy"
+                and hierarchy_account.export_permission != "allowed"
+            ):
+                raise PermissionError("producer denies hierarchy export")
+            if args.command == "query-hierarchy":
+                saved_hierarchy = HierarchyResult.model_validate_json(
+                    canonical(strict_json(Path(args.result).read_bytes()))
+                )
+                emit(
+                    query_hierarchy(
+                        hierarchy_account, saved_hierarchy, args.anchor, descendant_level=args.level
+                    ).model_dump(mode="json"),
+                    args.output,
+                )
+            else:
+                hierarchy_spec = HierarchySpec.model_validate_json(
+                    canonical(strict_json(Path(args.spec).read_bytes()))
+                )
+                if args.command == "build-hierarchy":
+                    emit(
+                        build_hierarchy(hierarchy_account, hierarchy_spec).model_dump(mode="json"),
+                        args.output,
+                    )
+                else:
+                    hierarchy_verified = verify_hierarchy(
+                        hierarchy_account,
+                        hierarchy_spec,
+                        HierarchyResult.model_validate_json(
+                            canonical(strict_json(Path(args.result).read_bytes()))
+                        ),
+                    )
+                    emit({"valid": True, "account_sha256": hierarchy_verified.account_sha256}, None)
         elif args.command == "group-source-rows":
             scene_account = read_supported_account(
                 Path(args.account), expected_sha256=args.expected_sha256

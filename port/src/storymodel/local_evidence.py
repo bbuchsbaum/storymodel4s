@@ -46,8 +46,8 @@ from .source_transitions import (
     SourceSequenceResult,
     SourceSequenceSpec,
     TransitionWeights,
+    _project_source_and_supports,
     build_source_sequence,
-    project_source,
 )
 
 Function = Literal[
@@ -578,7 +578,7 @@ def derive_local_evidence(
     """Generate local evidence from independent accounts; never alter reference or fidelity."""
     source, recall = require_text_account(source), require_text_account(recall)
     spec = _validate_instance(LocalEvidenceSpec, spec)
-    projection = project_source(source, spec.projection)
+    projection, anchor_supports = _project_source_and_supports(source, spec.projection)
     if not recall.documents or any(d.side != "recall" for d in recall.documents):
         raise ValueError("local evidence requires an independent recall-only account")
     nodes = {n.anchor: n for n in projection.nodes}
@@ -608,18 +608,20 @@ def derive_local_evidence(
             leaves[anchor] = tuple(sorted(found))
         return leaves[anchor]
 
-    for segment in source.units:
-        members = under(segment.id)
+    for segment_id, segment_supports in anchor_supports.items():
+        if segment_id in source_situations:
+            continue
+        members = under(segment_id)
         participants = tuple(
             sorted(
                 set(p for member in members for p in targets[member].participants),
                 key=lambda p: (p[0], tuple(sorted(p[1]))),
             )
         )
-        lemmas = stem_set(_text((text_support(segment.support),), source_docs)) | frozenset(
+        lemmas = stem_set(_text(segment_supports, source_docs)) | frozenset(
             token for _, names in participants for name in names for token in stem_set(name)
         )
-        targets[segment.id] = _Content(None, participants, "narrated", "unknown", "unknown", lemmas)
+        targets[segment_id] = _Content(None, participants, "narrated", "unknown", "unknown", lemmas)
     inverted: dict[tuple[int, str, str], list[str]] = defaultdict(list)
     for anchor, content in targets.items():
         for key in _query(content):
