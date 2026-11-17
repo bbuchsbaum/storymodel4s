@@ -39,8 +39,9 @@ now consumes these results while retaining the original evidence. [Conditional o
 consumes adjacent joint flow, with a separate explicitly independent-row path. Richer evidence
 construction, native media ordering and registered measurement eligibility remain owed.
 Recorded [context-holder resolution](attribution.md) now connects existing text contexts to
-verified identity and event/state inspection. First-person identity consumption, additional
-context families, attribution-aware assessment, playback and semantic channels remain owed. Mote owns
+verified identity and event/state inspection. [Holder-dependent identity](held-identity.md)
+now supplies a checked second pass and final role readout. Additional context families,
+attribution-aware assessment, playback and semantic channels remain owed. Mote owns
 live status; the preservation map records each slice's behavioral coverage and limitations.
 
 Do not require a complete event graph for basic categorical localization. Conversely, graph
@@ -235,6 +236,8 @@ These deliveries sequence P2–P6; the full phase exits above still apply. Build
 construction, correspondence, assessment and account-to-inference paths. Mote owns live status.
 The latest computational baseline includes [organization.json](../evidence/organization.json)
 and [attribution](attribution.md), with its evidence in [attribution.json](../evidence/attribution.json).
+[Holder-dependent identity](held-identity.md) adds the explicit singular-speaker rule;
+[held-identity.json](../evidence/held-identity.json) records its checks and deliberate unknown-number correction.
 These are recorded engineering results, not executed Scala equivalence or a full-parity claim.
 
 | Order | Connected result | Main prerequisite |
@@ -274,10 +277,13 @@ Reconstruction never silently changes categorical reference or fidelity. Organiz
 from an order-sensitive model stays labelled model-conditional, not independent evidence of
 recall organization.
 
-**Next action:** continue delivery 2 by consuming checked holder evidence in first-person identity,
-preserving plural/addressee uncertainty and context boundaries. Recorded holder resolution and
-event/state inspection are implemented; reuse them. Additional context families, attribution-aware
-assessment and playback need functioning construction and consumer paths.
+**Next action:** continue delivery 2 with the retained context families (desire, memory,
+imagination, hypothetical and counterfactual) through versioned construction and their actual
+consumers, then playback evidence. Reuse recorded holder resolution, two-pass identity and
+event/state inspection. Keep holderless contexts distinct from unknown holders, preserve
+existing occurrence IDs across explicit upgrades, and never silently widen old recorded prompts.
+Attribution-aware assessment, richer number acquisition and third-person number compatibility
+remain required consumers/extensions.
 The account-inference, reconstruction and conditional organization path is implemented locally;
 reuse it. Native media order, registered independent-measurement eligibility, refinement and
 richer evidence channels remain owed. Coupled ambiguity bounds stay unsupported unless a valid

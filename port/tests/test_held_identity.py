@@ -297,6 +297,42 @@ def test_context_in_another_document_cannot_merge_document_local_identity():
     assert result.referents[0].members == (account.entities[0].id,)
 
 
+def test_ambiguous_candidates_follow_classes_that_grow_in_the_same_pass():
+    account = fixture(
+        (("source", "source", "AA BB CC DD"),),
+        tuple(
+            ("source", label, ((3 * i, 3 * i + 2),))
+            for i, label in enumerate(("AA", "BB", "CC", "DD"))
+        ),
+        held=("source",),
+    )
+    forms = [
+        annotation(e, account.documents[0], (3 * i, 3 * i + 2), entity_type={"kind": "person"})
+        if i < 2
+        else annotation(
+            e,
+            account.documents[0],
+            (3 * i, 3 * i + 2),
+            form="pronominal",
+            person="first" if i == 2 else "third",
+            number="singular",
+        )
+        for i, e in enumerate(account.entities)
+    ]
+    result = resolve_attributed_identity(
+        account, raw(account, forms), canonical(packet(account, (0,)))
+    )
+    final = mentions(result)
+    grown = next(r for r in result.referents if account.entities[0].id in r.members)
+    assert set(grown.members) == {account.entities[0].id, account.entities[2].id}
+    assert final[account.entities[2].id].referent == grown.id
+    assert set(final[account.entities[3].id].candidates) == {r.id for r in result.referents}
+    assert final[account.entities[3].id].reason == "several-antecedents"
+    assert not set(final[account.entities[3].id].candidates) & {
+        r.id for r in result.attribution.identity.referents
+    }
+
+
 def test_reordered_inputs_and_account_storage_preserve_decisions_after_rebinding():
     account, forms, proposals = prepared()
     first = resolve_attributed_identity(account, raw(account, forms), canonical(proposals))

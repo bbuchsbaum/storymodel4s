@@ -1,0 +1,174 @@
+{
+  "source_commit": "9bc3d01f4d54683c9db2e97a5bda952260d2e672",
+  "bead": "bd-01M7MD01FMK3AFJK1M78BRYZHN",
+  "scope": "Second-pass holder-dependent identity, final class membership and verified event/state role consumption",
+  "deliberate_change": "Scala first-person nonplural branch permits unknown number; Python requires explicit singular and retains speaker-number-unknown with holder candidate.",
+  "checks": {
+    "full_suite": {
+      "command": ".venv/bin/pytest -q",
+      "passed": 746,
+      "seconds": 10.34,
+      "exit_code": 0,
+      "test_file_blob": "eaee10532a29fd75254892fb568fc0455a8eee14",
+      "log_sha256": "5ad53235220f47ca5a48452dc090b58000d5e2a066c54f1966ff2f39e4da9ead"
+    },
+    "mypy_source_files": 47,
+    "ruff_check": "passed",
+    "ruff_format_files": 118,
+    "schema_drift": "passed"
+  },
+  "independent_review": {
+    "agent": "held_identity_review",
+    "commit": "9bc3d01f4d54683c9db2e97a5bda952260d2e672",
+    "verdict": "No BLOCK; recommend acceptance for stated scope",
+    "probes": [
+      "simultaneous class growth and ambiguous third-person final candidate remapping",
+      "malformed tuple/list forgery refusal",
+      "omitted class refusal",
+      "no placement refusal",
+      "mixed narrated/held placement refusal"
+    ],
+    "followup_implemented": "Permanent test_ambiguous_candidates_follow_classes_that_grow_in_the_same_pass added after review; full final746 suite passes. No production change after review.",
+    "limitations": "Reviewer did not repeat parent full suite or mutations; no linguistic accuracy/full parity claim"
+  },
+  "reference_blobs": {
+    "document/src/main/scala/storymodel4s/document/coreference.scala": "d65d25dad9ce0670fb2196c11141719d53344d2d",
+    "document/src/test/scala/storymodel4s/document/EntityIdentitySuite.scala": "c380a8d5ecc862b9c1dbedc0cddb9e34fc4db6b2"
+  },
+  "controls": [
+    "source/recall and v3/v4 event/state preservation",
+    "first singular attaches, plural/unknown/second stay open",
+    "all original holder derivation/processing gaps retained",
+    "malformed or missing form input never rescued",
+    "nested holders differ; no parent inheritance; multiple placements refuse",
+    "first-person holder chains/self-reference do not bootstrap",
+    "resolved third-person holder accepted",
+    "cross-document context cannot merge identity",
+    "storage permutation preserves final decisions/classes after rebinding",
+    "all accepted refs and candidates remap to final classes including simultaneous growth",
+    "saved construction example and API/all3CLI agree",
+    "typed forged result and changed recording refusal",
+    "producer grants before recording reads"
+  ],
+  "mutations": [
+    {
+      "mutation": "unknown-number",
+      "old": "annotation.number == \"singular\"",
+      "new": "annotation.number != \"plural\"",
+      "test": "test_plural_unknown_and_addressee_keep_holder_candidate_without_claiming_identity[first-unknown-speaker-number-unknown]",
+      "controls": [
+        "test_holder_cannot_rescue_missing_or_invalid_form_evidence[missing]",
+        "test_cli_export_denial_precedes_recording_reads[resolve-attributed-identity]"
+      ],
+      "baseline": "3 passed in 0.20s",
+      "mutant": "1 failed, 2 passed in 0.26s",
+      "compiled": true
+    },
+    {
+      "mutation": "second-person",
+      "old": "annotation.person == \"first\" and annotation.number == \"singular\"",
+      "new": "annotation.number == \"singular\"",
+      "test": "test_plural_unknown_and_addressee_keep_holder_candidate_without_claiming_identity[second-singular-needs-addressee]",
+      "controls": [
+        "test_holder_cannot_rescue_missing_or_invalid_form_evidence[missing]",
+        "test_cli_export_denial_precedes_recording_reads[resolve-attributed-identity]"
+      ],
+      "baseline": "3 passed in 0.30s",
+      "mutant": "1 failed, 2 passed in 0.27s",
+      "compiled": true
+    },
+    {
+      "mutation": "ambiguous-placement",
+      "old": "if len(contexts) != 1:",
+      "new": "if False and len(contexts) != 1:",
+      "test": "test_nested_holder_noninheritance_and_ambiguous_placements",
+      "controls": [
+        "test_holder_cannot_rescue_missing_or_invalid_form_evidence[missing]",
+        "test_cli_export_denial_precedes_recording_reads[resolve-attributed-identity]"
+      ],
+      "baseline": "3 passed in 0.22s",
+      "mutant": "1 failed, 2 passed in 0.26s",
+      "compiled": true
+    },
+    {
+      "mutation": "document-boundary",
+      "old": "base_referents[holder.referent].document\n                    != entities[original.mention].origin_document",
+      "new": "False and base_referents[holder.referent].document\n                    != entities[original.mention].origin_document",
+      "test": "test_context_in_another_document_cannot_merge_document_local_identity",
+      "controls": [
+        "test_holder_cannot_rescue_missing_or_invalid_form_evidence[missing]",
+        "test_cli_export_denial_precedes_recording_reads[resolve-attributed-identity]"
+      ],
+      "baseline": "3 passed in 0.20s",
+      "mutant": "1 failed, 2 passed in 0.26s",
+      "compiled": true
+    },
+    {
+      "mutation": "recompute",
+      "old": "if checked != expected:",
+      "new": "if False and checked != expected:",
+      "test": "test_forged_final_classes_decisions_or_upstream_attribution_refuse",
+      "controls": [
+        "test_holder_cannot_rescue_missing_or_invalid_form_evidence[missing]",
+        "test_cli_export_denial_precedes_recording_reads[resolve-attributed-identity]"
+      ],
+      "baseline": "3 passed in 0.21s",
+      "mutant": "1 failed, 2 passed in 0.26s",
+      "compiled": true
+    }
+  ],
+  "mutation_reproduction_python": "from pathlib import Path\nimport os,shutil,subprocess,json\nbase=Path(__file__).resolve().parents[1]\nroot=base/'data/held-identity-mutations';root.mkdir(exist_ok=True)\ncontrols=['test_holder_cannot_rescue_missing_or_invalid_form_evidence[missing]','test_cli_export_denial_precedes_recording_reads[resolve-attributed-identity]']\ncases=[\n ('unknown-number','annotation.number == \"singular\"','annotation.number != \"plural\"','test_plural_unknown_and_addressee_keep_holder_candidate_without_claiming_identity[first-unknown-speaker-number-unknown]'),\n ('second-person','annotation.person == \"first\" and annotation.number == \"singular\"','annotation.number == \"singular\"','test_plural_unknown_and_addressee_keep_holder_candidate_without_claiming_identity[second-singular-needs-addressee]'),\n ('ambiguous-placement','if len(contexts) != 1:','if False and len(contexts) != 1:','test_nested_holder_noninheritance_and_ambiguous_placements'),\n ('document-boundary','base_referents[holder.referent].document\\n                    != entities[original.mention].origin_document','False and base_referents[holder.referent].document\\n                    != entities[original.mention].origin_document','test_context_in_another_document_cannot_merge_document_local_identity'),\n ('recompute','if checked != expected:','if False and checked != expected:','test_forged_final_classes_decisions_or_upstream_attribution_refuse'),\n]\nrecords=[]\nfor name,old,new,test in cases:\n case=root/name;case.mkdir(exist_ok=True)\n shutil.copytree(base/'src/storymodel',case/'storymodel',dirs_exist_ok=True)\n for fn in ['test_identity.py','test_attribution.py','test_held_identity.py']:shutil.copy2(base/'tests'/fn,case/fn)\n env=dict(os.environ,PYTHONPATH=str(case),PYTHONDONTWRITEBYTECODE='1')\n cmd=[str(base/'.venv/bin/python'),'-m','pytest','-q',*[f'test_held_identity.py::{t}' for t in [test,*controls]]]\n record={'mutation':name,'old':old,'new':new,'test':test,'controls':controls}\n for mode in ['baseline','mutant']:\n  if mode=='mutant':\n   path=case/'storymodel/held_identity.py';source=path.read_text();assert source.count(old)==1,(name,source.count(old))\n   path.write_text(source.replace(old,new))\n   subprocess.run([str(base/'.venv/bin/python'),'-m','py_compile',str(path)],check=True)\n   shutil.rmtree(case/'storymodel/__pycache__',ignore_errors=True)\n  result=subprocess.run(cmd,cwd=case,env=env,capture_output=True,text=True)\n  (case/f'{mode}.log').write_text(result.stdout+result.stderr)\n  assert result.returncode==(0 if mode=='baseline' else 1),(name,mode,result.stdout,result.stderr)\n  assert ('3 passed' if mode=='baseline' else '1 failed, 2 passed') in result.stdout,(name,mode,result.stdout)\n  record[mode]=result.stdout.splitlines()[-1]\n record['compiled']=True;records.append(record);print(name,record['mutant'])\n(root/'summary.json').write_text(json.dumps(records,indent=2)+'\\n')\n",
+  "installed": {
+    "wheel_sha256": "97f317fc56ef80243d1d238aa8e6513332fe0640426b07151fd17a58320c7515",
+    "source_commit": "9bc3d01f4d54683c9db2e97a5bda952260d2e672",
+    "result": {
+      "api": {
+        "import": "/Users/bbuchsbaum/code/scala/storymodel4s/port/data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+        "base_members": 2,
+        "final_members": 3,
+        "roles": 3,
+        "base_unchanged": true,
+        "account_unchanged": true,
+        "unknown_number_refused": true
+      },
+      "cli_verification": {
+        "account_sha256": "ce9d3b45410d2baf4b3000e17a333d6599e4bebfc5959cfedc5c8d091cc832fe",
+        "verified": true
+      },
+      "denied_verification": {
+        "account_sha256": "9e7e630d076790bada268910d47387f4ffdbad987b070aca52c9d09e2a6462ff",
+        "verified": true
+      },
+      "cli_api_saved_equal": true,
+      "denied_producers_refuse_before_reading_inputs": true,
+      "artifact_bytes": {
+        "situations.json": 3487,
+        "denied-result.json": 4816,
+        "denied-holders.json": 603,
+        "construction-request.json": 446,
+        "cli.json": 4818,
+        "denied-forms.json": 807,
+        "denied-account.json": 4202,
+        "cli-roles.json": 2432,
+        "account.json": 4204,
+        "attributed-identity.json": 4818,
+        "identity-annotations.json": 808,
+        "attribution.json": 3033,
+        "attributed-identity-roles.json": 2432,
+        "holder-proposals.json": 604,
+        "construction-proposals.json": 1217,
+        "construction-result.json": 5207
+      }
+    },
+    "reproduction_python": "from pathlib import Path\nimport os,subprocess,shutil,tempfile,json\nbase=Path(__file__).resolve().parents[1]\npython=base/'data/wheel-env/bin/python';cli=base/'data/wheel-env/bin/storymodel'\nenv=dict(os.environ);env.pop('PYTHONPATH',None)\nwith tempfile.TemporaryDirectory(prefix='storymodel-held-identity-') as tmp:\n root=Path(tmp);shutil.copy2(base/'examples/attribution_workflow.py',root/'example.py')\n subprocess.run([str(python),'example.py','example'],cwd=root,env=env,check=True)\n directory=root/'example';inputs=['account.json','identity-annotations.json','holder-proposals.json']\n subprocess.run([str(cli),'resolve-attributed-identity',*inputs,'--output','cli.json'],cwd=directory,env=env,check=True)\n check=subprocess.run([str(cli),'verify-attributed-identity',*inputs,'cli.json'],cwd=directory,env=env,check=True,capture_output=True,text=True)\n subprocess.run([str(cli),'attributed-identity-roles',*inputs,'cli.json','--output','cli-roles.json'],cwd=directory,env=env,check=True)\n assert json.loads((directory/'cli.json').read_text())==json.loads((directory/'attributed-identity.json').read_text())\n assert json.loads((directory/'cli-roles.json').read_text())==json.loads((directory/'attributed-identity-roles.json').read_text())\n probe='''import json\nfrom pathlib import Path\nimport storymodel\nfrom storymodel import read_supported_account,resolve_attributed_identity,verify_attributed_identity,attributed_identity_roles\nfrom storymodel.held_identity import AttributedIdentityResult\nfrom storymodel.attribution import AttributionResult\nfrom storymodel.serialization import canonical,digest\nassert 'site-packages' in storymodel.__file__\na=read_supported_account(Path('account.json'));before=a.model_dump_json()\nf=Path('identity-annotations.json').read_text();p=Path('holder-proposals.json').read_text()\nbase=AttributionResult.model_validate_json(Path('attribution.json').read_bytes())\nr=resolve_attributed_identity(a,f,p,attribution=base)\nassert r==AttributedIdentityResult.model_validate_json(Path('cli.json').read_bytes())\nverify_attributed_identity(a,f,p,r)\nrows=attributed_identity_roles(a,f,p,r)\nassert len(r.referents)==1 and len(r.referents[0].members)==3\nassert len(r.attribution.identity.referents[0].members)==2\nassert rows[-1].identity.rule=='speech-holder/v1'\nassert r.attribution==base and a.model_dump_json()==before\n# Unknown number is a deliberate refusal, not a silent singular default.\nunknown=json.loads(f);unknown['mentions'][-1]['number']='unknown'\nu=resolve_attributed_identity(a,canonical(unknown),p)\nlast=next(m for m in u.mentions if m.mention==a.entities[-1].id)\nassert last.reason=='speaker-number-unknown' and last.referent is None\n# Private computation/verifier does not grant export.\ndenied=a.model_copy(update={'export_permission':'denied'});sha=digest(denied.model_dump(mode='json'))\nforms=json.loads(f);holders=json.loads(p);forms['account_sha256']=holders['account_sha256']=sha\nforms=canonical(forms);holders=canonical(holders);private=resolve_attributed_identity(denied,forms,holders)\nassert private.attribution.export_permission=='denied'\nfor name,text in [('denied-account',denied.model_dump_json()),('denied-forms',forms),('denied-holders',holders),('denied-result',private.model_dump_json())]:Path(name+'.json').write_text(text)\nprint(json.dumps({'import':storymodel.__file__,'base_members':2,'final_members':3,'roles':len(rows),'base_unchanged':True,'account_unchanged':True,'unknown_number_refused':True}))\n'''\n api=subprocess.run([str(python),'-c',probe],cwd=directory,env=env,check=True,capture_output=True,text=True)\n private=subprocess.run([str(cli),'verify-attributed-identity','denied-account.json','denied-forms.json','denied-holders.json','denied-result.json'],cwd=directory,env=env,check=True,capture_output=True,text=True)\n for command in ['resolve-attributed-identity','attributed-identity-roles']:\n  args=[str(cli),command,'denied-account.json','missing-forms','missing-holders']\n  if command=='attributed-identity-roles':args.append('missing-result')\n  refusal=subprocess.run([*args,'--output','refused.json'],cwd=directory,env=env,capture_output=True,text=True)\n  assert refusal.returncode==2 and 'producer denies attribution export' in refusal.stderr\n  assert not (directory/'refused.json').exists()\n result={'api':json.loads(api.stdout),'cli_verification':json.loads(check.stdout),'denied_verification':json.loads(private.stdout),'cli_api_saved_equal':True,'denied_producers_refuse_before_reading_inputs':True,'artifact_bytes':{p.name:p.stat().st_size for p in directory.glob('*.json')}}\n (base/'data/held-identity-installed.json').write_text(json.dumps(result,indent=2)+'\\n');print(json.dumps(result,indent=2))\n"
+  },
+  "remaining": [
+    "desire/memory/imagination/hypothetical/counterfactual construction and consumers",
+    "richer number acquisition and third-person compatibility",
+    "addressee and speaker-group inference",
+    "automatic holder candidate acquisition",
+    "playback evidence",
+    "attribution-aware assessment",
+    "full P2-P6 behavioral parity"
+  ]
+}
