@@ -503,6 +503,37 @@ Results, as change in bits (tune / confirm):
 - **The binding limit is the confirm half's wide scene band.** With five participants the
   smallest two-sided sign-flip p is 0.0625.
 
+### Hill-climbing rounds 2 and 3 (2026-11-17; protocol revised before scoring)
+
+**Protocol revision (owner).** This change was made after round 1 showed that five participants
+per half cannot pass small gains.
+- **Pooled test.** A lever with no parameters, or with parameters fitted leave-one-participant-
+  out, is tested pooled over all ten development participants. It passes if both hold:
+  - the exact two-sided sign-flip test gives p ≤ 0.01 (in practice at least 9/10 wins); and
+  - its effect exceeds the pooled band, ±2 SE of sample 2 minus sample 1 on the same rows.
+- **Prompt or producer changes** keep the tune/confirm split.
+
+**Round 2 (free, cache-only).**
+1. **Two-sample ensembling:** the samples' distributions are averaged per row, against the mean
+   of their bits. No parameters.
+2. **Sharpening:** τ on located mass over the grid 1.0, 1.25, …, 3.0, applied to the ensemble
+   forecast. Each participant's τ is the one that minimises the mean of the scene, work and film
+   terms over the other nine participants. It is compared against the ensemble at τ = 1.
+
+**Round 3 (paid; budget 100 fresh calls).** Decision rule, recorded before any call.
+- **(b) The search-for-next sentence.** Pass 1 `v1b` changes one sentence of v1: the frame holds
+  until the speaker moves on, except that speech searching for what came next has no frame.
+  - **Isolation.** It uses full-run sample 1's per-call layout, seed and salt, so the sentence
+    is the only change. Pass-2 answers are reused per unit where the frame film is unchanged;
+    only items whose film changes are called fresh. This departs from "layout prefix" so that
+    the comparison stays isolated.
+  - **Kept if,** on both the tune five and the report five, the non-film mass on memory-search
+    rows rises, or the film term improves, beyond its half band; and the scene term does not
+    worsen beyond its band.
+- **(a) A context window of 3.** Projected at about 48 calls per half for the change, plus about
+  48 for a prefix reference on the report five: about 144 calls. That exceeds the budget left
+  after (b), so (a) is not run and is deferred.
+
 **Gaps for the vocabulary ADR.**
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the
