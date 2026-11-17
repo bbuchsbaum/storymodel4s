@@ -115,6 +115,60 @@ def test_header_is_checked_but_crlf_and_extra_published_columns_are_retained():
     assert source.header[-1] == "Additional published field"
 
 
+@pytest.mark.parametrize("start", [19, 21])
+def test_scan_break_continuity_is_checked_after_raw_pin_update(start):
+    changed = raw().replace(b"4\t20\t30", f"4\t{start}\t30".encode())
+    declaration = json.loads(repair_for(changed))
+    declaration["missingnessAndTails"]["scanBreakRows"][0]["startSeconds"] = start
+    with pytest.raises(ValueError, match="without gaps or overlaps"):
+        prepare_sherlock_source("sherlock", changed, json.dumps(declaration).encode())
+
+
+def test_notebook_offset_matches_actual_ordinary_end_not_only_other_declarations():
+    # Make every dependent declaration and checksum agree on 19. The actual final
+    # ordinary row still ends at 20; that disagreement alone must refuse intake.
+    changed = raw().replace(b"4\t20\t30", b"4\t19\t30")
+    declaration = json.loads(repair_for(changed))
+    declaration["missingnessAndTails"]["scanBreakRows"][0]["startSeconds"] = 19
+    declaration["repair"]["offsetSeconds"]["run-2"] = 19
+    declaration["coordinateSystems"][1]["runs"][0]["ordinaryEndSeconds"] = 19
+    declaration["coordinateSystems"][3]["endSeconds"] = 31
+    declaration["missingnessAndTails"]["partA"]["retainedNotebookAnnotationEndSeconds"] = 19
+    declaration["missingnessAndTails"]["partA"]["retainedNotebookAnnotationToMediaTailSeconds"] = (
+        11.4
+    )
+    for boundary in declaration["repair"]["boundaryChecks"][1:]:
+        boundary["repairedStartSeconds"] = boundary["rawStartSeconds"] + 19
+        boundary["repairedEndSeconds"] = boundary["rawEndSeconds"] + 19
+    serialized = (
+        "0001\trun-1\t0\t10\t0\t10\t1\t7\n"
+        "0002\trun-1\t10\t20\t10\t20\t8\t14\n"
+        "0003\trun-1\t20\t20\t20\t20\t14\t14\n"
+        "0005\trun-2\t0\t5\t19\t24\t21\t24\n"
+        "0006\trun-2\t5\t12\t24\t31\t25\t29\n"
+    )
+    declaration["repair"]["serializationReceipt"]["sha256"] = sha256(
+        serialized.encode()
+    ).hexdigest()
+    with pytest.raises(ValueError, match="ordinary run-1 end"):
+        prepare_sherlock_source("sherlock", changed, json.dumps(declaration).encode())
+
+
+def test_missing_provenance_is_not_an_equal_pair():
+    declaration = json.loads(repair())
+    declaration["repair"].pop("id")
+    declaration["coordinateSystems"][3].pop("derivationReceipt")
+    with pytest.raises(ValueError, match="repair/id"):
+        prepare_sherlock_source("sherlock", raw(), json.dumps(declaration).encode())
+
+
+def test_experimental_edition_binding_cannot_be_weakened():
+    declaration = json.loads(repair())
+    declaration["coordinateSystems"][0]["experimentalEditionBinding"] = "unestablished"
+    with pytest.raises(ValueError, match="experimentalEditionBinding"):
+        prepare_sherlock_source("sherlock", raw(), json.dumps(declaration).encode())
+
+
 @pytest.mark.parametrize(
     ("edit", "message"),
     [

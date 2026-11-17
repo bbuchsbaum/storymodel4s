@@ -440,6 +440,11 @@ def _validate_repair(
         edition_id,
         "media-part-local-seconds/experimentalEditionReceipt",
     )
+    _equal(
+        _field(local, "experimentalEditionBinding", "media-part-local-seconds"),
+        "owner-declared-and-byte-identified",
+        "media-part-local-seconds/experimentalEditionBinding",
+    )
     local_parts = _list(
         _field(local, "parts", "media-part-local-seconds"), "media-part-local-seconds/parts"
     )
@@ -626,6 +631,7 @@ def _validate_notebook(
     parts: list[SherlockPart],
 ) -> None:
     block = _mapping(_field(repair, "repair", "record"), "repair")
+    repair_id = _string(_field(block, "id", "repair"), "repair/id")
     drops = _list(_field(block, "dropSourceRows", "repair"), "repair/dropSourceRows")
     if not drops or any(type(row) is not int for row in drops) or drops != sorted(set(drops)):
         _fail("repair/dropSourceRows must be unique ordered rows")
@@ -661,7 +667,11 @@ def _validate_notebook(
     ordinary_end = _integer(
         _field(raw_one, "ordinaryEndSeconds", "raw run one"), "raw run one/ordinaryEndSeconds"
     )
-    if second_offset != ordinary_end or second_offset > run_one[0]["annotationEndSeconds"]:
+    if (
+        second_offset != ordinary_end
+        or second_offset != rows[ordinary[1] - 1].raw_end_seconds
+        or second_offset > run_one[0]["annotationEndSeconds"]
+    ):
         _fail("run-2 offset must equal ordinary run-1 end")
     assignments = _list(_field(block, "runAssignment", "repair"), "repair/runAssignment")
     if len(assignments) != 2:
@@ -722,7 +732,8 @@ def _validate_notebook(
         or notebook.get("rowCount") != retained
         or notebook.get("startSeconds") != 0
         or notebook.get("endSeconds") != second_offset + run_two[0]["annotationEndSeconds"]
-        or notebook.get("derivationReceipt") != block.get("id")
+        or _string(_field(notebook, "derivationReceipt", "notebook"), "notebook/derivationReceipt")
+        != repair_id
     ):
         _fail("notebook derived-axis declaration disagrees")
     boundary_checks = _list(_field(block, "boundaryChecks", "repair"), "repair/boundaryChecks")
@@ -817,6 +828,7 @@ def _validate_notebook(
     breaks = _list(_field(tails, "scanBreakRows", "tails"), "tails/scanBreakRows")
     if len(breaks) != len(drops):
         _fail("tail declaration omits scan breaks")
+    previous_end = second_offset
     for dropped, declared in zip(drops, breaks, strict=True):
         row = rows[dropped - 1]
         item = _mapping(declared, "scan break")
@@ -827,6 +839,11 @@ def _validate_notebook(
             or item.get("trBounds") != "missing"
         ):
             _fail("scan break declaration differs from raw row")
+        if row.raw_start_seconds != previous_end:
+            _fail("scan breaks must continue from ordinary run-1 end without gaps or overlaps")
+        previous_end = row.raw_end_seconds
+    if previous_end != run_one[0]["annotationEndSeconds"]:
+        _fail("scan breaks must finish at raw run-1 end")
     for part, name, run in zip(parts, ("partA", "partB"), parsed_runs, strict=True):
         tail = _mapping(_field(tails, name, "tails"), f"tails/{name}")
         if not _scaled_equals(
