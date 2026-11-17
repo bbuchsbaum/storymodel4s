@@ -229,6 +229,51 @@ was silent. These are declarations, not owner decisions.
     destinations.
   - A remark with no framed work is the non-film commentary state.
 
+### Revision 2026-11-17 (after the ML, linguistics and visualization critiques)
+
+Each rule below is switched in `scorer-config.json` (`rules`, with the previous values in
+`old_rules`) and covered by a named known-answer test and a discriminating mutant.
+
+- **Fallback: the frame film first** (`fallback: frame-film`). A row's unassigned mass is
+  spread over the producer's own pass-1 frame for the row's words, then by duration within the
+  film. Words without a frame keep the duration prior. A null producer, with no references and
+  no frames, scores the baseline exactly. The primary epsilon stays 0.01; 0.001 and 0.05 are a
+  sensitivity check only.
+- **Talk type is orthogonal to address** (`talk: orthogonal`). Commentary, evaluation and
+  metamemory, including memory search, carry no address mass. Giving up counts as metamemory,
+  and fragments are treated the same way. Each is typed non-addressed talk, a ledger count and
+  never a destination, unless the reply anchors a reference to film content. Off-task speech is
+  the non-film state `off_task`.
+  - **What the cached replies cannot separate:** a pass-1 `work` unit may name a film or only
+    evaluate one. Two variants are reported: `identifying` (default), where a framed or
+    positioned `work` unit is a work-level reference, and `position-only`.
+  - **Crosswalk to the gold's codes** (the gold does not define this vocabulary):
+
+    | Our talk / address | FilmFestival gold code |
+    |---|---|
+    | narration with a scene address | specific (scene set) |
+    | identification (work-level) | film-only (`movie*1000`) |
+    | metamemory inside a framed film | film-search (scene -1) |
+    | metamemory with no framed film | memory search (-1) or gave up (-2) |
+    | off task | off task (0) |
+    | commentary, fragment | no code of their own: the gold codes the surrounding stretch |
+- **Cross-scene broad references go to their scene set** (`cross_scene_broad: scene-set`).
+  Mass is spread within the set by the fallback, restricted to the set. The work node is used
+  only when a span cannot be bounded to scenes.
+- **The film-level baseline is each participant's LOPO non-film rate**
+  (`film_level_baseline: lopo`, alpha 0.5). Every forecast's non-film level uses this rate.
+- **Baselines.**
+  - The order oracle is relabelled `gold_context_ceiling`; it reads the previous gold row.
+  - `gold_context_fitted` is the same ceiling with stay and next-in-presentation-order rates
+    fitted leave-one-participant-out, then frozen.
+  - `hmm_tfidf` is a sequential non-oracle forecast: an HMM over scenes in presentation order
+    with TF-IDF emissions `exp(8 cos)`, filtered on recall words only.
+  - `pass1_only` is the frame film, then duration within it.
+- **The two-level outline renders an occurrence's parts in order** (`part-order`). The first
+  Sherlock two-level run used `start-only`, which sorted rows by seconds only and so interleaved
+  Sherlock's two parts. It is kept for exact replay. The two orders agree whenever each
+  occurrence has one segment, which is the FilmFestival case.
+
 **Gaps for the vocabulary ADR.**
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the
