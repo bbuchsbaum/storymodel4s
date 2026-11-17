@@ -77,6 +77,7 @@ completed port or evidence of scientific accuracy or measured speedup over Scala
 - [Recorded direct mapping](docs/direct-mapping.md): unit-only reference and conditional fidelity.
 - [Rich accounts](docs/rich-accounts.md): checked states, literal circumstances and recorded construction.
 - [Rich detail workflow](docs/rich-detail-workflow.md): recorded graphs through details, mapping and views.
+- [Sparse sequence inference](docs/sequence-inference.md): posterior, transition flow and best paths over supplied numerical inputs.
 - [Design decisions](docs/decisions.md): provisional choices and rejected alternatives.
 - [Reference snapshot](docs/references.json): exact source revisions and file hashes.
 

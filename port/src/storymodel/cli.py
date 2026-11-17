@@ -39,6 +39,7 @@ from .relations import admit_relations, relation_table
 from .rich_account import RichAccount, situation_table, validate_rich_account
 from .rich_construction import prepare_rich_construction
 from .rich_workflow import RichRecording, import_rich, read_rich_request, replay_rich, rich_prompt
+from .sequence import infer_sequence, validate_sequence, verify_sequence
 from .source import SourceRow, prepare_source
 from .source_workflow import (
     SourceRecording,
@@ -276,10 +277,29 @@ def main(argv: list[str] | None = None) -> int:
     align.add_argument("--policy-file")
     align.add_argument("--account-only", action="store_true")
     align.add_argument("--output")
+    sequence = commands.add_parser("infer-sequence", help="infer from sparse numeric inputs")
+    sequence.add_argument("request")
+    sequence.add_argument("--output")
+    sequence_check = commands.add_parser(
+        "verify-sequence", help="recompute a saved result against its independent input"
+    )
+    sequence_check.add_argument("request")
+    sequence_check.add_argument("result")
     args = parser.parse_args(argv)
     try:
         if args.command == "example":
             emit(example_account().model_dump(mode="json"), args.output)
+        elif args.command in ("infer-sequence", "verify-sequence"):
+            sequence_request = validate_sequence(Path(args.request).read_bytes())
+            if args.command == "infer-sequence":
+                if sequence_request.export_permission != "allowed":
+                    raise PermissionError("producer denies sequence result export")
+                emit(infer_sequence(sequence_request).model_dump(mode="json"), args.output)
+            else:
+                verified_sequence = verify_sequence(
+                    sequence_request, Path(args.result).read_bytes()
+                )
+                emit({"valid": True, "request_sha256": verified_sequence.request_sha256}, None)
         elif args.command == "schema":
             emit(
                 {"account": Account.model_json_schema(), "analysis": Analysis.model_json_schema()},

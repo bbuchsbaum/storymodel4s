@@ -222,3 +222,28 @@ snapshot-bound, so only the later mapping step has the unit-only input condition
 No existing details or completed inventories are silently replaced. Revision workflows, rich
 grouping/summaries, remaining graph families, full structured alignment and the rest of P3–P6
 remain owed. A connected bounded workflow is not full parity or a scientific accuracy result.
+
+## P4.1 supplied-transition sequence inference
+
+Bead `bd-01M7KVBD5K6101NP5DG2P2QK1M`: [sparse sequence inference](sequence-inference.md)
+ports the numerical forward/backward, adjacent-flow and Viterbi path from `GraphHsmm.run`
+in `align/hsmm.scala`. It consumes explicitly supplied per-unit states, finite costs and sparse
+stochastic transition distributions. `align/matrix.scala` supplies the faithful/distorted/
+external distinctions; `align/facets.scala` supplies the ten distortion facets. Input checking
+does not assert that an anchor belongs to a scientific account or has passed `LocalEvidence`.
+
+The three-unit seven-state `StructuralWeightSuite` oracle enumerates all 343 paths independently
+of dynamic programming. Additional direct-path cases cover varying layers, unreachable states,
+zero edges, numeric ties and wide cost cancellation. The installed example saves exact inputs
+and results; CLI readback recomputes the complete result. Checked posterior/flow marginals and
+source-state identity do not alone prove the inference result, hence input-bound verification.
+
+Python improves cancellation handling with Decimal log messages and centered binary64
+transcendental summation. A small versioned numerical tie tolerance and a digest fallback for
+ambiguous rendered state keys are explicit differences from Scala's raw float/key comparison.
+Old categorical and mapping artifacts are unchanged. Scientific posterior calibration and
+the value of graph priors are not established by this engineering port.
+
+Still owed: graph-feature transition construction, local-evidence and mode gates, refinement,
+reconstruction/decision policies, richer alignment methods and feature/measurement consumers.
+This kernel preserves the numerical path-weight model, not full Graph-HSMM workflow parity.

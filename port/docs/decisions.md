@@ -150,3 +150,15 @@ mapping envelopes share the resolver while preserving the v1 wire contract. Reje
 downgrading away states, replacing prior details implicitly, labeling limited work complete, or
 concatenating discontinuous quotes into words not present in the input. The acquisition profile
 declares its full-snapshot input; it does not borrow the later mapper's unit-only claim.
+
+P4.1 sparse sequence kernel (2026-11-17): separate supplied numerical states/costs/transitions
+from account-specific evidence and graph transition builders. Use typed anchored modes and
+external states, sparse edge lists, and content-derived state identity. Rejected alternatives:
+requiring another graph framework or translating Scala's collection/typeclass hierarchy.
+Keep wide Decimal log messages with centered binary64 log-sum-exp so a costly prefix can recover
+after later evidence; float conversion precedes neither that cancellation nor Viterbi comparison.
+Rejected alternative: ordinary float log-space alone, which erases 3:1 odds when equal-total-cost
+paths trade a cost of 1e20 across units. This improves a numerical weakness without changing the
+path-weight model. The versioned recipe declares near-tie handling, roundoff normalization and
+finite binary64 absolute-log output limits. Posterior output is not calibrated confidence;
+account mode gates, graph-derived transitions and refinement remain separate required work.
