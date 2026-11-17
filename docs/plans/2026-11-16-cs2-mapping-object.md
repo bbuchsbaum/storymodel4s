@@ -242,8 +242,14 @@ Each rule below is switched in `scorer-config.json` (`rules`, with the previous 
 - **Talk type is orthogonal to address** (`talk: orthogonal`). Commentary, evaluation and
   metamemory, including memory search, carry no address mass. Giving up counts as metamemory,
   and fragments are treated the same way. Each is typed non-addressed talk, a ledger count and
-  never a destination, unless the reply anchors a reference to film content. Off-task speech is
-  the non-film state `off_task`.
+  never a destination, unless the reply anchors a reference to film content.
+  - **Correction, made after seeing the film term** (owner, 2026-11-17). The first build also
+    treated memory search between films, giving up and off-task speech as non-addressed talk.
+    The FilmFestival film term then fell (skill vs duration 0.145 to 0.053), and the 83
+    non-film rows rose to 5.33 bits. These three are non-film *states*: typed destinations
+    among the plan's address classes, not talk about a film. They are restored as non-film
+    destinations. Rule B applies only to evaluation, commentary and metamemory inside a framed
+    film, and to fragments.
   - **What the cached replies cannot separate:** a pass-1 `work` unit may name a film or only
     evaluate one. Two variants are reported: `identifying` (default), where a framed or
     positioned `work` unit is a work-level reference, and `position-only`.
@@ -254,7 +260,8 @@ Each rule below is switched in `scorer-config.json` (`rules`, with the previous 
     | narration with a scene address | specific (scene set) |
     | identification (work-level) | film-only (`movie*1000`) |
     | metamemory inside a framed film | film-search (scene -1) |
-    | metamemory with no framed film | memory search (-1) or gave up (-2) |
+    | non-film state: memory search between films | memory search (-1) |
+    | non-film state: gave up | gave up (-2) |
     | off task | off task (0) |
     | commentary, fragment | no code of their own: the gold codes the surrounding stretch |
 - **Cross-scene broad references go to their scene set** (`cross_scene_broad: scene-set`).

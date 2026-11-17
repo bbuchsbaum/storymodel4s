@@ -670,10 +670,10 @@ def convert_session(
     """Word cells of one session; adds its references to `refs`.
 
     rules['talk']: 'orthogonal' (owner, 2026-11-17; default) or 'state-map-v1' (previous).
-    Under 'orthogonal' talk type is a field, not an address: commentary, metamemory (memory
-    search, giving up) and fragments are non-addressed talk (TalkSample: a ledger count) unless
-    the reply anchors a reference to film content; off-task speech is the non-film state
-    off_task; a pass-1 'work' unit is identification (rules['talk_work_variant'] =
+    Under 'orthogonal' talk type is a field, not an address: commentary, metamemory inside a
+    framed film and fragments are non-addressed talk (TalkSample: a ledger count) unless the
+    reply anchors a reference to film content; memory search between films (no frame), giving
+    up and off-task speech are non-film states (destinations); a pass-1 'work' unit is identification (rules['talk_work_variant'] =
     'identifying': a framed or positioned unit is a work-level reference) or, under
     'position-only', only a positioned unit is. `framing` receives each framed unit's pass-1
     frame and `unit_talk` each unit's talk type."""
@@ -743,12 +743,16 @@ def convert_session(
             elif kind == "work":
                 talk = "commentary"  # names no work it can be resolved to
                 sample_of = talk_only(uid, wids, talk)
-            elif kind in ("memory_search", "gave_up", "fragment"):
-                if kind == "fragment":
-                    conv["fragment_words"] += len(wids)
+            elif kind == "memory_search" and top is not None:
+                sample_of = talk_only(uid, wids, talk)  # metamemory inside a framed film
+            elif kind == "fragment":
+                conv["fragment_words"] += len(wids)
                 sample_of = talk_only(uid, wids, talk)
-            elif kind == "off_task":
-                sample_of = {w: StateSample(uid, "off_task") for w in wids}
+            elif kind in ("memory_search", "gave_up", "off_task"):
+                # correction 2026-11-17: memory search between films (no frame), giving up and
+                # off-task speech are non-film STATES, typed destinations of the plan's address
+                # classes, not talk about a film
+                sample_of = {w: StateSample(uid, kind) for w in wids}
         else:
             raise ValueError(f"unknown talk rule {talk_rule!r}")
         if kind == "content" and i in items_by_k:

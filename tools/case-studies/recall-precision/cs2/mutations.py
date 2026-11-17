@@ -306,8 +306,8 @@ MUTANTS = [
         id="M34",
         guard="rule talk 'orthogonal': memory search (even framed) is non-addressed talk",
         file="cs2/ff_producer.py",
-        edits=[('            elif kind in ("memory_search", "gave_up", "fragment"):\n',
-                '            elif kind in ("gave_up", "fragment"):\n')],
+        edits=[('            elif kind == "memory_search" and top is not None:\n',
+                '            elif kind == "memory_search" and False:\n')],
         test="test_talk_is_orthogonal_and_non_addressed_talk_has_no_mass",
     ),
     dict(
@@ -340,6 +340,16 @@ MUTANTS = [
         file="cs2/baselines.py",
         edits=[('            work[prev.work] += rates["stay"]\n', "            work[prev.work] += 0.0\n")],
         test="test_gold_context_fitted_known_answer",
+    ),
+    dict(
+        id="M39",
+        guard="correction: unframed memory search, giving up and off task are non-film states",
+        file="cs2/ff_producer.py",
+        edits=[('                sample_of = {w: StateSample(uid, kind) for w in wids}\n'
+                '        else:\n            raise ValueError(f"unknown talk rule {talk_rule!r}")\n',
+                '                sample_of = talk_only(uid, wids, "metamemory")\n'
+                '        else:\n            raise ValueError(f"unknown talk rule {talk_rule!r}")\n')],
+        test="test_non_film_states_are_destinations_not_talk",
     ),
     dict(
         id="M16",

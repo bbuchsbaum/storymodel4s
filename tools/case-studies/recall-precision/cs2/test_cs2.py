@@ -982,15 +982,15 @@ def test_talk_is_orthogonal_and_non_addressed_talk_has_no_mass():
     comp, cells, refs, conv, framing, talk = _orthogonal_session(
         frames, answers, {2: dict(oid="o2"), 3: dict(oid="o3")})
     kinds = [type(c.sample).__name__ for c in cells[::2]]
-    assert kinds == ["TalkSample", "TalkSample", "TalkSample", "Uncovered", "StateSample",
+    assert kinds == ["TalkSample", "StateSample", "TalkSample", "Uncovered", "StateSample",
                      "RefSample", "TalkSample"], kinds
     assert type(cells[7].sample).__name__ == "RefSample"  # the anchored word
     assert refs[cells[7].sample.ref].talk == "commentary"
     assert isinstance(refs[cells[10].sample.ref], WorkReference)
-    assert conv["non_addressed_words"] == {"metamemory": 4, "commentary": 2, "fragment": 2}
+    assert conv["non_addressed_words"] == {"metamemory": 2, "commentary": 2, "fragment": 2}
     assert talk[("P", "s", "P:s:u0")] == "metamemory" and framing[("P", "s", "P:s:u0")]
     acc = Account(comp, refs, {("P", "s"): cells})
-    ld = LocationDistribution.from_words(acc, cells, [Bin(0, 1.5), Bin(1.5, 3.5)])
+    ld = LocationDistribution.from_words(acc, cells, [Bin(0, 1.5), Bin(4, 5.5)])
     assert [r.state for r in ld.rows] == ["only_non_addressed", "only_non_addressed"]
 
 
@@ -1099,6 +1099,23 @@ def test_hmm_tfidf_filters_on_recall_words():
         close(math.fsum(fc.work.values()), 1.0)
     order = B.presentation_order(comp, CFG)
     assert order == [1, 2, 6, 7, 8, 9, 10, 3, 4]  # A@p1, B, C, then A@p2; title scene 5 dropped
+
+
+def test_non_film_states_are_destinations_not_talk():
+    # correction 2026-11-17: memory search between films (no frame), giving up and off task are
+    # non-film states with mass; memory search inside a framed film stays non-addressed talk
+    frames = [dict(kind="memory_search", frame=[], position=None),
+              dict(kind="gave_up", frame=[], position=None),
+              dict(kind="off_task", frame=[], position=None),
+              dict(kind="memory_search", frame=[("B", 0.8)], position=None)]
+    comp, cells, refs, _, _, _ = _orthogonal_session(frames, {}, {})
+    states = [c.sample.state if type(c.sample).__name__ == "StateSample" else None
+              for c in cells[::2]]
+    assert states == ["memory_search", "gave_up", "off_task", None], states
+    assert type(cells[6].sample).__name__ == "TalkSample"
+    acc = Account(comp, refs, {("P", "s"): cells})
+    row = LocationDistribution.from_words(acc, cells, [Bin(0, 1.5)]).rows[0]
+    assert row.mass == {("nonfilm", "memory_search"): 1.0}
 
 
 # ---------------------------------------------------------------- runner
