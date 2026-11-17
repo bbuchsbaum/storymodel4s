@@ -36,8 +36,9 @@ construction is owed independently of whether it improves localization accuracy.
 | P5 — Operate studies and close specialized coverage | Reuse study adapters, providers, perception, semantic representations and interview workflows. | Documented installed commands for retained studies and specialized capabilities, replay/recovery and interoperability evidence. |
 | P6 — Inspect and demonstrate full parity | Finish the React inspection workflow and close the capability-level audit. | Saved investigations, permission-checked exports, executed Python equivalents of all retained Scala workflows. |
 
-P2 → P3 is the immediate critical path. P4 numerical ports can begin once their representations
-are stable; they need not wait for live provider integration. P5 adapter work starts alongside
+P2 → P3 is sequencing guidance: start P3's lightweight direct route as soon as its
+source/account boundary is stable, without waiting for every P2 enrichment. P4 numerical ports
+can begin once their representations are stable; they need not wait for live provider integration. P5 adapter work starts alongside
 P2 for the first corpus, then expands after P3. A minimal P6 artifact inspector starts after P3;
 visual refinement stays late. Full completion requires all retained capabilities, including
 those scheduled later—not just P2–P3 or the initial synthetic path.
@@ -221,3 +222,12 @@ proof precedes scientific claims, but scientific qualification must not block un
 
 The next implementation starts at P2.1. Do not spend another iteration strengthening a lexical
 matcher while its source event universe is still manually constructed.
+
+Tracked first slices (Mote owns status):
+
+- P2.1 source construction: `bd-01M7KKCY94B9NWXAQSFM15EQ66`.
+- P2.2 first slice, typed relation admission: `bd-01M7KKF5KXSN6V0MA8KRSF7XF5`.
+- P2.3 first slice, cross-unit mention identity: `bd-01M7KKFRRB3PRM7GK9QE9F6M4Z`.
+
+The latter two depend on P2.1's source construction contract. Remaining P2 families receive
+bounded implementation beads as that contract settles; they remain explicit phase obligations.

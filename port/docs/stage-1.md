@@ -1,8 +1,8 @@
 # Stage 1: preserve a complete workflow and test a simpler implementation
 
 **Continuation:** [Port roadmap](roadmap.md) is the current execution direction after the
-computational foundation. This document retains the initial pilot acceptance criteria;
-unfinished inspection and qualification obligations carry forward rather than disappear.
+computational foundation. Correctness, inspection and qualification obligations carry forward.
+The original conditional expansion rules are superseded below.
 
 **Planning date:** 2026-11-16. **Scope:** one Python package and a narrow React/TypeScript
 workbench under `port/`. **Planning bead:** `bd-01M7K75VHV71V6GGAXEDD8QNFY`.
@@ -181,23 +181,17 @@ Required gates:
   TypeScript checks and focused browser tests. Report totals, skips, commands and actual exits.
   Hosted CI and scientific qualification are separate claims.
 
-Proposed speed criterion, to freeze before measurement: at least a twofold reduction in
-median warm edit-to-focused-check latency for each matched task, and lower total effort to
-reach the reviewed user-visible result for both tasks. Report the ratios independently;
-do not hide a regression in one task with an average. This is a decision rule for a small
-engineering pilot, not an assertion that the threshold has already been met.
+The original conditional expansion decision is **superseded** by the owner's full working
+capability commitment and the [port roadmap](roadmap.md). Correctness, compatibility and
+inspection obligations above remain owed. Corpus, AMR, kernel, decoder and Atlas capability
+coverage is scheduled work, not an optional later scope decision. Retirement, publication
+and scientific claims still require their own evidence and authorization.
 
-- **Continue selectively:** correctness passes, the speed criterion passes, and migration cost
-  looks recoverable for the remaining work. Choose the next user workflow, not a module census.
-- **Revise the design:** correctness passes but speed is mixed, or validation/UI duplication
-  grows. Adjust the small implementation or compare the focused Scala alternative.
-- **Stop expansion:** a required distinction is lost, durable replay/inspection cannot be
-  preserved economically, or the measured gain does not justify migration. Preserve the pilot
-  and usable imported assets; do not delete the Scala implementations.
-
-Full corpus coverage, provider accuracy, calibrated uncertainty, a complete Atlas replacement,
-all AMR/kernel/decoder algorithms and retirement of existing APIs belong to later decisions.
-The full event-graph ambition remains intact; Stage 1 proves a small working construction path.
+The proposed twofold warm edit-to-check improvement remains an optional benchmark target,
+not a prerequisite to further implementation. Freeze matched tasks before measurement and
+report latency and total effort separately. Mixed speed results should improve the design;
+they do not silently cancel the authorized capability goal. No speed advantage is claimed
+until measured. Preserve the Scala reference throughout the port.
 
 ## Evidence and handoff
 

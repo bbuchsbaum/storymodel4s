@@ -51,8 +51,10 @@ Freeze expected behavior before timing. Keep exact parity cases separate from de
 changed schemas/estimators. An unsupported legacy feature is a typed refusal with a reason,
 not dropped data or an invented neutral value.
 
-The first expansion decision belongs after Stage 1 evidence. Passing the pilot authorizes
-a recommendation; it does not itself merge, publish, retire APIs, move data or replace Atlas.
+The owner has authorized expansion toward full working capability; the roadmap sequences it.
+Pilot speed criteria no longer gate that commitment. Evidence still determines correctness
+and scientific/productivity claims. Expansion does not itself authorize merging, publication,
+API retirement, data moves or replacing the deployed Atlas.
 
 First computational workflow (2026-11-16): port the strict film/time interpretation using
 supplied recall units and independent numerical source registries, with recorded raw text
