@@ -450,7 +450,7 @@ def prepare_recall_utf8(key: str, raw: bytes) -> PreparedRecall:
 
 def validate_prepared_recall(value: PreparedRecall) -> PreparedRecall:
     """Recompute a public artifact, refusing forged ``model_copy`` or stale derived fields."""
-    checked = PreparedRecall.model_validate_json(canonical(value.model_dump(mode="json")))
+    checked = PreparedRecall.model_validate(value)
     rebuilt = prepare_recall(checked.key, checked.raw_text)
     if canonical(rebuilt.model_dump(mode="json")) != canonical(checked.model_dump(mode="json")):
         raise ValueError("prepared recall differs from deterministic intake")

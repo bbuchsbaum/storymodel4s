@@ -52,14 +52,14 @@ def allocate(
     Bins must be ordered and nonoverlapping. Uncovered support remains unallocated.
     """
     quantity = rational(value)
-    checked = Interval.model_validate_json(support.model_dump_json())
+    checked = Interval.model_validate(support)
     start, end = rational(checked.start), rational(checked.end)
     if mode not in ("held-level", "uniform-amount"):
         raise ValueError("unknown allocation")
     result: list[TemporalCell] = []
     previous: Fraction | None = None
     for raw in bins:
-        cell = Interval.model_validate_json(raw.model_dump_json())
+        cell = Interval.model_validate(raw)
         lo, hi = rational(cell.start), rational(cell.end)
         if cell.clock != checked.clock:
             raise ValueError("foreign clock")

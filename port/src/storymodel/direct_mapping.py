@@ -93,12 +93,11 @@ def _details(request: _MappingRequestFields) -> tuple[Detail, ...]:
 
 def validate_mapping_request(value: MappingInput | str | bytes) -> MappingInput:
     """Revalidate nested copied objects before generating prompts or changing bindings."""
-    raw = (
-        canonical(value.model_dump(mode="json"))
-        if isinstance(value, _MappingRequestFields)
-        else value
-    )
-    parsed = strict_json(raw)
+    if isinstance(value, RichMappingRequest):
+        return RichMappingRequest.model_validate(value)
+    if isinstance(value, MappingRequest):
+        return MappingRequest.model_validate(value)
+    parsed = strict_json(value)
     if not isinstance(parsed, dict):
         raise ValueError("mapping request must be a JSON object")
     if parsed.get("schema_version") == "storymodel.mapping-request/v2":
@@ -453,7 +452,7 @@ def resolve_mapping(value: MappingInput, raw: str) -> MappingOutput:
 def verify_mapping(value: MappingInput, raw: str, receipt: MappingOutput) -> MappingOutput:
     """Recompute receipts, evidence and bindings from independently supplied original inputs."""
     result_class = RichMappingResult if isinstance(receipt, RichMappingResult) else MappingResult
-    checked = result_class.model_validate_json(canonical(receipt.model_dump(mode="json")))
+    checked = result_class.model_validate(receipt)
     expected = resolve_mapping(value, raw)
     if checked != expected:
         raise ValueError("mapping result differs from recorded inputs")

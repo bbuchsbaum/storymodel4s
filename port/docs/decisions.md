@@ -162,3 +162,12 @@ paths trade a cost of 1e20 across units. This improves a numerical weakness with
 path-weight model. The versioned recipe declares near-tie handling, roundoff normalization and
 finite binary64 absolute-log output limits. Posterior output is not calibrated confidence;
 account mode gates, graph-derived transitions and refinement remain separate required work.
+
+Public object validation (2026-11-17): validate supplied Pydantic instances recursively with
+`model_validate` before serialization, while raw JSON retains duplicate-key/nonfinite parsing
+and strict schema validation. Rejected alternative: serializing copied/constructed objects and
+then validating the JSON. That can coerce Boolean numeric fields into integers/floats and drop
+unknown fields before a validator sees them. The earlier sequence review exposed the defect;
+`AlignmentPolicy.max_candidates=True` reproduced it in an older consumer. This repair changes
+invalid-object refusal, not valid artifact schemas, identities or replay hashes. Typed mapping
+instances retain their declared version instead of disguising a forged version through JSON.

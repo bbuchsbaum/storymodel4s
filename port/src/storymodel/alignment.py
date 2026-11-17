@@ -70,8 +70,9 @@ class AlignmentPolicy(Model):
 
 
 def validate_policy(value: AlignmentPolicy | str | bytes) -> AlignmentPolicy:
-    raw = canonical(value.model_dump(mode="json")) if isinstance(value, AlignmentPolicy) else value
-    return AlignmentPolicy.model_validate_json(canonical(strict_json(raw)))
+    if isinstance(value, AlignmentPolicy):
+        return AlignmentPolicy.model_validate(value)
+    return AlignmentPolicy.model_validate_json(canonical(strict_json(value)))
 
 
 class RoleMatch(Model):
@@ -366,10 +367,11 @@ def align_account(value: Account, policy: AlignmentPolicy | None = None) -> Alig
 
 def verify_alignment(original: Account, result: AlignmentResult | str | bytes) -> AlignmentResult:
     """Recompute diagnostics and bindings against the original input before trusting a receipt."""
-    raw = (
-        canonical(result.model_dump(mode="json")) if isinstance(result, AlignmentResult) else result
+    checked = (
+        AlignmentResult.model_validate(result)
+        if isinstance(result, AlignmentResult)
+        else AlignmentResult.model_validate_json(canonical(strict_json(result)))
     )
-    checked = AlignmentResult.model_validate_json(canonical(strict_json(raw)))
     expected = align_account(original, checked.policy)
     if checked != expected:
         raise ValueError("alignment receipt differs from deterministic recomputation")

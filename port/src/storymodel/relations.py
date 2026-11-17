@@ -167,7 +167,7 @@ def admit_relations(value: Account, raw: str) -> RelationResult:
 
 def verify_relations(value: Account, raw: str, receipt: RelationResult) -> RelationResult:
     """Recompute both graph and processing decisions from independently supplied inputs."""
-    checked = RelationResult.model_validate_json(canonical(receipt.model_dump(mode="json")))
+    checked = RelationResult.model_validate(receipt)
     expected = admit_relations(value, raw)
     if checked != expected:
         raise ValueError("relation result differs from recorded inputs")

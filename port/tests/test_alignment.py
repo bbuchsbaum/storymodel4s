@@ -278,7 +278,8 @@ def test_forged_receipts_and_copied_inputs_are_revalidated():
     altered["events"][0]["candidates"][0]["eligible"] = False
     with pytest.raises(ValueError, match="recomputation"):
         verify_alignment(account, json.dumps(altered))
-    with pytest.warns(UserWarning, match="serializer warnings"), pytest.raises(ValueError):
+    # Wrong Python types refuse before a serializer can coerce or warn about them.
+    with pytest.raises(ValueError, match="valid integer"):
         align_account(
             account, AlignmentPolicy().model_copy(update={"max_candidates": float("nan")})
         )

@@ -268,7 +268,7 @@ def resolve_time_item(
     source: StudySource, item: dict[str, Any] | None, *, failure: str = "omitted"
 ) -> dict[str, Any]:
     """Replay and judge one strict-chunked-time reply without reading narrative source text."""
-    checked = StudySource.model_validate(source.model_dump(by_alias=True))
+    checked = StudySource.model_validate(source)
     if item is None:
         stated = _failed(failure)
         missing = {"stated": stated, "judgement": _judge(checked, stated)}

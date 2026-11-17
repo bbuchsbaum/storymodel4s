@@ -66,12 +66,9 @@ def validate_rich_construction_request(
     value: RichConstructionRequest | str | bytes,
 ) -> RichConstructionRequest:
     """Revalidate copied requests before compiling their evidence-bound graph."""
-    raw = (
-        canonical(value.model_dump(mode="json"))
-        if isinstance(value, RichConstructionRequest)
-        else value
-    )
-    return RichConstructionRequest.model_validate_json(canonical(strict_json(raw)))
+    if isinstance(value, RichConstructionRequest):
+        return RichConstructionRequest.model_validate(value)
+    return RichConstructionRequest.model_validate_json(canonical(strict_json(value)))
 
 
 def rich_construction_request_digest(value: RichConstructionRequest) -> str:
@@ -327,7 +324,7 @@ def verify_rich_construction(
     value: RichConstructionRequest, raw: str, result: RichConstructionResult
 ) -> RichConstructionResult:
     """Recompute the row receipts and v4 graph rather than trusting a copied result."""
-    checked = RichConstructionResult.model_validate_json(canonical(result.model_dump(mode="json")))
+    checked = RichConstructionResult.model_validate(result)
     expected = compile_rich_construction(value, raw)
     if checked != expected:
         raise ValueError("rich construction result differs from recorded inputs")

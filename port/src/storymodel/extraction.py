@@ -124,10 +124,9 @@ class ExtractionRequest(Model):
 
 def validate_request(value: ExtractionRequest | str | bytes) -> ExtractionRequest:
     """Recheck copied Python values and duplicate/nonfinite JSON before consumption."""
-    raw = (
-        canonical(value.model_dump(mode="json")) if isinstance(value, ExtractionRequest) else value
-    )
-    return ExtractionRequest.model_validate_json(canonical(strict_json(raw)))
+    if isinstance(value, ExtractionRequest):
+        return ExtractionRequest.model_validate(value)
+    return ExtractionRequest.model_validate_json(canonical(strict_json(value)))
 
 
 def request_digest(value: ExtractionRequest) -> str:

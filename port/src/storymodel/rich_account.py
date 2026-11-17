@@ -64,8 +64,9 @@ class RichAccount(_AccountFields):
 
 def validate_rich_account(value: RichAccount | str | bytes) -> RichAccount:
     """Recheck copied objects and complete graph relationships at every v4 consumer boundary."""
-    raw = canonical(value.model_dump(mode="json")) if isinstance(value, RichAccount) else value
-    return RichAccount.model_validate_json(canonical(strict_json(raw)))
+    if isinstance(value, RichAccount):
+        return RichAccount.model_validate(value)
+    return RichAccount.model_validate_json(canonical(strict_json(value)))
 
 
 SupportedAccount = Account | RichAccount

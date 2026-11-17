@@ -13,7 +13,7 @@ def replay_account(
     implement sentence extraction, segmentation or the legacy Scala record writer.
     Expected documents come from the caller's intake, never from the model response.
     """
-    documents = tuple(Document.model_validate_json(d.model_dump_json()) for d in expected_documents)
+    documents = tuple(Document.model_validate(d) for d in expected_documents)
     if not documents or len({d.id for d in documents}) != len(documents):
         raise ValueError("expected documents must be nonempty and distinct")
     input_hashes = {d.sha256 for d in documents}

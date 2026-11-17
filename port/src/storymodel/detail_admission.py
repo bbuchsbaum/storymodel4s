@@ -53,8 +53,9 @@ class DetailRequest(Model):
 
 
 def validate_detail_request(value: DetailRequest | str | bytes) -> DetailRequest:
-    raw = canonical(value.model_dump(mode="json")) if isinstance(value, DetailRequest) else value
-    return DetailRequest.model_validate_json(canonical(strict_json(raw)))
+    if isinstance(value, DetailRequest):
+        return DetailRequest.model_validate(value)
+    return DetailRequest.model_validate_json(canonical(strict_json(value)))
 
 
 def prepare_details(account: RichAccount, units: tuple[str, ...]) -> DetailRequest:
@@ -309,7 +310,7 @@ def admit_details(value: DetailRequest, raw: str) -> DetailAdmissionResult:
 def verify_details(
     value: DetailRequest, raw: str, result: DetailAdmissionResult
 ) -> DetailAdmissionResult:
-    checked = DetailAdmissionResult.model_validate_json(canonical(result.model_dump(mode="json")))
+    checked = DetailAdmissionResult.model_validate(result)
     expected = admit_details(value, raw)
     if checked != expected:
         raise ValueError("detail admission result differs from recorded inputs")

@@ -24,6 +24,8 @@ Side = Literal["source", "recall"]
 class Model(BaseModel):
     """Strict immutable records; contextual validity belongs to Account admission."""
 
+    # Public consumers call model_validate on instances before serializing: copying can
+    # forge values, while JSON serialization can coerce their types or discard unknowns.
     model_config = ConfigDict(
         extra="forbid", frozen=True, strict=True, revalidate_instances="always"
     )
@@ -610,8 +612,9 @@ def validate_account(value: Account | str | bytes) -> Account:
     """Revalidate even model_copy/model_construct results at every public operation."""
     if isinstance(value, _AccountFields) and not isinstance(value, Account):
         raise ValueError("legacy account consumer cannot accept a different wire version")
-    raw = canonical(value.model_dump(mode="json")) if isinstance(value, Account) else value
-    return Account.model_validate_json(canonical(strict_json(raw)))
+    if isinstance(value, Account):
+        return Account.model_validate(value)
+    return Account.model_validate_json(canonical(strict_json(value)))
 
 
 def account_digest(value: Account) -> str:

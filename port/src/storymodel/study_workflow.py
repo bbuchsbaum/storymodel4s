@@ -103,9 +103,8 @@ class TimeStudyResult(Model):
 
 
 def checked_request(value: TimeStudy) -> TimeStudy:
-    # Pydantic JSON serialization coerces NaN/Infinity to null before validation.
-    # Canonicalize Python values first so a forbidden row cannot become another identity.
-    return TimeStudy.model_validate_json(canonical(value.model_dump(mode="json")))
+    # Validate Python types before serialization can coerce forged numbers or drop fields.
+    return TimeStudy.model_validate(value)
 
 
 def read_request(path: Path, *, expected_sha256: str | None = None) -> TimeStudy:
@@ -173,7 +172,7 @@ def import_time_replies(value: TimeStudy, replies: ImportedReplies, root: Path) 
     directory after diagnosis. A supplied reply is never relabelled as a live provider call.
     """
     request = checked_request(value)
-    replies = ImportedReplies.model_validate_json(canonical(strict_json(replies.model_dump_json())))
+    replies = ImportedReplies.model_validate(replies)
     if replies.request_sha256 != request_digest(request):
         raise ValueError("imported replies belong to another request")
     chunks = _chunks(request)

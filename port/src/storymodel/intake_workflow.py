@@ -60,7 +60,7 @@ class PreparedTimeStudy(Model):
 
 
 def validate_prepared_study(value: PreparedTimeStudy) -> PreparedTimeStudy:
-    return PreparedTimeStudy.model_validate_json(canonical(value.model_dump(mode="json")))
+    return PreparedTimeStudy.model_validate(value)
 
 
 def prepare_time_study(

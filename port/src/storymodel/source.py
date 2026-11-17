@@ -71,8 +71,9 @@ class SourceRequest(Model):
 
 def validate_source_request(value: SourceRequest | str | bytes) -> SourceRequest:
     """Recheck copied requests and strict JSON before public consumption."""
-    raw = canonical(value.model_dump(mode="json")) if isinstance(value, SourceRequest) else value
-    return SourceRequest.model_validate_json(canonical(strict_json(raw)))
+    if isinstance(value, SourceRequest):
+        return SourceRequest.model_validate(value)
+    return SourceRequest.model_validate_json(canonical(strict_json(value)))
 
 
 def source_request_digest(value: SourceRequest) -> str:
@@ -253,7 +254,7 @@ def compile_source(value: SourceRequest, raw: str) -> SourceResult:
 
 def verify_source(value: SourceRequest, raw: str, result: SourceResult) -> SourceResult:
     """Recompute the receipt, row decisions and graph instead of trusting edited artifacts."""
-    checked = SourceResult.model_validate_json(canonical(result.model_dump(mode="json")))
+    checked = SourceResult.model_validate(result)
     expected = compile_source(value, raw)
     if expected != checked:
         raise ValueError("source result differs from its recorded inputs")

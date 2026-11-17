@@ -74,7 +74,7 @@ def read_source_request(path: Path, *, expected_sha256: str | None = None) -> So
 def import_source(value: SourceRequest, recording: SourceRecording, root: Path) -> None:
     """Record the supplied reply before parsing it; this never makes a provider call."""
     request = validate_source_request(value)
-    supplied = SourceRecording.model_validate_json(canonical(recording.model_dump(mode="json")))
+    supplied = SourceRecording.model_validate(recording)
     if supplied.request_sha256 != source_request_digest(request):
         raise ValueError("source recording belongs to another request")
     root.mkdir(parents=True, exist_ok=False)

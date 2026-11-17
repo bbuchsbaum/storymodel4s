@@ -80,7 +80,7 @@ def read_rich_request(path: Path, *, expected_sha256: str | None = None) -> Rich
 def import_rich(value: RichConstructionRequest, recording: RichRecording, root: Path) -> None:
     """Save the raw reply before parsing, refusing a prior or interrupted recording directory."""
     request = _checked(value)
-    supplied = RichRecording.model_validate_json(canonical(recording.model_dump(mode="json")))
+    supplied = RichRecording.model_validate(recording)
     if supplied.request_sha256 != digest(request.model_dump(mode="json")):
         raise ValueError("rich recording belongs to another request")
     root.mkdir(parents=True, exist_ok=False)

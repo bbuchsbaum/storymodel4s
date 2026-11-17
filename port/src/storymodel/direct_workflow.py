@@ -62,7 +62,7 @@ def read_mapping_request(path: Path, *, expected_sha256: str | None = None) -> M
 def import_mapping(value: MappingInput, recording: MappingRecording, root: Path) -> None:
     """Store imported raw text before parse; this path never invokes a provider."""
     request = _exportable(value)
-    supplied = MappingRecording.model_validate_json(canonical(recording.model_dump(mode="json")))
+    supplied = MappingRecording.model_validate(recording)
     if supplied.request_sha256 != mapping_request_digest(request):
         raise ValueError("mapping recording belongs to another request")
     root.mkdir(parents=True, exist_ok=False)
