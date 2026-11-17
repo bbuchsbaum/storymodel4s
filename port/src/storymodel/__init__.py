@@ -9,6 +9,15 @@ from .artifacts import (
     read_account,
     read_supported_account,
 )
+from .attribution import (
+    AttributionResult,
+    ContextHolder,
+    HolderProposal,
+    HolderProposals,
+    attribution_table,
+    resolve_context_holders,
+    verify_attribution,
+)
 from .claim_assessment import (
     ClaimQuestion,
     assess_claims,
@@ -86,6 +95,13 @@ from .source_workflow import SourceRecording, import_source, replay_source
 __version__ = "0.1.0"
 
 __all__ = [
+    "AttributionResult",
+    "ContextHolder",
+    "HolderProposal",
+    "HolderProposals",
+    "attribution_table",
+    "resolve_context_holders",
+    "verify_attribution",
     "OrganizationDestination",
     "DestinationMass",
     "OrganizationRow",

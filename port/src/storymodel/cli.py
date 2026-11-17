@@ -8,6 +8,12 @@ from typing import Any
 from .alignment import align_account, validate_policy
 from .analysis import Analysis, Policy, project
 from .artifacts import publish_json, read_account, read_supported_account
+from .attribution import (
+    AttributionResult,
+    attribution_table,
+    resolve_context_holders,
+    verify_attribution,
+)
 from .claim_assessment import (
     ClaimQuestion,
     assess_claims,
@@ -363,6 +369,16 @@ def main(argv: list[str] | None = None) -> int:
     identity_inspect.add_argument("result")
     identity_inspect.add_argument("--expected-sha256")
     identity_inspect.add_argument("--output")
+    for name in ("resolve-holders", "verify-attribution", "attribution-table"):
+        attribution = commands.add_parser(name, help="checked context holder attribution")
+        attribution.add_argument("account")
+        attribution.add_argument("annotations")
+        attribution.add_argument("proposals")
+        if name != "resolve-holders":
+            attribution.add_argument("result")
+        attribution.add_argument("--expected-sha256")
+        if name != "verify-attribution":
+            attribution.add_argument("--output")
     align = commands.add_parser(
         "align", help="generate sparse candidates and partial references offline"
     )
@@ -889,6 +905,49 @@ def main(argv: list[str] | None = None) -> int:
                     ),
                     args.output,
                 )
+        elif args.command in ("resolve-holders", "verify-attribution", "attribution-table"):
+            attribution_account = read_supported_account(
+                Path(args.account), expected_sha256=args.expected_sha256
+            )
+            if (
+                args.command != "verify-attribution"
+                and attribution_account.export_permission != "allowed"
+            ):
+                raise PermissionError("producer denies attribution export")
+            form_annotations = Path(args.annotations).read_bytes().decode("utf-8")
+            holder_proposals = Path(args.proposals).read_bytes().decode("utf-8")
+            if args.command == "resolve-holders":
+                emit(
+                    resolve_context_holders(
+                        attribution_account, form_annotations, holder_proposals
+                    ).model_dump(mode="json"),
+                    args.output,
+                )
+            else:
+                saved_attribution = AttributionResult.model_validate_json(
+                    canonical(strict_json(Path(args.result).read_bytes()))
+                )
+                if args.command == "verify-attribution":
+                    verified_attribution = verify_attribution(
+                        attribution_account, form_annotations, holder_proposals, saved_attribution
+                    )
+                    emit(
+                        {"verified": True, "account_sha256": verified_attribution.account_sha256},
+                        None,
+                    )
+                else:
+                    emit(
+                        [
+                            row.model_dump(mode="json")
+                            for row in attribution_table(
+                                attribution_account,
+                                form_annotations,
+                                holder_proposals,
+                                saved_attribution,
+                            )
+                        ],
+                        args.output,
+                    )
         elif args.command in ("resolve-identity", "identity-roles"):
             identity_account = read_supported_account(
                 Path(args.account), expected_sha256=args.expected_sha256

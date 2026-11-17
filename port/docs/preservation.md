@@ -454,3 +454,20 @@ collapse by target for this readout, while the original inference remains availa
 bounds refuse. Native media part-order/source composition and the registered independent
 measurement-eligibility pipeline remain owed. [Contract](organization.md); no scientific
 accuracy or executed Scala runtime comparison is claimed.
+
+## P2 checked context-holder resolution (2026-11-17)
+
+Reference: `story/nodes.scala` (`ContextHolder`, `HolderGap`), `document/compiler.scala`
+(`holderOf`), `document/placement.scala` (candidate versus identity distinction),
+`ContextPlacementSuite`, `EntityIdentitySuite`, story validation and codec holder export.
+Python `attribution.py` resolves recorded candidates through verified text identity and
+provides complete context decisions and a checked event/state inspection consumer.
+Mote: `bd-01M7MC4BJN40SX70B369FPT6QB`. [Contract and executable example](attribution.md).
+
+Preserve distinct no-candidate, unresolved-candidate and several-candidates outcomes;
+deduplicate by resolved identity, not mention count; an open candidate blocks naming even
+beside a resolved one. Context placement and all account IDs remain unchanged. Python
+adds explicit omitted/unattempted/failed/unsupported outcomes and input-bound recomputation.
+No nearest speaker or source-to-recall identity inference is introduced. Old construction
+recordings remain readable. Full context vocabulary, automatic candidate acquisition,
+first-person/addressee identity rules, playback and assessment consumption remain owed.

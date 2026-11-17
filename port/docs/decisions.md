@@ -290,3 +290,15 @@ marginals, treating reconstructed choices as independent observations, splicing 
 adding pairwise extrema, deriving chronology from scoring coordinates, or silently substituting
 product-space bounds for coupled bounds. Registered measurement eligibility and media order
 remain separate retained consumers. See [organization](organization.md).
+
+## Context attribution (P2, 2026-11-17)
+
+Provisional implementation choice: resolve candidate mention occurrences through the existing
+verified identity classes and retain a complete account-bound attribution result. Placement
+and holder derivation remain separate, as they are in the Scala compiler. The result feeds
+event/state inspection; subsequent identity and assessment rules can consume it with explicit
+method versioning. Rejected alternatives: adding default holder fields to legacy Context
+identity material, picking one readable candidate while ignoring unresolved competitors,
+using raw mention count as distinct-holder count, or fabricating no-candidate results for
+unattempted work. The sidecar is a derived result over the existing account, not a second graph
+hierarchy. See [attribution](attribution.md) for the remaining retained capabilities.
