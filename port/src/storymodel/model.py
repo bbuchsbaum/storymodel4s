@@ -188,6 +188,29 @@ class Event(Identified):
     evidence: Evidence
 
 
+class State(Identified):
+    """A contextual condition is distinct from an event, with explicit unknown truth attributes."""
+
+    namespace: ClassVar[str] = "state"
+    side: Side
+    context: Name
+    predicate: Name
+    participants: tuple[Participation, ...] = ()
+    evidence: Evidence
+    polarity: Literal["positive", "negative", "unknown"] = "unknown"
+    modality: Literal[
+        "asserted",
+        "possible",
+        "probable",
+        "necessary",
+        "intended",
+        "desired",
+        "counterfactual",
+        "reported",
+        "unknown",
+    ] = "unknown"
+
+
 class Relation(Identified):
     """Typed, evidenced relationships between contextualized occurrences."""
 
@@ -392,12 +415,10 @@ def acyclic(edges: Iterable[tuple[str, str]], label: str) -> None:
         raise ValueError(f"cyclic {label}")
 
 
-class Account(Model):
-    """One validated paired account; absent information stays absent."""
+class _AccountFields(Model):
+    """Shared flat fields and relational checks; public wire versions declare their own schema."""
 
-    schema_version: Literal[
-        "storymodel.account/v1", "storymodel.account/v2", "storymodel.account/v3"
-    ] = "storymodel.account/v1"
+    schema_version: str = "storymodel.account/v1"
     documents: tuple[Document, ...]
     units: tuple[Unit, ...]
     contexts: tuple[Context, ...]
@@ -410,13 +431,16 @@ class Account(Model):
     recipe: Recipe
     export_permission: Literal["allowed", "denied"] = "denied"
 
+    def _situations(self) -> tuple[Event | State, ...]:
+        return self.events
+
     @model_validator(mode="after")
     def validate_relations(self) -> Self:
         docs = indexed(self.documents, "document")
         units = indexed(self.units, "unit")
         contexts = indexed(self.contexts, "context")
         entities = indexed(self.entities, "entity")
-        events = indexed(self.events, "event")
+        events = indexed(self._situations(), "event")
         details = indexed(self.details, "detail")
         indexed(self.relations, "relation")
         if len({(d.side, d.key) for d in docs.values()}) != len(docs):
@@ -468,7 +492,7 @@ class Account(Model):
         for side in ("source", "recall"):
             narrated = sum(c.kind == "narrated" and c.side == side for c in contexts.values())
             present = any(document.side == side for document in docs.values())
-            if self.schema_version.endswith("/v3"):
+            if self.schema_version.endswith(("/v3", "/v4")):
                 if present and narrated != 1:
                     raise ValueError("each present account side needs exactly one narrated world")
                 if not present and any(context.side == side for context in contexts.values()):
@@ -574,8 +598,18 @@ class Account(Model):
         return self
 
 
+class Account(_AccountFields):
+    """One validated paired account; absent information stays absent."""
+
+    schema_version: Literal[
+        "storymodel.account/v1", "storymodel.account/v2", "storymodel.account/v3"
+    ] = "storymodel.account/v1"
+
+
 def validate_account(value: Account | str | bytes) -> Account:
     """Revalidate even model_copy/model_construct results at every public operation."""
+    if isinstance(value, _AccountFields) and not isinstance(value, Account):
+        raise ValueError("legacy account consumer cannot accept a different wire version")
     raw = canonical(value.model_dump(mode="json")) if isinstance(value, Account) else value
     return Account.model_validate_json(canonical(strict_json(raw)))
 
