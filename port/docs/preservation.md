@@ -74,3 +74,33 @@ scientific meaning now; implement additional algorithms when the workflow needs 
 
 No preservation claim is established by a line-count reduction or by copying a type name.
 Judge the retained behavior at its input, saved artifact and researcher-visible output.
+
+## P2.1 source construction contract
+
+Bead `bd-01M7KKCY94B9NWXAQSFM15EQ66` supplies an anchored-row construction path rather than
+translating a finished Scala compiler. The bounded Scala lookup found hand-built graph fixtures
+and admission primitives, not a working observation-to-rich-graph caller. This does not exclude
+any graph capability from the later phases.
+
+| Retained behavior | Scala source / caller / test evidence | Python path and independent witness |
+|---|---|---|
+| Proposal and accepted claim are distinct; missing, unresolved and rejected outcomes survive. | `acquire/resolve.scala` `Resolution`, `ClaimFamily`, `Resolver`, `CandidateLedger`; `ResolveSuite`, `D1aAcquireSupportSuite`. | `compile_source` and per-row `SourceRowResolution`; explicit row-status expected vector and atomic sibling-survival tests in `test_source.py`. This extractive profile does not claim Scala's critic/agreement/calibration policy. |
+| Situations carry contexts; endpoints, roles, identities and evidence are checked. | `story/nodes.scala`, `StoryValidator` in `story/validate.scala`, `StoryModel.draft`; `story/Gens.scala` and `fixtures/wog/WarOfTheGhostsModel.scala` construct graph values directly. | Shared `_admission.admit_graph` plus ordinary `Account` admission. Source and recall context-promotion refusals, foreign row/role/quote guards and independent exact graph expectations. |
+| Exact source edition and anchored observations remain independent of recall. | `core/textsource.scala` text-source/atlas construction; supplied atlases do not invent missing units. | `prepare_source` with exact UTF-16 rows; saved source digest reused by two distinct recall sessions; surrogate, overlap and foreign-side refusal. |
+| Source evidence packets do not establish graph truth. | `pipeline/agentmapping/FilmOutline.scala`, `FilmOutlineSuite`; `AgentBundleSource.dictionary` joins annotations/media/targets and omits rows with missing joins. | Source result retains every requested row, including unsupported, failed and missing work. No silent row omission. `AgentAnswers.Field`/`AgentBundleSuite` are precedents for explicit processing states, not an equivalent source compiler. |
+
+Compatibility: `storymodel.source-{request,proposal,result,recording}/v1` are new profiles;
+the output uses unchanged Account v3. Existing extraction schemas, legacy Account v1/v2/v3
+rules and accepted extraction graph identities remain unchanged. Public extraction proposal
+imports are retained after moving shared implementation into a private module. Existing
+recorded execution is reused without a second provider engine.
+
+Independent checks: hand-stated expected source predicates, roles, UTF-16 supports and row
+outcomes; JSON/account readback; two-session source reuse; source and recall attribution-guard
+mutations; offline CLI/API agreement; installed example and schema drift checks. These prove
+engineering behavior on admitted diagnostics, not extraction accuracy or scientific benefit.
+
+Limitations still owed: state/place/time/playback evidence, relations, discontinuous proposal
+quotes, cross-row coreference, scene/episode grouping, source construction diagnostics in the
+inspector, semantic proposal evaluation and operational source adapters. Source completeness
+is a receipt in `SourceResult`; exporting Account alone intentionally does not assert it.

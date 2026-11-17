@@ -26,7 +26,8 @@ inspectable reference decisions. It preserves alternatives, unresolved and searc
 outcomes, existing external references, and unassessed fidelity.
 
 The [port roadmap](docs/roadmap.md) defines the next phases toward full working capability;
-its immediate next slice is source-account construction.
+P2 begins with [source-account construction](docs/source-construction.md): anchored observations
+and recorded proposals produce independently reusable source graphs and explicit row outcomes.
 
 ## Run it
 

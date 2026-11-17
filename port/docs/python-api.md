@@ -22,6 +22,8 @@ The principal public operations are available directly from `storymodel`:
 | Operation | Responsibility |
 |---|---|
 | `make_account` | Construct an independent or paired v3 account; supply roots for present sides. |
+| `prepare_source`, `compile_source` | Anchor source observations and admit recorded row proposals, independently of recall. |
+| `import_source`, `replay_source`, `verify_source` | Preserve raw source proposals, replay offline and check complete row receipts. |
 | `prepare_extraction` | Bind raw recall to deterministic intake and a proposal contract. |
 | `resolve_extraction` | Admit supplied proposal text; useful with independently obtained replies. |
 | `import_extraction`, `replay_extraction` | Persist and replay raw replies through the existing recorded-run engine. |

@@ -105,3 +105,12 @@ Use an honest Python entity-origin name with a compatibility wire name, and expl
 identity namespaces rather than deriving identity from class names. Share strict JSON handling
 and reuse already validated snapshots for hashing. Keep the existing common RecordedRun engine;
 do not introduce another generic workflow layer solely to unify superficially similar profiles.
+
+P2.1 source construction (2026-11-16): add anchored source requests and atomic per-row
+extractive proposals, sharing quote/role/context admission with recall. Rejected alternatives:
+hand-assembling more trusted fixture graph objects, accepting a provider-generated Account,
+or coupling source construction to a participant. Keep source processing receipts in the
+versioned SourceResult rather than silently changing Account v3's recall-inventory meaning.
+The result and raw recording are the construction artifact; the account is its reusable graph.
+This profile checks declared evidence/scopes, not semantic entailment, model agreement or
+calibrated acceptance. States, relation families, identity and richer evidence remain P2 work.

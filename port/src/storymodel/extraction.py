@@ -11,6 +11,34 @@ from typing import Literal, Self
 
 from pydantic import Field, model_validator
 
+from ._admission import (
+    ROOT as ROOT,
+)
+from ._admission import (
+    ContextProposal as ContextProposal,
+)
+from ._admission import (
+    DetailProposal as DetailProposal,
+)
+from ._admission import (
+    EntityProposal as EntityProposal,
+)
+from ._admission import (
+    EventProposal as EventProposal,
+)
+from ._admission import (
+    Quote as Quote,
+)
+from ._admission import (
+    RoleProposal as RoleProposal,
+)
+from ._admission import (
+    UnresolvedClaim as UnresolvedClaim,
+)
+from ._admission import (
+    _inside,
+    admit_graph,
+)
 from .model import (
     Account,
     Context,
@@ -20,10 +48,7 @@ from .model import (
     Event,
     Inventory,
     Model,
-    Name,
-    Participation,
     Recipe,
-    Span,
     Support,
     Unit,
     canonical,
@@ -34,79 +59,6 @@ from .recall_intake import PreparedRecall, prepare_recall_utf8, validate_prepare
 from .serialization import strict_json
 
 RECIPE: Literal["recall-extractive-admission/v1"] = "recall-extractive-admission/v1"
-ROOT = "narrated"
-
-
-class Quote(Model):
-    """Exact canonical UTF-16 evidence; the resolver checks the text independently."""
-
-    span: Span
-    text: Name
-
-
-class ContextProposal(Model):
-    """Attribution evidence and content scope are different supports."""
-
-    key: Name
-    kind: Literal["reported", "believed", "intended"]
-    parent: Name
-    cue: Quote
-    scope: Quote
-
-
-class EntityProposal(Model):
-    """One local mention; no source identity or cross-unit coreference is asserted."""
-
-    key: Name
-    mention: Quote
-
-
-class RoleProposal(Model):
-    """A proposed typed role of a local entity in an event."""
-
-    entity: Name
-    role: Literal["agent", "patient", "speaker", "recipient", "experiencer", "location"]
-    evidence: Quote
-
-
-class EventProposal(Model):
-    """An extractive predicate in an explicitly named context."""
-
-    key: Name
-    context: Name
-    evidence: Quote
-    predicate: Quote
-    participants: tuple[RoleProposal, ...] = ()
-
-
-class DetailProposal(Model):
-    """An expressed detail, attached to an event without a source-address judgment."""
-
-    key: Name
-    event: Name
-    kind: Literal[
-        "event",
-        "participant",
-        "attribute",
-        "temporal",
-        "spatial",
-        "perceptual",
-        "dialogue",
-        "mental",
-        "relation",
-        "knowledge",
-        "discourse",
-    ]
-    evidence: Quote
-
-
-class UnresolvedClaim(Model):
-    """A provider abstention retained outside the accepted graph."""
-
-    key: Name
-    kind: Literal["entity", "event", "detail", "context", "role"]
-    reason: Name
-    evidence: Quote
 
 
 class UnitProposal(Model):
@@ -221,14 +173,6 @@ class ExtractionResult(Model):
     resolutions: tuple[UnitResolution, ...]
 
 
-def _inside(child: Span, parent: Span) -> bool:
-    return parent.start <= child.start and child.end <= parent.end
-
-
-def _overlap(a: Span, b: Span) -> bool:
-    return a.start < b.end and b.start < a.end
-
-
 def _resolve_unit(
     proposal: UnitProposal,
     request: ExtractionRequest,
@@ -238,144 +182,47 @@ def _resolve_unit(
     tuple[Context, ...], tuple[Entity, ...], tuple[Event, ...], tuple[Detail, ...], dict[str, str]
 ]:
     document = request.recall.document
-    unit_span = unit.support.spans[0]
-
-    def evidence(quote: Quote, parent: Span = unit_span) -> Support:
-        if not _inside(quote.span, parent):
-            raise ValueError("evidence lies outside its unit or owning claim")
-        if quote.span.slice(document.text) != quote.text:
-            raise ValueError("quoted evidence differs from canonical recall")
-        return Support(document=document.id, spans=(quote.span,))
-
-    keys = [
-        x.key
-        for group in (
-            proposal.contexts,
-            proposal.entities,
-            proposal.events,
-            proposal.details,
-            proposal.unresolved,
-        )
-        for x in group
-    ]
-    if ROOT in keys or len(set(keys)) != len(keys):
-        raise ValueError("duplicate or reserved proposal key")
-    for claim in proposal.unresolved:
-        evidence(claim.evidence)
-    context_proposals = {c.key: c for c in proposal.contexts}
-    contexts = {ROOT: root}
-    pending = dict(context_proposals)
-    while pending:
-        ready = sorted(k for k, c in pending.items() if c.parent in contexts)
-        if not ready:
-            raise ValueError("cyclic or unknown context parent")
-        for key in ready:
-            c = pending.pop(key)
-            cue = evidence(c.cue)
-            evidence(c.scope)
-            if c.parent != ROOT and (
-                not _inside(c.scope.span, context_proposals[c.parent].scope.span)
-                or not _inside(c.cue.span, context_proposals[c.parent].scope.span)
-                or c.scope.span == context_proposals[c.parent].scope.span
-            ):
-                raise ValueError("nested context must have a strictly narrower scope within parent")
-            contexts[key] = Context(
-                side="recall",
-                kind=c.kind,
-                parent=contexts[c.parent].id,
-                evidence=(cue,),
-            )
-    # A scope must be a tree: overlapping siblings or undeclared spatial nesting is ambiguous.
-    ordered = sorted(proposal.contexts, key=lambda c: (c.scope.span.start, -c.scope.span.end))
-    stack: list[ContextProposal] = []
-    for c in ordered:
-        while stack and stack[-1].scope.span.end <= c.scope.span.start:
-            stack.pop()
-        if c.parent != (stack[-1].key if stack else ROOT):
-            raise ValueError("overlapping or inconsistently nested context scopes")
-        if stack and not _inside(c.scope.span, stack[-1].scope.span):
-            raise ValueError("partially overlapping context scopes")
-        stack.append(c)
-
-    def context_for(span: Span) -> str:
-        matches = []
-        for c in ordered:
-            if _overlap(span, c.scope.span):
-                if not _inside(span, c.scope.span):
-                    raise ValueError("claim crosses an attributed scope boundary")
-                matches.append(c)
-        return matches[-1].key if matches else ROOT
-
-    entities = {
-        e.key: Entity(
-            source_document=document.id, label=e.mention.text, evidence=(evidence(e.mention),)
-        )
-        for e in proposal.entities
-    }
-    events: dict[str, Event] = {}
+    graph = admit_graph(
+        document,
+        unit,
+        root,
+        context_proposals_input=proposal.contexts,
+        entity_proposals_input=proposal.entities,
+        event_proposals_input=proposal.events,
+        unresolved=proposal.unresolved,
+        extra_keys=tuple(d.key for d in proposal.details),
+    )
     event_proposals = {e.key: e for e in proposal.events}
-    for e in proposal.events:
-        support = evidence(e.evidence)
-        evidence(e.predicate, e.evidence.span)
-        if e.context not in contexts or context_for(e.evidence.span) != e.context:
-            raise ValueError("event context differs from its declared content scope")
-        participants: list[Participation] = []
-        for p in e.participants:
-            if p.entity not in entities:
-                raise ValueError("unknown local entity reference")
-            role_support = evidence(p.evidence, e.evidence.span)
-            # This profile supports mention-local roles only, not asserted coreference.
-            if role_support != entities[p.entity].evidence[0]:
-                raise ValueError("role evidence must be the referenced local entity mention")
-            participants.append(
-                Participation(entity=entities[p.entity].id, role=p.role, evidence=(role_support,))
-            )
-        events[e.key] = Event(
-            side="recall",
-            context=contexts[e.context].id,
-            predicate=e.predicate.text,
-            evidence=(support,),
-            participants=tuple(participants),
-        )
     details: dict[str, Detail] = {}
     for d in proposal.details:
-        if d.event not in events:
+        if d.event not in event_proposals:
             raise ValueError("unknown local event reference")
-        support = evidence(d.evidence, event_proposals[d.event].evidence.span)
+        if not _inside(d.evidence.span, event_proposals[d.event].evidence.span):
+            raise ValueError("evidence lies outside its unit or owning claim")
+        if d.evidence.span.slice(document.text) != d.evidence.text:
+            raise ValueError("quoted evidence differs from canonical recall")
         details[d.key] = Detail(
             unit=unit.id,
             kind=d.kind,
             content=d.evidence.text,
-            support=support,
+            support=Support(document=document.id, spans=(d.evidence.span,)),
             address="unresolved",
-            event=events[d.event].id,
+            event=graph.accepted[d.event],
         )
-    accepted = {
-        k: v.id
-        for group in (contexts, entities, events, details)
-        for k, v in group.items()
-        if k != ROOT
-    }
-    # Equal content under two temporary keys is not two accepted occurrences.
+    accepted = {**graph.accepted, **{k: v.id for k, v in details.items()}}
     if len(set(accepted.values())) != len(accepted):
         raise ValueError("duplicate semantic proposal")
     Account(
         schema_version="storymodel.account/v2",
         documents=(document,),
         units=(unit,),
-        contexts=(Context(side="source", kind="narrated"), *contexts.values()),
-        entities=tuple(entities.values()),
-        events=tuple(events.values()),
+        contexts=(Context(side="source", kind="narrated"), root, *graph.contexts),
+        entities=graph.entities,
+        events=graph.events,
         details=tuple(details.values()),
         recipe=Recipe(name=RECIPE, input_sha256=(document.sha256,)),
     )
-    return (
-        tuple(c for k, c in contexts.items() if k != ROOT),
-        tuple(entities.values()),
-        tuple(events.values()),
-        tuple(details.values()),
-        accepted,
-    )
+    return (graph.contexts, graph.entities, graph.events, tuple(details.values()), accepted)
 
 
 def resolve_extraction(value: ExtractionRequest, raw: str) -> ExtractionResult:

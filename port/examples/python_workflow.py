@@ -7,29 +7,23 @@ be run as a notebook cell. No provider calls, new narrative text or output write
 # %% Independently obtain a source account (construction does not require recall).
 from storymodel import (
     align_account,
-    make_account,
+    compile_source,
     pair_accounts,
     prepare_extraction,
     project,
     resolve_extraction,
 )
-from storymodel.extraction_demo import example_proposal, example_request
+from storymodel.demo import RECALL_TEXT
+from storymodel.extraction_demo import example_proposal
+from storymodel.source_demo import example_source_proposal, example_source_request
 
-fixture = example_request()
-assert fixture.source is not None
-source = make_account(
-    documents=fixture.source.documents,
-    units=fixture.source.units,
-    contexts=tuple(c for c in fixture.source.contexts if c.side == "source"),
-    entities=fixture.source.entities,
-    events=fixture.source.events,
-    export_permission="allowed",
-)
+compiled = compile_source(example_source_request(), example_source_proposal())
+source = compiled.account
 assert {c.side for c in source.contexts} == {"source"}
 
 # %% Extract recall independently. This fixture string is an explicitly synthetic reply.
 request = prepare_extraction(
-    "independent-session", fixture.recall.raw_text.encode(), export_permission="allowed"
+    "independent-session", RECALL_TEXT.encode(), export_permission="allowed"
 )
 extracted = resolve_extraction(request, example_proposal())
 recall = extracted.account

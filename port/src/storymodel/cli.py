@@ -20,6 +20,14 @@ from .extraction_workflow import (
 )
 from .intake_workflow import prepare_time_study_files
 from .model import Account, canonical
+from .source import SourceRow, prepare_source
+from .source_workflow import (
+    SourceRecording,
+    import_source,
+    read_source_request,
+    replay_source,
+    source_prompt,
+)
 from .study_workflow import (
     ImportedReplies,
     import_time_replies,
@@ -108,6 +116,29 @@ def main(argv: list[str] | None = None) -> int:
     extract_replay.add_argument("--expected-import-sha256")
     extract_replay.add_argument("--account-only", action="store_true")
     extract_replay.add_argument("--output")
+    source_prepare = commands.add_parser(
+        "prepare-source", help="prepare independently anchored source rows"
+    )
+    source_prepare.add_argument("text")
+    source_prepare.add_argument("rows")
+    source_prepare.add_argument("--source-key", required=True)
+    source_prepare.add_argument("--allow-export", action="store_true")
+    source_prepare.add_argument("--output")
+    source_contract = commands.add_parser(
+        "source-prompt", help="write the recorded source proposal contract"
+    )
+    source_contract.add_argument("request")
+    source_contract.add_argument("--output")
+    source_import = commands.add_parser("import-source", help="record an exported source reply")
+    source_import.add_argument("request")
+    source_import.add_argument("reply")
+    source_import.add_argument("recording")
+    source_replay = commands.add_parser("replay-source", help="compile a recorded source offline")
+    source_replay.add_argument("request")
+    source_replay.add_argument("recording")
+    source_replay.add_argument("--expected-import-sha256")
+    source_replay.add_argument("--account-only", action="store_true")
+    source_replay.add_argument("--output")
     align = commands.add_parser(
         "align", help="generate sparse candidates and partial references offline"
     )
@@ -145,15 +176,49 @@ def main(argv: list[str] | None = None) -> int:
                 export_permission="allowed" if args.allow_export else "denied",
             )
             emit(extraction.model_dump(mode="json"), args.output)
+        elif args.command == "prepare-source":
+            raw_rows = strict_json(Path(args.rows).read_bytes())
+            if not isinstance(raw_rows, list):
+                raise ValueError("source rows must be a JSON array")
+            rows = tuple(SourceRow.model_validate(item) for item in raw_rows)
+            source = prepare_source(
+                args.source_key,
+                Path(args.text).read_bytes().decode("utf-8"),
+                rows,
+                export_permission="allowed" if args.allow_export else "denied",
+            )
+            emit(source.model_dump(mode="json"), args.output)
+        elif args.command in ("source-prompt", "import-source", "replay-source"):
+            source = read_source_request(Path(args.request))
+            if args.command == "source-prompt":
+                emit(strict_json(source_prompt(source)), args.output)
+            elif args.command == "import-source":
+                source_recording = SourceRecording.model_validate_json(
+                    canonical(strict_json(Path(args.reply).read_bytes()))
+                )
+                import_source(source, source_recording, Path(args.recording))
+                emit({"recording": args.recording, "imported": 1}, None)
+            else:
+                if source.export_permission != "allowed":
+                    raise PermissionError("producer denies source export")
+                compiled = replay_source(
+                    source,
+                    Path(args.recording),
+                    expected_import_sha256=args.expected_import_sha256,
+                )
+                emit(
+                    (compiled.account if args.account_only else compiled).model_dump(mode="json"),
+                    args.output,
+                )
         elif args.command in ("extraction-prompt", "import-extraction", "replay-extraction"):
             extraction = read_extraction_request(Path(args.request))
             if args.command == "extraction-prompt":
                 emit(strict_json(extraction_prompt(extraction)), args.output)
             elif args.command == "import-extraction":
-                recording = ExtractionRecording.model_validate_json(
+                extraction_recording = ExtractionRecording.model_validate_json(
                     canonical(strict_json(Path(args.reply).read_bytes()))
                 )
-                import_extraction(extraction, recording, Path(args.recording))
+                import_extraction(extraction, extraction_recording, Path(args.recording))
                 emit({"recording": args.recording, "imported": 1}, None)
             else:
                 if extraction.export_permission != "allowed":

@@ -27,13 +27,13 @@ with tempfile.TemporaryDirectory(prefix="extraction-mutation-") as directory:
     ]
     baseline = subprocess.run(command, cwd=root, env=env, capture_output=True, text=True)
     assert baseline.returncode == 0, baseline.stdout + baseline.stderr
-    path = root / "storymodel/extraction.py"
+    path = root / "storymodel/_admission.py"
     original = path.read_text()
     guard = "e.context not in contexts or context_for(e.evidence.span) != e.context"
     assert original.count(guard) == 1
     path.write_text(original.replace(guard, "e.context not in contexts"))
     imported = subprocess.run(
-        [sys.executable, "-c", "import storymodel.extraction as m; print(m.__file__)"],
+        [sys.executable, "-c", "import storymodel._admission as m; print(m.__file__)"],
         cwd=root,
         env=env,
         capture_output=True,
