@@ -21,6 +21,12 @@ from .claim_assessment import (
     validate_claim_plan,
     verify_claim_assessment,
 )
+from .construction_links import (
+    ConnectedConstructionResult,
+    connect_rich_construction,
+    construction_link_prompt,
+    verify_connected_construction,
+)
 from .demo import example_account
 from .detail_admission import detail_prompt, prepare_details
 from .detail_workflow import (
@@ -269,6 +275,17 @@ def main(argv: list[str] | None = None) -> int:
     rich_replay.add_argument("--expected-import-sha256")
     rich_replay.add_argument("--account-only", action="store_true")
     rich_replay.add_argument("--output")
+    for command in ("construction-link-prompt", "connect-rich", "verify-connected-rich"):
+        linked = commands.add_parser(command, help="connect verified row-local graph references")
+        linked.add_argument("request")
+        linked.add_argument("construction", help="exact original rich construction reply file")
+        if command != "construction-link-prompt":
+            linked.add_argument("links")
+        if command == "connect-rich":
+            linked.add_argument("--account-only", action="store_true")
+        if command == "verify-connected-rich":
+            linked.add_argument("result")
+        linked.add_argument("--output")
     situations = commands.add_parser(
         "situation-table", help="inspect v4 events, states and circumstances"
     )
@@ -1006,6 +1023,46 @@ def main(argv: list[str] | None = None) -> int:
                     ),
                     args.output,
                 )
+        elif args.command in ("construction-link-prompt", "connect-rich", "verify-connected-rich"):
+            linked_request = read_rich_request(Path(args.request))
+            if linked_request.export_permission != "allowed":
+                raise PermissionError("producer denies construction links export")
+            construction_raw = Path(args.construction).read_bytes().decode("utf-8")
+            if args.command == "construction-link-prompt":
+                emit(
+                    strict_json(construction_link_prompt(linked_request, construction_raw)),
+                    args.output,
+                )
+            else:
+                links_raw = Path(args.links).read_bytes().decode("utf-8")
+                if args.command == "connect-rich":
+                    connected = connect_rich_construction(
+                        linked_request, construction_raw, links_raw
+                    )
+                    if args.account_only and (
+                        connected.status != "admitted"
+                        or any(r.status != "admitted" for r in connected.construction.resolutions)
+                    ):
+                        raise ValueError(
+                            "account-only export would hide incomplete connected construction"
+                        )
+                    emit(
+                        (connected.account if args.account_only else connected).model_dump(
+                            mode="json"
+                        ),
+                        args.output,
+                    )
+                else:
+                    connected_saved = ConnectedConstructionResult.model_validate_json(
+                        canonical(strict_json(Path(args.result).read_bytes()))
+                    )
+                    verified_connected = verify_connected_construction(
+                        linked_request, construction_raw, links_raw, connected_saved
+                    )
+                    emit(
+                        {"verified": True, "links_sha256": verified_connected.links_sha256},
+                        args.output,
+                    )
         elif args.command == "prepare-mapping":
             mapping_account = read_supported_account(
                 Path(args.account), expected_sha256=args.expected_sha256

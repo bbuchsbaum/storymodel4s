@@ -25,6 +25,16 @@ from .claim_assessment import (
     prepare_claim_assessment,
     verify_claim_assessment,
 )
+from .construction_links import (
+    ConnectedConstructionResult,
+    ConstructionLink,
+    ConstructionLinks,
+    ConstructionQuote,
+    ConstructionRef,
+    connect_rich_construction,
+    construction_link_prompt,
+    verify_connected_construction,
+)
 from .detail_admission import admit_details, detail_prompt, prepare_details, verify_details
 from .detail_workflow import DetailRecording, import_details, replay_details
 from .direct_mapping import mapping_prompt, prepare_mapping, resolve_mapping, verify_mapping
@@ -210,6 +220,14 @@ __all__ = [
     "align_account",
     "compile_source",
     "compile_rich_construction",
+    "ConnectedConstructionResult",
+    "ConstructionLink",
+    "ConstructionLinks",
+    "ConstructionQuote",
+    "ConstructionRef",
+    "connect_rich_construction",
+    "construction_link_prompt",
+    "verify_connected_construction",
     "export_account",
     "export_supported_account",
     "project",

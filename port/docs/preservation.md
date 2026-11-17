@@ -531,3 +531,25 @@ The [example](../examples/playback_workflow.py) reuses one native source across 
 text recalls. [Contract and limits](playback.md). Media-aware identity/assessment, clock maps,
 composition, shots/tracks and acquisition remain owed. Supplied abstract controls do not
 establish audiovisual accuracy, executed Scala parity or completion of P2–P6.
+
+## P2 row-qualified cross-unit construction links (2026-11-17)
+
+Scala reference: `document/compiler.scala` `CausalAttempt`, `TemporalAttempt`,
+`NarrativeCandidateAddress` and missing-upstream materialization. Endpoints address actual
+proposed occurrences, not matching labels. Pair evidence can come from either endpoint's
+observation; unsupported upstream situations do not create default edges. The deterministic
+provider's adjacent-root temporal proposal is `Unclear`, not inferred strict chronology.
+Relevant tests: `CompilerSuite` missing/accepted causal and temporal candidates, and
+`TrajectoryCompilerSuite` endpoint/observation restrictions.
+
+Python `construction_links.py` translates verified row/key references into existing rich
+relation admission, preserving occurrence IDs, exact evidence and complete construction
+receipts. An installed [example](../examples/connected_construction.py) reuses one source across
+two recalls and feeds relation inspection, source projection and account inference.
+Mote: `bd-01M7MJS40DZ972EAYPGBQZYT0G`. [Contract](construction-links.md).
+
+This closes the local-reference construction seam for the four existing Python relation kinds.
+It does not claim Scala's complete candidate/gap taxonomy or relation algebra: canonical Allen
+relations, deeper shared temporal scopes, causal epistemic/cross-context semantics, generic
+entity relations, primary hierarchy, native links and grouping remain owed. Generic part_of
+never becomes primary containment. No new Scala execution or semantic accuracy is claimed.

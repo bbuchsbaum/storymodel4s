@@ -342,3 +342,13 @@ sides when checking independent accounts. Preserve the parent-cue rule and rejec
 media inputs at those numerical entry points too. A paired account cannot masquerade as an
 independent input because its opposite side happens to be media. Regression and mutation
 checks cover both directions; this does not yet qualify media-aware numerical consumers.
+
+## Row-qualified construction links (P2, 2026-11-17)
+
+Provisional implementation choice: resolve `(row, key)` against a construction recomputed from
+its original inputs, then reuse the existing atomic relation engine. Bind the complete
+construction and raw link reply, preserve row outcomes, and cite exact endpoint-row evidence.
+Reject caller-manufactured IDs, first-match label resolution, trusting copied accepted-key maps,
+implicit before edges from adjacency and a second relation validator. Existing bounded relation
+semantics stay versioned; full Scala temporal/causal/hierarchy behavior remains owed.
+[Contract](construction-links.md).
