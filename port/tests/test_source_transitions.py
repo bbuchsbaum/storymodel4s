@@ -424,6 +424,41 @@ def test_primary_memberships_reject_wrong_rows_and_multidocument_evidence():
         project_source(account, SourceProjectionPolicy(memberships={multi.id: row_a.id}))
 
 
+def test_projection_refuses_empty_primary_parent_in_direct_and_forged_accounts():
+    document = Document.create("parent-control", "source", "AA BB")
+    scene = Unit(kind="scene", support=support(document, 0, 5))
+    row = Unit(kind="row", support=support(document, 0, 2))
+    # Both legal forms continue to construct hierarchy, including the root None value.
+    unparented = make_account((document,), units=(row,))
+    assert project_source(unparented).nodes[0].parent is None
+    child = Unit(kind="row", support=row.support, parent=scene.id)
+    parented = make_account((document,), units=(scene, child))
+    assert (
+        next(n for n in project_source(parented).nodes if n.anchor == child.id).parent == scene.id
+    )
+
+    # Existing account validation permits an empty parent; this consumer must refuse
+    # it explicitly rather than indexing a nonexistent hierarchy endpoint.
+    direct = Unit(kind="row", support=row.support, parent="")
+    invalid = make_account((document,), units=(direct,))
+    forged = unparented.model_copy(
+        update={"units": (row.model_copy(update={"id": "", "parent": ""}),)}
+    )
+    for account in (invalid, forged):
+        with pytest.raises(ValueError, match="primary parent"):
+            project_source(account)
+
+
+@pytest.mark.parametrize("invalid", [False, 0, "", []])
+def test_projection_refuses_invalid_falsy_policies(invalid):
+    account = make_account((Document.create("policy-control", "source", "AA"),))
+    expected = project_source(account, SourceProjectionPolicy())
+    assert project_source(account, None) == expected
+    assert project_source(account, {}) == expected  # structurally valid default fields
+    with pytest.raises(ValueError):
+        project_source(account, invalid)
+
+
 def test_extreme_external_logit_retains_tiny_source_mass_and_overflowed_scores_refuse():
     source, (a, b, _, _, _), _ = source_account()
     recall, units = recall_account()

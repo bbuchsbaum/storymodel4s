@@ -201,7 +201,9 @@ def project_source(
     unambiguous document, entity neighbors use first-occurrence rank; labels never join IDs.
     """
     checked = _one_side(account, "source")
-    selected = _validate_instance(SourceProjectionPolicy, policy or SourceProjectionPolicy())
+    selected = _validate_instance(
+        SourceProjectionPolicy, SourceProjectionPolicy() if policy is None else policy
+    )
     docs = {d.id: d for d in checked.documents}
     if len(set(selected.scoring_documents)) != len(selected.scoring_documents) or any(
         d not in docs for d in selected.scoring_documents
@@ -223,6 +225,8 @@ def project_source(
         ):
             raise ValueError("primary row must contain all situation evidence")
         parents[child] = row_parent
+    if any(parent is not None and parent not in parents for parent in parents.values()):
+        raise ValueError("primary parent must be an existing source anchor or None")
     # Height, not a hard-coded scene level: nested scenes retain their actual hierarchy.
     levels = {s: 0 for s in situations}
     levels.update({u.id: 1 if u.kind == "row" else 2 for u in checked.units})
