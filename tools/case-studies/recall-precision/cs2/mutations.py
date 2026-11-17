@@ -288,6 +288,16 @@ MUTANTS = [
         test="test_small_batches_respect_the_window",
     ),
     dict(
+        id="M30",
+        guard="a pass-1 fragment is a ledger count, never a non-film destination",
+        file="cs2/ff_producer.py",
+        edits=[('            conv["fragment_words"] += len(wids)  # a ledger count, never a destination\n'
+                '        elif kind == "work":',
+                '            sample_of = {w: StateSample(uid, "fragment") for w in wids}\n'
+                '        elif kind == "work":')],
+        test="test_state_mapping_matches_the_gold_definitions",
+    ),
+    dict(
         id="M16",
         guard="the part marginal places a unit's mass on the unit's own part",
         file="cs2/projections.py",

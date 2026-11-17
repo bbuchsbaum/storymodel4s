@@ -5,7 +5,7 @@ Usage (from tools/case-studies/recall-precision):
   python -m cs2.run baselines CORPUS OUT_DIR      # development participants with gold only
   python -m cs2.run sherlock-smoke OUT_DIR
   python -m cs2.run ff-run OUT_DIR --export DIR --seed N --salt S --sample K \\
-      [--sessions development|p:s,...] [--dry]      # without --dry it makes model calls
+      [--sessions development|p:s,...] [--arm A] [--jobs N] [--dry|--cache-only]
 
 Outputs (under the ignored data root): summary.json, rows.tsv (keys and bits, no text) and
 manifest.json with the commit SHA, the config digest and input digests. Recall text is read into
@@ -508,15 +508,18 @@ def cmd_ff_run(args):
     [--sessions development | p:s,p:s,...] [--dry]. Without --dry this makes model calls."""
     from cs2 import ff_producer as P
 
+    P.CACHE_ONLY = "--cache-only" in args
     state = git_state()  # before any model call
     opt = {}
     rest = []
     it = iter(args)
     for a in it:
-        if a in ("--export", "--seed", "--salt", "--sample", "--sessions", "--arm"):
+        if a in ("--export", "--seed", "--salt", "--sample", "--sessions", "--arm", "--jobs"):
             opt[a[2:]] = next(it)
         elif a == "--dry":
             opt["dry"] = True
+        elif a == "--cache-only":
+            opt["cache_only"] = True
         else:
             rest.append(a)
     for k in ("export", "seed", "salt", "sample"):
@@ -535,7 +538,8 @@ def cmd_ff_run(args):
     seed, sample = int(opt["seed"]), int(opt["sample"])
     acc, ledger, log, conds = P.run(A, sessions, Path(opt["export"]), out, seed, opt["salt"],
                                     sample, dry=bool(opt.get("dry")),
-                                    arm=opt.get("arm", "coverage"))
+                                    arm=opt.get("arm", "coverage"),
+                                    jobs=int(opt.get("jobs", 1)))
     calls = P.call_ledger(log)
     extra = dict(
         participants=sorted({p for p, _ in sessions}), sessions=[f"{p}:{s}" for p, s in sessions],
@@ -544,6 +548,7 @@ def cmd_ff_run(args):
                                         for c in log],
         calls=calls, export_index_sha256=ledger["export_index_sha256"],
         batches=ledger["batches"], dry=bool(opt.get("dry")), arm=opt.get("arm", "coverage"),
+        cache_only=bool(opt.get("cache_only")),
         word_clock=A.WORD_CLOCK_RECEIPT,
         gold_clock=A.gold_clock_receipt(sorted({p for p, _ in sessions})),
     )

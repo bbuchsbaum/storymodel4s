@@ -27,13 +27,16 @@ Seeds: pass-1 film order from (seed, sample, participant, session); pass-2 batch
 sample takes a new seed and salt, so nothing is reused across samples.
 
 Declared conversion into the account (cs2.account):
-- content: pass-2 references with member weight = top frame weight x alt weight. Non-episodic
-  talk becomes a typed state (metamemory -> memory_search, commentary, fragment);
+- content: pass-2 references with member weight = top frame weight x alt weight. Pass-2
+  metamemory or commentary inside the framed film is a WorkReference to the framed work;
 - work: a WorkReference to the top frame film; with a stated position, a PositionReference
   resolved by `resolve_position` (ordinals, "second to last", "next", "previous");
 - memory_search with a frame: a WorkReference (the gold codes memory search within a film as
   film-level; a typed 'searching within work' state is a vocabulary-ADR gap). Without a frame:
-  the non-film state memory_search. gave_up, off_task, fragment: typed states;
+  the non-film state memory_search. gave_up and off_task: non-film states. A pass-1 'work'
+  remark with no framed work: the non-film commentary state;
+- fragment (pass 1 or pass 2: no content of its own) is a ledger count (fragment_words), never
+  a destination and never non-film mass; its words are uncovered;
 - shapes: occurrence joint (two or more intervals) -> JOINT; repeated or generic -> SINGLE with one
   constituent per interval; mode gist with extent stretch -> BROAD; otherwise SINGLE. A BROAD
   hypothesis is located by projections.broad_case;
@@ -404,9 +407,32 @@ def conditions(seed, salt, sample, arm="coverage", word_clock=None):
 # ---------------------------------------------------------------- calls with a log
 
 
+CACHE_ONLY = False  # set for a rescore: a cache miss is refused instead of calling the model
+_PREFETCHED_FRESH: set = set()
+
+
+def prefetch(pairs, jobs):
+    """Make the first-attempt calls for [(prompt, system)] in parallel; later logged calls read
+    them from the cache but are still counted as fresh."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    todo = []
+    for prompt, system in pairs:
+        key = sha(json.dumps([MODEL, system, prompt]))
+        if not (CACHE / f"{key}.json").exists():
+            if CACHE_ONLY:
+                raise RuntimeError(f"cache miss in a cache-only run: {key}")
+            todo.append((key, prompt, system))
+    with ThreadPoolExecutor(max(1, jobs)) as ex:
+        list(ex.map(lambda t: call(t[1], t[2], model=MODEL), todo))
+    _PREFETCHED_FRESH.update(k for k, _, _ in todo)
+
+
 def logged_call(prompt, system, log, label, condition):
     key = sha(json.dumps([MODEL, system, prompt]))
-    cached = (CACHE / f"{key}.json").exists()
+    cached = (CACHE / f"{key}.json").exists() and key not in _PREFETCHED_FRESH
+    if CACHE_ONLY and not (CACHE / f"{key}.json").exists():
+        raise RuntimeError(f"cache miss in a cache-only run: {label}")
     t0 = time.time()
     text = call(prompt, system, model=MODEL)
     rec = json.loads((CACHE / f"{key}.json").read_text())
@@ -631,7 +657,11 @@ def convert_session(
                     rid, top[0], top[1], condition=conds["pass1"]["id"]
                 )
             sample_of = {w: RefSample(rid) for w in wids}
-        elif kind in ("memory_search", "gave_up", "off_task", "fragment"):
+        elif kind == "fragment":
+            conv["fragment_words"] += len(wids)  # a ledger count, never a destination
+        elif kind == "work":  # a remark with no framed work: the non-film commentary state
+            sample_of = {w: StateSample(uid, "commentary") for w in wids}
+        elif kind in ("memory_search", "gave_up", "off_task"):  # between films, or no film
             sample_of = {w: StateSample(uid, kind) for w in wids}
         elif kind == "content" and i in items_by_k:
             got = answers.get(items_by_k[i]["oid"])
@@ -641,9 +671,14 @@ def convert_session(
                 x, rowmap = got
                 conv["frame_mismatch"] += bool(x.get("frame_mismatch"))
                 talk = x.get("talk")
-                if talk in ("metamemory", "commentary", "fragment"):
-                    st = "memory_search" if talk == "metamemory" else talk
-                    sample_of = {w: StateSample(uid, st) for w in wids}
+                if talk == "fragment":
+                    conv["fragment_words"] += len(wids)  # a ledger count, never a destination
+                elif talk in ("metamemory", "commentary"):
+                    # memory search or commentary inside the framed film: work-level
+                    rid = f"{uid}:work"
+                    refs[rid] = WorkReference(rid, top[0], top[1],
+                                              condition=conds["pass2"]["id"])
+                    sample_of = {w: RefSample(rid) for w in wids}
                 else:
                     pairs = [(w, t) for w in wids for t in toks(words[w].text)]
                     utoks = [t for _, t in pairs]
@@ -698,6 +733,7 @@ def run(
     sample: int,
     dry: bool = False,
     arm: str = "coverage",
+    jobs: int = 1,
 ):
     """Both passes over `sessions` (development only), pass 2 pooled across them.
 
@@ -739,6 +775,11 @@ def run(
             pass1_film_order=order1,
             pass1_prompt_sha256=sha256(prompt1),
         )
+        data[(p, s)] = dict(words=words, units=units, prompt1=prompt1, rec=rec)
+    if not dry:
+        prefetch([(d["prompt1"], PASS1_SYSTEM) for d in data.values()], jobs)
+    for (p, s), d in data.items():
+        words, units, prompt1, rec = d["words"], d["units"], d["prompt1"], d["rec"]
         if dry:
             p1, retries = [], 0
         else:
@@ -781,14 +822,17 @@ def run(
                 )
     batches = make_batches(items, seed, sample)
     ledger["batches"] = batch_report(batches)
-    answers, p2_calls = {}, []
+    answers, p2_calls, rendered = {}, [], []
     for bi, batch in enumerate(batches):
         rng = random.Random(f"{seed}:{sample}:pass2:call{bi}")
         bworks = sorted({it["work"] for it in batch})
         outline2, rowmap, order2 = film_outline(
             comp, texts, bworks, rng, f"{salt}:{sample}:call{bi}", True
         )
-        prompt2 = pass2_prompt(batch, outline2)
+        rendered.append((pass2_prompt(batch, outline2), rowmap, order2))
+    if not dry:
+        prefetch([(r[0], PASS2_ARMS[arm]) for r in rendered], jobs)
+    for bi, (batch, (prompt2, rowmap, order2)) in enumerate(zip(batches, rendered)):
         rec = dict(
             call=bi,
             items=len(batch),
@@ -827,6 +871,7 @@ def run(
         shapes={},
         broad_cases={},
         positions=dict(resolved=0, unresolved=0),
+        fragment_words=0,
     )
     for key, d in data.items():
         by_k = {it["k"]: it for it in items if it["session_key"] == key}

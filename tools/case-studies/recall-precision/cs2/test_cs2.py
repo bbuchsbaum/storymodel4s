@@ -852,6 +852,48 @@ def test_condition_ids_follow_prompt_digests():
     assert a["pass2"]["renderer_sha256"] == P.renderer_sha256()
 
 
+def test_state_mapping_matches_the_gold_definitions():
+    # fragment -> ledger count; commentary or metamemory inside the framed film -> work-level;
+    # memory search between films, gave up, off task -> non-film; an unframed remark -> non-film
+    # commentary.
+    P = _producer()
+    from cs2.source import RecallWord
+
+    comp = fixture()
+    words = [RecallWord(i, f"w{i}", float(i)) for i in range(14)]
+    units = [dict(first=2 * i, last=2 * i + 1) for i in range(7)]
+    frames = [
+        dict(kind="fragment", frame=[("B", 0.9)], position=None),
+        dict(kind="content", frame=[("B", 0.8)], position=None),
+        dict(kind="content", frame=[("C", 1.0)], position=None),
+        dict(kind="content", frame=[("C", 1.0)], position=None),
+        dict(kind="memory_search", frame=[], position=None),
+        dict(kind="work", frame=[], position=None),
+        dict(kind="gave_up", frame=[], position=None),
+    ]
+    items = {k: dict(oid=f"o{k}") for k in (1, 2, 3)}
+    answers = {"o1": (dict(talk="commentary"), {}), "o2": (dict(talk="metamemory"), {}),
+               "o3": (dict(talk="fragment"), {})}
+    conds = P.conditions(1, "s", 1)
+    refs = {}
+    conv = dict(references=0, refused={}, frame_mismatch=0, pass2_missing=0, shapes={},
+                broad_cases={}, positions=dict(resolved=0, unresolved=0), fragment_words=0)
+    cells = P.convert_session(("P", "s"), words, units, frames, answers, items, comp, conds,
+                              refs, conv)
+    kinds = [type(c.sample).__name__ for c in cells[::2]]
+    assert kinds == ["Uncovered", "RefSample", "RefSample", "Uncovered", "StateSample",
+                     "StateSample", "StateSample"], kinds
+    assert conv["fragment_words"] == 4
+    w1, w2 = refs[cells[2].sample.ref], refs[cells[4].sample.ref]
+    assert isinstance(w1, WorkReference) and w1.work == "B" and abs(w1.weight - 0.8) < 1e-12
+    assert isinstance(w2, WorkReference) and w2.work == "C"
+    assert [cells[i].sample.state for i in (8, 10, 12)] == ["memory_search", "commentary",
+                                                             "gave_up"]
+    acc = Account(comp, refs, {("P", "s"): cells})
+    row = LocationDistribution.from_words(acc, cells, [Bin(0, 2)]).rows[0]
+    assert row.state == "only_uncovered"  # a fragment unit is never non-film mass
+
+
 # ---------------------------------------------------------------- runner
 
 

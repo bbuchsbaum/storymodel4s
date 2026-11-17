@@ -215,6 +215,20 @@ was silent. These are declarations, not owner decisions.
   (`wordOnsetsAreMeasured: false`), so the word clock still carries the authors' utterance
   timing.
 
+- **The pass-2 prompt is the coverage arm** (owner, 2026-11-16). On the three A/B sessions
+  (sub-02, sub-07, sub-08), the total hierarchical log loss is lower for all three participants
+  (mean 1.466 vs 1.551 bits). Coverage is higher (12.5% vs 20.4% of words uncovered), and the
+  work term is better. The scene term (0.985 vs 0.964) differs within noise at n = 3.
+- **Producer states map onto the gold's definitions** (owner, 2026-11-16). The first mapping
+  disagreed with how the gold is coded, so the film term lost to the flat baseline.
+  - A fragment (no content of its own) is a ledger count, like uncovered words, and never
+    non-film mass.
+  - Commentary, metamemory or memory search inside a framed film is a work-level reference of
+    the framed work.
+  - Only memory search between films (no framed work), gave up and off task are non-film
+    destinations.
+  - A remark with no framed work is the non-film commentary state.
+
 **Gaps for the vocabulary ADR.**
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the
