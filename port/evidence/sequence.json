@@ -1,0 +1,86 @@
+{
+  "source_commit": "f38a97a919624986fc60839da23a94743698e130",
+  "scope": "P4.1 supplied-transition sparse sequence kernel; not full Graph-HSMM workflow parity",
+  "checks": {
+    "full_suite_before_test_only_additions": "384 passed in 4.73s at pre-review implementation",
+    "final_affected": "16 passed; independently repeated by reviewer",
+    "mypy": "35 source files passed",
+    "ruff": "lint passed and format check 81 files passed",
+    "schema": "request/result generated schema equality passed",
+    "installed_wheel": "site-packages outside checkout; example/API/CLI equality/readback/changed-input refusal at8f35616a4; rebuilt finalwheel example/readback/Boolean and UTF-16 regressions passed",
+    "final_full_suite": "388 passed in 4.86s at f38a97a91"
+  },
+  "independent_review": {
+    "reviewer": "sequence_review",
+    "initial": "Two BLOCKs at8f35616a4: serialization coerces forged Boolean float fields; codepoint ordering differs from Scala UTF-16 ordering.",
+    "resolution": "Both closed atf38a97a91; no new BLOCK in narrow delta.",
+    "numerics": "200 seeded sparse varying-layer direct Decimal enumerations agreed on marginals, flows, MAP and logZ; maximum probability error 1.11e-16. Extreme signed-cost cancellation retained3:1 odds. These are reviewer-run probes, not a committed universal error bound."
+  },
+  "mutations": [
+    {
+      "change": "Convert log operands to float before subtraction in _probabilities",
+      "named_test": "test_decimal_oracle_retains_huge_traded_costs_with_both_priors",
+      "result": "Baseline3 passed; compiled mutant1 named failure,2 controls passed"
+    },
+    {
+      "change": "Serialize request instance before validation",
+      "named_test": "test_model_copies_cannot_smuggle_boolean_numbers_through_serialization",
+      "result": "Baseline3 passed; compiled mutant1 named failure,2 controls passed"
+    },
+    {
+      "change": "Serialize result instance before validation",
+      "named_test": "test_model_copies_cannot_smuggle_boolean_numbers_through_serialization",
+      "result": "Compiled mutant1 named failure,2 controls passed"
+    },
+    {
+      "change": "Compare rendered keys as Python strings instead of UTF-16BE bytes",
+      "named_test": "test_viterbi_ties_use_scala_utf16_order_for_valid_unicode_ids",
+      "result": "Compiled mutant1 named failure,2 controls passed"
+    }
+  ],
+  "sparse_smoke": {
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "python": "3.12.11",
+    "measurement": "perf_counter around infer_sequence under tracemalloc; peak Python allocation, not RSS; single samples, no Scala comparison",
+    "generator": "states segment/str(j); unit str(i); cost ((i+j)%5)/10; temperature .2; each origin j has two outgoing edges to j and(j+1)%width with probability.5; construct inputs before timing",
+    "cases": [
+      {
+        "units": 20,
+        "states_per_unit": 8,
+        "edges": 304,
+        "seconds": 0.040213,
+        "peak_python_bytes": 1218462
+      },
+      {
+        "units": 100,
+        "states_per_unit": 8,
+        "edges": 1584,
+        "seconds": 0.200939,
+        "peak_python_bytes": 6142576
+      },
+      {
+        "units": 100,
+        "states_per_unit": 32,
+        "edges": 6336,
+        "seconds": 0.800742,
+        "peak_python_bytes": 23644840
+      }
+    ],
+    "revision": "8f35616a4 before input-validation/Unicode review delta"
+  },
+  "shared_lessons": [
+    "2bca9ffd-f420-4b20-bfcd-49ff635b9eff",
+    "9b2ceed7-01a0-495d-b5f5-13cdb72cafa9"
+  ],
+  "limits": [
+    "No Scala gate or direct Scala execution in this slice.",
+    "No calibrated probability or empirical accuracy claim.",
+    "No universal long-chain error or speedup bound.",
+    "Graph-derived transitions, evidence/mode gates, refinement, reconstruction and broader P2-P6 capabilities remain owed."
+  ],
+  "next_action": {
+    "bead": "bd-01M7KWTTVNKHF6V0HGDC2344NA",
+    "scope": "Repair public instance validation before serialization, then rich relation/identity/structural consumers.",
+    "confirmed_reproduction": "AlignmentPolicy max_candidates=True becomes integer1 through validate_policy; direct model_validate refuses."
+  }
+}
