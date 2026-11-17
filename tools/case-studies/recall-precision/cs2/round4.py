@@ -466,6 +466,37 @@ def describe(X, named, fcs, bands=None):
     return out
 
 
+def step_split(X, prod, dec):
+    """Post hoc: scene-scored rows by the gold step from the previous scene-coded row of the
+    same work (the last valid scene of each set, as the transition fit takes it)."""
+    rows = X.rows()
+    out, prev = {}, None
+    for i, g in enumerate(rows):
+        if prev is not None and (prev[0], prev[1]) != (g.participant, g.session):
+            prev = None
+        if g.work is None:
+            continue
+        if prev is not None and prev[2] != g.work:
+            prev = None
+        t = DC._top(g, X.valid) if g.specific else None
+        if t is None:
+            continue
+        j = X.valid[g.work].index(t)
+        k = None if prev is None else j - prev[3]
+        key = ("first in the work" if k is None else "stay" if k == 0 else "forward 1"
+               if k == 1 else "forward 2-3" if 2 <= k <= 3 else "forward 4+" if k > 3
+               else "backward")
+        if prod[i].scene_bits is not None:
+            out.setdefault(key, []).append(i)
+        prev = (g.participant, g.session, g.work, j)
+    return {k: dict(n=len(ii),
+                    producer_scene_bits=float(np.mean([prod[i].scene_bits for i in ii])),
+                    decoded_scene_bits=float(np.mean([dec[i].scene_bits for i in ii])),
+                    producer_top_scene=float(np.mean([prod[i].scene_hit for i in ii])),
+                    decoded_top_scene=float(np.mean([dec[i].scene_hit for i in ii])))
+            for k, ii in sorted(out.items())}
+
+
 def run_variant(X, fmap, alpha=None, extra=None, bands=None):
     """Decode one evidence map. alpha None: fitted leave-one-participant-out; else fixed."""
     dcd = Decoder(X, fmap)
@@ -509,12 +540,13 @@ def decode(out_json):
         bands[t] = 2 * float(np.std(d, ddof=1)) / math.sqrt(len(d))
     res["pooled_bands"] = bands
     F = res["corpora"]["filmfestival"] = {}
-    F["sample_1"], a_ff, _ = run_variant(ff, f1, None, dict(pass1_only=pass1_only(ff, 1)), bands)
+    F["sample_1"], a_ff, n_ff = run_variant(ff, f1, None, dict(pass1_only=pass1_only(ff, 1)),
+                                            bands)
     F["sample_2"], _, _ = run_variant(ff, f2, None, dict(pass1_only=pass1_only(ff, 2)), bands)
     ens = {k: [SC.EnsembleForecast([x, y]) for x, y in zip(f1[k], f2[k])] for k in ff.keys}
     F["ensemble"], _, _ = run_variant(ff, ens, None, None, bands)
     S = res["corpora"]["sherlock"] = {}
-    S["part_order_run"], _, _ = run_variant(sh, sh.producer(1), a_ff)
+    S["part_order_run"], _, n_sh = run_variant(sh, sh.producer(1), a_ff)
     res["null_producer_equals_order_prior_only"] = dict(
         filmfestival=null_check(ff, 1, a_ff), sherlock=null_check(sh, 1, a_ff))
     # the gold-blind windows: every fitted quantity is refitted on the windowed rows
@@ -537,6 +569,18 @@ def decode(out_json):
         "3_sherlock_confirmation": bool(c3), "4_beats_references_on_scene": bool(c4)}
     res["verdict"] = "KEEP" if c1 and c2 and c3 and c4 else "DROP"
     res["sherlock_alpha"] = a_ff
+    # post hoc: computed after the verdict to explain it; no decision rests on any of it
+    own, _, _ = run_variant(sh, sh.producer(1))
+    res["post_hoc"] = dict(
+        note="computed after the verdict to explain it; not part of the protocol, and no "
+        "decision rests on it",
+        by_gold_step=dict(
+            filmfestival_sample_1=step_split(ff, n_ff["producer"], n_ff["producer_decoded"]),
+            sherlock_part_order_run=step_split(sh, n_sh["producer"], n_sh["producer_decoded"])),
+        sherlock_alpha_fitted_within_sherlock=dict(
+            alpha=own["alpha"], forecasts={k: own["forecasts"][k] for k in
+                                           ("producer", "producer_decoded")},
+            tests={k: own["tests"][k] for k in TERMS[False]}))
     out_json.parent.mkdir(parents=True, exist_ok=True)
     out_json.write_text(json.dumps(res, indent=1, default=str) + "\n")
     print(out_json)
