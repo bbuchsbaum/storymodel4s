@@ -38,6 +38,15 @@ from .rich_workflow import RichRecording, import_rich, replay_rich
 from .scenes import SceneGroup, group_source_rows, verify_scene_grouping
 from .sequence import SequenceRequest, SequenceResult, infer_sequence, verify_sequence
 from .source import SourceRow, compile_source, prepare_source, verify_source
+from .source_transitions import (
+    SourceProjectionPolicy,
+    SourceSequenceSpec,
+    TransitionWeights,
+    build_source_sequence,
+    project_source,
+    verify_source_projection,
+    verify_source_sequence,
+)
 from .source_workflow import SourceRecording, import_source, replay_source
 
 __version__ = "0.1.0"
@@ -62,6 +71,13 @@ __all__ = [
     "SequenceRequest",
     "SequenceResult",
     "SourceRow",
+    "SourceProjectionPolicy",
+    "SourceSequenceSpec",
+    "TransitionWeights",
+    "build_source_sequence",
+    "project_source",
+    "verify_source_projection",
+    "verify_source_sequence",
     "SceneGroup",
     "group_source_rows",
     "verify_scene_grouping",

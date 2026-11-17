@@ -56,6 +56,12 @@ from .rich_workflow import RichRecording, import_rich, read_rich_request, replay
 from .scenes import SceneGroup, group_source_rows
 from .sequence import infer_sequence, validate_sequence, verify_sequence
 from .source import SourceRow, prepare_source
+from .source_transitions import (
+    SourceSequenceResult,
+    SourceSequenceSpec,
+    build_source_sequence,
+    verify_source_sequence,
+)
 from .source_workflow import (
     SourceRecording,
     import_source,
@@ -350,10 +356,57 @@ def main(argv: list[str] | None = None) -> int:
     )
     sequence_check.add_argument("request")
     sequence_check.add_argument("result")
+    for name in ("build-source-sequence", "verify-source-sequence"):
+        source_sequence = commands.add_parser(
+            name, help="derive or verify source graph transitions"
+        )
+        source_sequence.add_argument("source")
+        source_sequence.add_argument("recall")
+        source_sequence.add_argument("spec")
+        source_sequence.add_argument("--source-sha256")
+        source_sequence.add_argument("--recall-sha256")
+        if name == "build-source-sequence":
+            source_sequence.add_argument("--request-only", action="store_true")
+            source_sequence.add_argument("--output")
+        else:
+            source_sequence.add_argument("result")
     args = parser.parse_args(argv)
     try:
         if args.command == "example":
             emit(example_account().model_dump(mode="json"), args.output)
+        elif args.command in ("build-source-sequence", "verify-source-sequence"):
+            graph_source = read_supported_account(
+                Path(args.source), expected_sha256=args.source_sha256
+            )
+            building = args.command == "build-source-sequence"
+            if building and graph_source.export_permission != "allowed":
+                raise PermissionError("producer denies source sequence export")
+            graph_recall = read_supported_account(
+                Path(args.recall), expected_sha256=args.recall_sha256
+            )
+            if building and graph_recall.export_permission != "allowed":
+                raise PermissionError("producer denies recall sequence export")
+            graph_spec = SourceSequenceSpec.model_validate_json(
+                canonical(strict_json(Path(args.spec).read_bytes()))
+            )
+            if building:
+                graph_result = build_source_sequence(graph_source, graph_recall, graph_spec)
+                emit(
+                    (graph_result.request if args.request_only else graph_result).model_dump(
+                        mode="json"
+                    ),
+                    args.output,
+                )
+            else:
+                graph_result = verify_source_sequence(
+                    graph_source,
+                    graph_recall,
+                    graph_spec,
+                    SourceSequenceResult.model_validate_json(
+                        canonical(strict_json(Path(args.result).read_bytes()))
+                    ),
+                )
+                emit({"valid": True, "spec_sha256": graph_result.spec_sha256}, None)
         elif args.command in ("infer-sequence", "verify-sequence"):
             sequence_request = validate_sequence(Path(args.request).read_bytes())
             if args.command == "infer-sequence":

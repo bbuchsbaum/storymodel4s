@@ -371,3 +371,25 @@ and full P3 correspondence remain owed. No question count is presented as accura
 - **Limits:** the sparse reference algorithm is executed; direct-reference and grading replies
   are scripted engineering controls, not an accuracy comparison. Semantic/embedding channels,
   event/episode grain, richer graph families and whole-film/neighbor-aware assessment remain owed.
+
+## P4 source-layer and transition producer (2026-11-17)
+
+`source_transitions.py` connects checked independent source/recall accounts and declared local
+states/costs to the existing sequence kernel. Reference implementations: `align/hsmm.scala`
+`TransitionFeatures.between` and `transitionRow`; `bridge/StorySourceView.scala` primary
+containment, precedence cover and bounded entity continuity; `source.scala` declared scoring
+coordinates. Relevant Scala witnesses: `TransitionFeaturesSuite`, `WorkedExampleSuite`,
+`LocalEvidenceSuite` (the latter's complete producer remains owed).
+
+Python entry points: `project_source`, `build_source_sequence`, their recomputing verifiers,
+and `build-source-sequence`/`verify-source-sequence`. Independent evidence: analytical feature
+and mixture assertions, tiny path enumeration, missingness/ownership/forgery refusals and
+installed offline example. Mote: `bd-01M7M3WSMQ8VA0CPGSFQN54VK9`.
+
+Preserved: source/distorted anchor transitions, external/unranked mixtures, declared-position
+missingness, hierarchy directions, causal OR versus direction, sparse relation layers and
+account-bound receipts. Explicit new recipe: first-occurrence discourse ordering, canonical
+text opt-in per document, bounded cross-coordinate entity ordering, and external-population
+refusal. Full local evidence/mode gates/cost production, chart-aware comparisons, semantic
+providers, complete narrative construction, refinement and readouts remain owed. No new Scala
+execution or scientific accuracy claim. [Contract and limits](source-transitions.md).

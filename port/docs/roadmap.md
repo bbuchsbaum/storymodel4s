@@ -5,7 +5,7 @@ capabilities available in idiomatic Python, improving the implementation using l
 Small slices are delivery order, not scope cuts. Deferred work remains owed.
 
 This is the current **port** execution direction, refreshed on 2026-11-17 through
-rich-consumer integration and the claim-assessment implementation in progress.
+the correspondence workflow and the source-derived transition producer.
 It extends [Stage 1](stage-1.md); it does not supersede the parent project's
 [VISION](../../VISION.md), scientific contracts or Scala roadmap. Mote holds live status.
 The [preservation map](preservation.md) remains the behavioral contract. Phase numbering starts
@@ -29,9 +29,11 @@ evidence, not a claim that the branch has landed or that the full phases are com
 The sparse sequence kernel and rich relation path have local implementation and independent
 evidence; see [sequence inference](sequence-inference.md) and [relations](relations.md).
 Rich identity extends the same sidecar path to state participants; [rich structural candidates](alignment.md)
-extend the sparse local rule with separate qualifier diagnostics. Finish the fixed-population
-claim-assessment slice, then deliver a discriminating correspondence workflow. Playback, attribution,
-richer graph families, semantic channels and account-derived inference remain owed. Mote owns
+extend the sparse local rule with separate qualifier diagnostics. Fixed-population claim
+assessment, conditional fidelity and the discriminating [correspondence workflow](correspondence-workflow.md)
+now have local implementation and evidence. The next connected producer derives sequence
+transitions from checked source structure; full admissibility and local-cost production remain owed.
+Playback, attribution, richer graph families and semantic channels remain owed. Mote owns
 live status; the preservation map records each slice's behavioral coverage and limitations.
 
 Do not require a complete event graph for basic categorical localization. Conversely, graph
@@ -224,8 +226,9 @@ proof precedes scientific claims, but scientific qualification must not block un
 
 These checkpoints organize the next work across P2–P6; they do not rename the phases or
 replace their full exits. The supplied-transition kernel and rich consumer integrations are
-already implemented locally. Do not restart them. Claim assessment is in progress under
-`bd-01M7M0916GDS07X2Q0M0TCRQTK`; its text profile does not yet close chart/playback assessment.
+already implemented locally. Do not restart them. Claim assessment, conditional fidelity and
+the correspondence controls have local evidence; their text profiles do not close chart/playback
+assessment or whole-film/neighbor-aware grading.
 Mote owns verification and landing status.
 
 ### 1. Finish assessment and demonstrate useful correspondence — P3
@@ -257,8 +260,9 @@ coverage; source identity and bytes remain unchanged across recalls. Validate re
 exact input binding and the relevant scientific distinctions independently. Recorded model
 replies establish reproducibility, not model accuracy.
 
-**Next action:** complete verification and cold review of the current claim-assessment slice,
-then add the correspondence workflow and hypothesis-conditional graded assessment.
+**Next action:** continue the P4 account-derived inference connection below, while retaining
+semantic channels, expanded target grains and richer assessment profiles in the P3 backlog.
+The correspondence demonstration does not close every P3 capability.
 
 ### 2. Complete the representations that downstream computation needs — P2
 

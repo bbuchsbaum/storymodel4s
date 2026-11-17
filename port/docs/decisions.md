@@ -234,3 +234,17 @@ changing the existing identity rule, or silently rewriting paired/mapped artifac
 small source grouping operation; full narrative hierarchy remains owed. The connected
 [correspondence control](correspondence-workflow.md) executes both reference routes separately
 and records which results are computed versus scripted.
+
+## Source-derived transitions (P4, 2026-11-17)
+
+Provisional implementation choice: one checked projection/transition module feeds the existing
+numerical kernel, binding independent source and recall snapshots and supplied local costs.
+Preserve explicit primary containment and optional canonical-text scoring; distinguish
+discourse order from the narrated-world precedence cover. Use sparse dictionaries and
+bounded-memory reachability rather than copying Scala's stored transitive closure. Rejected
+alternatives: inferring hierarchy from generic part-of, implicitly using evidence offsets as
+scoring features, comparing unrelated document coordinates, rebuilding the sequence kernel,
+or claiming supplied costs establish admissibility. The versioned projection names its
+first-occurrence ordering and cross-coordinate entity-neighbor rule. Refuse destination
+populations missing the external component required by the mixture rather than silently losing
+mass or changing the model. See [source transitions](source-transitions.md).
