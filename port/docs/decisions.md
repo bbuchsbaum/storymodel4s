@@ -175,3 +175,11 @@ instances retain their declared version instead of disguising a forged version t
 Direct Python validation alone was also rejected: bare strings can contain lone surrogates that
 the previous JSON reader refused, so type-only admission could reach recording I/O before a
 later UTF-8 failure. Valid ASCII and supplementary Unicode remain accepted.
+
+Rich relation consumers (2026-11-17): extend the existing admission/verification/table path
+using explicit v2 proposal and result envelopes for v4 accounts; reuse the same atomic graph
+checks. Rich inspection rows distinguish event and state endpoints. Rejected alternatives:
+silently broadening the v1 event vocabulary, dropping rich collections to fit legacy receipts,
+or maintaining a second graph engine. The four pilot relation rules remain deliberately
+bounded; situation `part_of` does not replace Scala narrative segment hierarchy. Its full
+construction and semantic contract remain owed.

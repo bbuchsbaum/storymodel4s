@@ -23,7 +23,6 @@ from storymodel.model import (
     digest,
     validate_account,
 )
-from storymodel.relations import relation_table
 from storymodel.rich_account import (
     Circumstance,
     RichAccount,
@@ -223,7 +222,7 @@ def test_state_and_circumstance_relational_forgery_refuses(mutation):
 
 def test_old_consumers_refuse_v4_without_silent_state_loss():
     rich = fixture()
-    for consumer in (validate_account, align_account, relation_table):
+    for consumer in (validate_account, align_account):
         with pytest.raises(ValueError, match="different wire version"):
             consumer(rich)
     with pytest.raises(ValueError):

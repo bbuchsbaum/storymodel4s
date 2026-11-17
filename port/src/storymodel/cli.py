@@ -241,7 +241,7 @@ def main(argv: list[str] | None = None) -> int:
     source_replay.add_argument("--account-only", action="store_true")
     source_replay.add_argument("--output")
     relation_admit = commands.add_parser(
-        "admit-relations", help="admit an input-bound recorded event relation batch"
+        "admit-relations", help="admit an input-bound recorded event or state relation batch"
     )
     relation_admit.add_argument("account")
     relation_admit.add_argument("proposals")
@@ -459,7 +459,7 @@ def main(argv: list[str] | None = None) -> int:
                     args.output,
                 )
         elif args.command in ("admit-relations", "relation-table"):
-            relation_account = read_account(
+            relation_account = read_supported_account(
                 Path(args.account), expected_sha256=args.expected_sha256
             )
             if relation_account.export_permission != "allowed":

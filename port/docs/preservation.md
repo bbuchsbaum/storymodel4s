@@ -247,3 +247,23 @@ the value of graph priors are not established by this engineering port.
 Still owed: graph-feature transition construction, local-evidence and mode gates, refinement,
 reconstruction/decision policies, richer alignment methods and feature/measurement consumers.
 This kernel preserves the numerical path-weight model, not full Graph-HSMM workflow parity.
+
+## Rich relation consumer integration
+
+Bead `bd-01M7KYDXPJ4ZE61RWENP3GTWYG` connects v4 accounts to `admit_relations`,
+`verify_relations`, `relation_table` and their existing CLI commands. The shared account validator
+already checks both events and states; this slice makes them constructible and inspectable
+through the same atomic admission engine. Explicit v2 proposal/result envelopes retain every
+rich collection. Legacy v1 schema and output hashes are frozen before the extension.
+
+Scala reference: `story/nodes.scala` defines both event and state situation nodes;
+`story/validate.scala` checks situation endpoints for temporal, causal and reference edges.
+The independent Python witnesses cover each bounded kind on source/recall and mixed/state
+endpoints, foreign context/evidence refusals, union cycles, processing status, copied-object
+tampering and exact account preservation. The installed rich relation example starts from
+construction proposals and compares CLI/API readback. It is an engineering control.
+
+This does not implement Scala's full temporal algebra, causal/reference subfamilies,
+state-change edges, entity relations or `NarrativeHierarchy`. Pilot situation-to-situation
+`part_of` is explicitly distinct from situation/segment membership under a narrative segment.
+Identity and structured candidate consumers still need their own rich-account integration.
