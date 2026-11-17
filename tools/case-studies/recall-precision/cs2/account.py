@@ -153,6 +153,20 @@ class PositionReference:
 
 
 @dataclass(frozen=True)
+class CompositionReference:
+    """A remark about the whole sequence of films: film-level mass spread over all works."""
+
+    id: str
+    weight: float = 1.0
+    condition: str = ""
+    talk: str = "identification"
+    unassigned: float = field(init=False)
+
+    def __post_init__(self):
+        object.__setattr__(self, "unassigned", _check_weights([self.weight], self.id))
+
+
+@dataclass(frozen=True)
 class Comparison:
     a: str
     b: str

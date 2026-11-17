@@ -309,6 +309,48 @@ Each rule below is switched in `scorer-config.json` (`rules`, with the previous 
 - **Cost is notional.** Calls run on the owner's subscription through `claude -p`, so
   `cost_usd` is the CLI's list-price estimate. It is reported beside call and token counts.
 
+### Pass-1 revision (2026-11-17, stage 2; linguistics critique round 2)
+
+One combined change, recorded as a new condition (`--pass1 v2`, run with layout `prefix`).
+Each part has a named test and a mutant.
+
+- **Three fields per unit.**
+  - **talk**, a closed enum plus Custom: content, evaluation, metamemory, search_within,
+    search_next, closing, ending, off_task, fragment.
+  - **topic frame:** the film the discourse is about at this unit, or none.
+  - **referential address class:** moment, work, position, composition, none.
+- **Framing rules.**
+  - search_next has an empty topic frame (enforced by the parser).
+  - An opening cue is framed with the incoming film.
+  - closing is framed with the film it closes.
+  - ending is the non-film state gave_up.
+  - A film switch is a segment boundary with its opening and closing cues.
+- **Converter.**
+  - moment content goes to pass 2.
+  - A framed work address is a work-level reference.
+  - A position address is resolved in its recorded reading: viewing order, or the speaker's
+    recall order (distinct frame films in order of first mention). The ledger records the
+    phrase, the reading and the resolution.
+  - A composition remark is film-level mass spread over all works by the fallback.
+  - search_next, ending and off_task are non-film states. So are unframed metamemory and
+    search_within.
+  - An unframed evaluation is non-film commentary. Framed evaluation, metamemory, search and
+    closing are non-addressed talk, as are fragments and Custom.
+  - A framed row's fallback reads the topic frame.
+- **Two declared variants of `frame_mismatch` as switch evidence**, both on the same calls:
+  - A, `clear-frame`: the unit's frame and its pass-2 references are dropped.
+  - B, `incoming-frame`: as A, and the unit then takes the next framed unit's film when that
+    is different.
+- **Split, recorded before any call**
+  (`data/study/recall-precision/cs2/filmfestival/stage2-20261117/split.json`). The ten coded
+  development participants are sorted by `sha256("cs2-stage2-split-20261117:" + id)`.
+  - Develop on the first five: sub-07, sub-08, sub-14, sub-17, sub-18.
+  - Report on the other five: sub-01, sub-02, sub-10, sub-16, sub-19.
+- **Selection, fixed before any call.** On the develop five, pick the variant with the lower
+  work term. A tie within 0.005 bits goes to the higher ±1 switch F1. The frozen choice must not
+  make the scene term worse than the per-call v1 run on the same rows. It is then run once on
+  the report five.
+
 **Gaps for the vocabulary ADR.**
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the

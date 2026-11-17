@@ -1191,6 +1191,91 @@ def test_span_anchors_convert_to_word_cells():
     assert P.numbered("he ran home") == "[0]he [1]ran [2]home"
 
 
+def _v2_session(replies, answers=None, items=None, rules=None):
+    P = _producer()
+    from cs2.source import RecallWord
+
+    comp = fixture()
+    n = len(replies)
+    words = [RecallWord(i, f"w{i}", float(i)) for i in range(2 * n)]
+    units = [dict(first=2 * i, last=2 * i + 1) for i in range(n)]
+    labels = {w.id: w.label for w in comp.works}
+    raw = [dict(id=f"U{i + 1}", **{k: ([{"film": labels[f], "w": w} for f, w in v]
+                                       if k == "frame" else v) for k, v in r.items()})
+           for i, r in enumerate(replies)]
+    frames, bad = P.parse_frames_v2(raw, units, comp)
+    assert bad == 0
+    refs, conv, framing, talk = {}, P.new_conv(), {}, {}
+    cells = P.convert_session(("P", "s"), words, units, frames, answers or {}, items or {}, comp,
+                              P.conditions(1, "s", 1), refs, conv,
+                              dict(talk="orthogonal", talk_work_variant="identifying",
+                                   **(rules or {})), framing, talk)
+    return comp, frames, cells, refs, conv, framing
+
+
+def test_pass1_v2_talk_frame_and_address():
+    replies = [
+        dict(talk="search_next", frame=[("C", 0.9)], address="none"),       # empty frame
+        dict(talk="content", frame=[("B", 1.0)], address="moment"),          # pass-2 item
+        dict(talk="closing", frame=[("B", 1.0)], address="none"),            # framed talk
+        dict(talk="ending", frame=[], address="none"),                       # non-film state
+        dict(talk="evaluation", frame=[], address="composition"),            # all works
+        dict(talk="content", frame=[("C", 1.0)], address="moment"),
+        dict(talk="evaluation", frame=[("C", 1.0)], address="position",
+             position="the first one I talked about", reading="recall"),
+        dict(talk="off_task", frame=[], address="none"),
+    ]
+    comp, frames, cells, refs, conv, framing = _v2_session(replies)
+    assert frames[0]["frame"] == [] and frames[1]["kind"] == "content"
+    s = [c.sample for c in cells[::2]]
+    assert s[0].state == "memory_search" and type(s[2]).__name__ == "TalkSample"
+    assert s[2].talk == "closing" and s[3].state == "gave_up" and s[7].state == "off_task"
+    assert type(refs[s[4].ref]).__name__ == "CompositionReference"
+    r = refs[s[6].ref]
+    assert r.resolved_work == "B"  # recall order: B was framed first, then C
+    assert conv["position_readings"] == [dict(phrase="the first one I talked about",
+                                              reading="recall", resolved="B")]
+
+
+def test_composition_spreads_over_all_works():
+    comp = fixture()
+    dur = B.with_nonfilm(B.duration_prior(comp, CFG), 0.05)
+    from cs2.projections import Row
+
+    row = Row(Bin(0, 1), "sampled", {("composition",): 1.0}, ("x",), {}, 1)
+    f = SC.producer_forecast(row, comp, dur, CFG["epsilon"])
+    for w in ("A", "B", "C"):
+        close(f.p_work(w), dur.p_work(w) * (1 - CFG["epsilon"]) + f.u * dur.p_work(w))
+    close(f.p_nonfilm(), f.u * 0.05)  # film-level mass: not non-film
+
+
+def test_frame_mismatch_switch_rules():
+    replies = [dict(talk="content", frame=[("B", 1.0)], address="moment"),
+               dict(talk="content", frame=[("C", 1.0)], address="moment")]
+    ans = {"o0": (dict(talk="episodic", frame_mismatch=True, refs=[]), {})}
+    items = {0: dict(oid="o0")}
+    _, _, cells, _, conv, framing = _v2_session(replies, ans, items,
+                                                dict(mismatch_rule="clear-frame"))
+    assert ("P", "s", "P:s:u0") not in framing and conv["mismatch_words"] == 2
+    _, _, _, _, _, framing2 = _v2_session(replies, ans, items,
+                                          dict(mismatch_rule="incoming-frame"))
+    assert framing2[("P", "s", "P:s:u0")] == (("C", 1.0),)
+    _, _, _, _, _, framing3 = _v2_session(replies, ans, items, dict(mismatch_rule="none"))
+    assert framing3[("P", "s", "P:s:u0")] == (("B", 1.0),)
+
+
+def test_switch_timing_early_and_late():
+    comp = fixture()
+    mk = lambda i, w, top: SC.RowScore("P", "s", i, "film_only", w, 0.0, None, top_work=top)  # noqa: E731
+    # gold switches B->C at 2->3 and C->A at 5->6; predicted switches one row early, one late
+    gold = ["B", "B", "B", "C", "C", "C", "A", "A"]
+    pred = ["B", "B", "C", "C", "C", "C", "C", "A"]
+    st = SC.strata([mk(i, g, q) for i, (g, q) in enumerate(zip(gold, pred))], comp, True)
+    t = st["film_switch_f1"]["matched_timing"]
+    assert t == dict(exact=0, early=1, late=1), t
+    assert st["film_switch_f1"]["f1"] == 0.0 and st["film_switch_f1"]["f1_tolerance_1_row"] == 1.0
+
+
 # ---------------------------------------------------------------- runner
 
 

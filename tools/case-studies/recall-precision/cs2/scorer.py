@@ -87,6 +87,7 @@ class ProducerForecast:
     no_sample: bool = False  # True for the typed absences (no sample, only uncovered, ...)
     empty: str = ""  # which typed absence, '' when the row was sampled
     sets: dict = field(default_factory=dict)  # (work, scenes) -> mass on a scene set
+    composition: float = 0.0  # film-level mass spread over all works by the fallback
 
     @property
     def u(self):
@@ -101,6 +102,7 @@ class ProducerForecast:
         )
         sets = math.fsum(m for (sw, _), m in self.sets.items() if sw == w)
         claimed = own + self.spread.get(w, 0.0) + self.outside.get(w, 0.0) + sets
+        claimed += self.composition * self.fallback.p_work(w)
         return (1 - self.eps) * claimed + self.u * self.fallback.p_work(w)
 
     def p_set_and_work(self, scenes, w):
@@ -119,6 +121,7 @@ class ProducerForecast:
             # node, spread over the work's valid scenes by the fallback
             set_part += m * (math.fsum(fs.get(x, 0.0) for x in q if x in scenes) / fq
                              if fq > 0 else f_set)
+        set_part += self.composition * self.fallback.p_work(w) * f_set
         return (1 - self.eps) * (own + self.spread.get(w, 0.0) * f_set + set_part) + self.u * (
             self.fallback.p_work(w) * f_set
         )
@@ -136,10 +139,12 @@ def producer_forecast(row, comp, fallback, eps) -> ProducerForecast:
             {}, {}, {}, 0.0, 1.0, fallback, eps, comp, no_sample=True, empty=row.state
         )
     loc, spread, outside, nonfilm, sets = {}, {}, {}, {}, {}
-    nonwork = abstain = 0.0
+    nonwork = abstain = comp_mass = 0.0
     for key, m in row.mass.items():
         tag = key[0]
-        if tag == "scene_set":
+        if tag == "composition":
+            comp_mass += m
+        elif tag == "scene_set":
             sets[(key[1], key[2])] = sets.get((key[1], key[2]), 0.0) + m
         elif tag == "at":
             if key[1] != "scene":
@@ -163,7 +168,8 @@ def producer_forecast(row, comp, fallback, eps) -> ProducerForecast:
         else:
             raise ScoreError(f"unknown state {key!r}")
     return ProducerForecast(
-        loc, spread, outside, nonwork, abstain, fallback, eps, comp, nonfilm, sets=sets
+        loc, spread, outside, nonwork, abstain, fallback, eps, comp, nonfilm, sets=sets,
+        composition=comp_mass,
     )
 
 
@@ -345,17 +351,24 @@ def strata(scores, comp, work_applicable=True):
             qi = [i for i, x in enumerate(q) if x]
             used = set()
             for i in qi:
-                hit = next((j for j in gi if abs(j - i) <= 1 and j not in used), None)
+                hit = next((j for j in sorted(gi, key=lambda j: abs(j - i))
+                            if abs(j - i) <= 1 and j not in used), None)
                 if hit is None:
                     tol["fp"] += 1
                 else:
                     used.add(hit)
                     tol["tp"] += 1
+                    # timing of a matched predicted switch relative to the gold switch
+                    tol["exact"] = tol.get("exact", 0) + (i == hit)
+                    tol["early"] = tol.get("early", 0) + (i < hit)
+                    tol["late"] = tol.get("late", 0) + (i > hit)
             tol["fn"] += len(gi) - len(used)
         den = 2 * tol["tp"] + tol["fp"] + tol["fn"]
         out["film_switch_f1"] = dict(
             n=len(gold_sw), switches=int(sum(gold_sw)), f1=binary_f1(pred_sw, gold_sw),
             f1_tolerance_1_row=(2 * tol["tp"] / den) if den else float("nan"),
+            matched_timing=dict(exact=tol.get("exact", 0), early=tol.get("early", 0),
+                                late=tol.get("late", 0)),
         )
         out["top_work_agreement"] = dict(
             n=len(film),

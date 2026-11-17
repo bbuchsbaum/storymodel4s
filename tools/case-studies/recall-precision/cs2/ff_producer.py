@@ -71,6 +71,7 @@ from cs2.account import (  # noqa: E402
     AccountError,
     Hypothesis,
     Member,
+    CompositionReference,
     PositionReference,
     Reference,
     RefSample,
@@ -190,7 +191,7 @@ ORDINALS = {
 }
 
 
-def resolve_position(comp, stated, current_work=None):
+def resolve_position(comp, stated, current_work=None, order=None):
     """The work a stated position names, or None when it cannot be resolved.
 
     Absolute: "first" .. "tenth", "last"/"final", "<ordinal> to last" / "penultimate".
@@ -199,7 +200,9 @@ def resolve_position(comp, stated, current_work=None):
     if not stated:
         return None
     s = " ".join(toks(stated))
-    order = films_in_order(comp)
+    order = order if order is not None else films_in_order(comp)
+    if not order:
+        return None
     m = re.search(r"\b(" + "|".join(ORDINALS) + r") (?:to|from the) last\b", s)
     if m:
         i = len(order) - 1 - ORDINALS[m.group(1)]
@@ -319,6 +322,79 @@ PASS1_TEMPLATE = (
     "Return all {n} units."
 )
 PASS1_UNIT = "U{i}: {text}"
+
+# ---- pass 1, version 2 (linguistics critique round 2; 2026-11-17): separate fields per unit
+PASS1_SYSTEM_V2 = """You read one person's spoken free recall of a sequence of short films they \
+watched, and you annotate the discourse unit by unit. The films are described below under the \
+names shown to viewers, listed in ARBITRARY order (not the order they were shown). The recall is \
+divided into numbered units in the order spoken.
+
+For every unit return three separate fields:
+- "talk": what the unit does. One of: "content" (describes what happens in a film), \
+"evaluation" (an opinion or remark about a film), "metamemory" (about remembering or forgetting), \
+"search_within" (searching memory for more of the current film), "search_next" (searching memory \
+for the next film to talk about), "closing" (closing the current film, e.g. "that was it for that \
+one"), "ending" (ending the recall altogether), "off_task" (talk unrelated to the films), \
+"fragment" (a filler or connective with no content of its own), or {"custom": "<short label>"} \
+when none fits.
+- "frame": the topic frame, i.e. the film the discourse is about at this unit, as a list of \
+{"film": name exactly as listed, "w": probability}; several entries only when genuinely \
+uncertain; weights sum to at most 1. Rules: a unit that searches for the next film has an EMPTY \
+frame []. A unit that opens a new film ("the next one was about a dog") is framed with the \
+INCOMING film. A unit that closes a film is framed with the film it closes. Use [] for ending \
+the recall and for off-task talk.
+- "address": what the words refer to. "moment" (particular content of a film), "work" (a film \
+as a whole: its title or the film itself), "position" (a film by its place in an order: "the \
+first one", "the next one"), "composition" (the whole sequence of films: "they were all \
+short"), or "none".
+- For "position" only: "position" (the speaker's own words for the place) and "reading": \
+"viewing" if the place is in the order the films were watched, "recall" if it is in the order \
+the speaker is recalling them ("the first one I talked about").
+
+Treat a change of film as a segment boundary: opening and closing cues belong to the films they \
+open and close. Use the whole recall; be calibrated.
+
+Reply with JSON only: {"units": [{"id": "U1", "talk": "...", "frame": [{"film": "...", \
+"w": 0.9}], "address": "...", "position": null, "reading": null}]} covering every unit exactly \
+once."""
+
+TALK_V2 = ("content", "evaluation", "metamemory", "search_within", "search_next", "closing",
+           "ending", "off_task", "fragment")
+ADDRESS_V2 = ("moment", "work", "position", "composition", "none")
+
+
+def parse_frames_v2(p1, units, comp):
+    """Pass-1 v2 replies -> frame dicts (kind 'content' for content units, 'v2' otherwise)."""
+    label_to_work = {w.label: w.id for w in comp.works}
+    by_id = {str(x.get("id")): x for x in p1 or []}
+    frames, bad = [], 0
+    for i in range(len(units)):
+        x = by_id.get(f"U{i + 1}")
+        talk = x.get("talk") if x else None
+        if isinstance(talk, dict) and "custom" in talk:
+            talk = "custom"
+        address = x.get("address") if x else None
+        if x is None or (talk not in TALK_V2 and talk != "custom") or address not in ADDRESS_V2:
+            bad += 1
+            frames.append(dict(kind=None, frame=[], position=None, v2=True, talk=None,
+                               address=None, reading=None))
+            continue
+        fr = []
+        for f in x.get("frame") or []:
+            w = label_to_work.get(str(f.get("film")))
+            try:
+                wt = float(f.get("w"))
+            except (TypeError, ValueError):
+                wt = None
+            if w is not None and wt and wt > 0:
+                fr.append((w, min(wt, 1.0)))
+        if talk == "search_next":
+            fr = []  # declared: searching for the next film has an empty topic frame
+        kind = "content" if talk == "content" and address in ("moment", "none") else "v2"
+        frames.append(dict(kind=kind, frame=sorted(fr, key=lambda t: -t[1]), v2=True,
+                           talk=talk, address=address, position=x.get("position"),
+                           reading=x.get("reading")))
+    return frames, bad
 
 PASS2_SYSTEM = """You localize excerpts of people's spoken free recall of short films within the \
 film they are about. You are given film annotations: each film's rows are numbered for this \
@@ -734,7 +810,8 @@ def parse_frames(p1, units, comp):
 def new_conv():
     return dict(references=0, refused={}, frame_mismatch=0, pass2_missing=0, shapes={},
                 broad_cases={}, positions=dict(resolved=0, unresolved=0), fragment_words=0,
-                non_addressed_words={}, anchored_non_narration_units=0, modes={})
+                non_addressed_words={}, anchored_non_narration_units=0, modes={},
+                position_readings=[], mismatch_words=0)
 
 
 def convert_session(
@@ -763,6 +840,8 @@ def convert_session(
     in_unit = {}
     cells_samples = {}
     current = None
+    recall_order = []  # distinct frame films in order of first mention (for 'recall' readings)
+    mismatched = []
 
     def talk_only(uid, wids, talk):
         conv["non_addressed_words"][talk] = conv["non_addressed_words"].get(talk, 0) + len(wids)
@@ -793,6 +872,47 @@ def convert_session(
         talk = {"content": "narration", "work": "identification", "memory_search": "metamemory",
                 "gave_up": "metamemory", "off_task": "off_task",
                 "fragment": "fragment"}.get(kind, "unknown")
+        if f.get("v2") and kind == "v2":
+            talk = f["talk"]
+            addr = f["address"]
+            if addr == "position":
+                reading = f.get("reading") if f.get("reading") in ("viewing", "recall") else "viewing"
+                order = recall_order if reading == "recall" else None
+                resolved = resolve_position(comp, f["position"] or "", current, order)
+                conv["position_readings"].append(dict(phrase=f["position"], reading=reading,
+                                                      resolved=resolved))
+                conv["positions"]["resolved" if resolved else "unresolved"] += 1
+                rid = f"{uid}:work"
+                refs[rid] = PositionReference(rid, str(f["position"]), resolved,
+                                              top[1] if top else 1.0,
+                                              condition=conds["pass1"]["id"])
+                sample_of = {w: RefSample(rid) for w in wids}
+            elif addr == "work" and top is not None:
+                rid = f"{uid}:work"
+                refs[rid] = WorkReference(rid, top[0], top[1], condition=conds["pass1"]["id"])
+                sample_of = {w: RefSample(rid) for w in wids}
+            elif addr == "composition":
+                rid = f"{uid}:composition"
+                refs[rid] = CompositionReference(rid, 1.0, condition=conds["pass1"]["id"])
+                sample_of = {w: RefSample(rid) for w in wids}
+            elif talk in ("search_next", "ending", "off_task") or (
+                    talk in ("metamemory", "search_within") and top is None):
+                state = {"ending": "gave_up", "off_task": "off_task"}.get(talk, "memory_search")
+                sample_of = {w: StateSample(uid, state) for w in wids}
+            elif talk == "evaluation" and top is None:
+                sample_of = {w: StateSample(uid, "commentary") for w in wids}
+            else:  # framed evaluation, metamemory, search, closing; fragments; custom
+                if talk == "fragment":
+                    conv["fragment_words"] += len(wids)
+                sample_of = talk_only(uid, wids, {"search_within": "metamemory",
+                                                  "evaluation": "commentary"}.get(talk, talk))
+            unit_talk[(p, s, uid)] = talk
+            if top is not None:
+                current = top[0]
+                if top[0] not in recall_order:
+                    recall_order.append(top[0])
+            cells_samples.update(sample_of)
+            continue
         if talk_rule == "state-map-v1":
             if kind in ("work", "memory_search") and top is not None:
                 rid = f"{uid}:work"
@@ -836,6 +956,16 @@ def convert_session(
             else:
                 x, rowmap = got
                 conv["frame_mismatch"] += bool(x.get("frame_mismatch"))
+                if x.get("frame_mismatch") and rules.get("mismatch_rule") in (
+                        "clear-frame", "incoming-frame"):
+                    # declared switch evidence: the unit is a segment boundary; its frame and
+                    # its pass-2 references are dropped (words uncovered, counted)
+                    mismatched.append((i, uid))
+                    framing.pop((p, s, uid), None)
+                    conv["mismatch_words"] += len(wids)
+                    cells_samples.update({w: Uncovered(uid) for w in wids})
+                    unit_talk[(p, s, uid)] = "narration"
+                    continue
                 t2 = x.get("talk")
                 anchored = bool(x.get("refs"))
                 if t2 == "fragment":
@@ -899,7 +1029,17 @@ def convert_session(
         unit_talk[(p, s, uid)] = talk
         if top is not None:
             current = top[0]
+            if top[0] not in recall_order:
+                recall_order.append(top[0])
         cells_samples.update(sample_of)
+    if rules.get("mismatch_rule") == "incoming-frame":
+        # the mismatched unit takes the frame of the next framed unit when that is a different
+        # film (an early switch)
+        for i, uid in mismatched:
+            own = frames[i]["frame"][0][0] if frames[i]["frame"] else None
+            nxt = next((f["frame"] for f in frames[i + 1:] if f["frame"]), None)
+            if nxt and nxt[0][0] != own:
+                framing[(p, s, uid)] = tuple(nxt)
     cells = []
     for w in range(len(words)):
         uid = in_unit.get(w, "")
@@ -925,6 +1065,7 @@ def run(
     outline_order: str = "part-order",
     rendering: str = "plain",
     layout: str = "per-call",
+    pass1: str = "v1",
 ):
     """Both passes over `sessions` (development only), pass 2 pooled across them.
 
@@ -938,7 +1079,10 @@ def run(
     if layout not in LAYOUTS:
         raise ValueError(f"unknown layout {layout!r}")
     arms = PASS2_SPAN_ARMS if layout == "prefix" else PASS2_ARMS
-    sys1, sys2 = corpus_text(PASS1_SYSTEM, A, 1), corpus_text(arms[arm], A, 2)
+    if pass1 not in ("v1", "v2"):
+        raise ValueError(f"unknown pass-1 version {pass1!r}")
+    sys1 = corpus_text(PASS1_SYSTEM_V2 if pass1 == "v2" else PASS1_SYSTEM, A, 1)
+    sys2 = corpus_text(arms[arm], A, 2)
     conds = conditions(seed, salt, sample, arm, A.WORD_CLOCK_RECEIPT, (sys1, sys2),
                        getattr(A, "PRODUCER_SEGMENTER", None), layout)
     if rendering not in RENDERINGS:
@@ -1015,7 +1159,7 @@ def run(
             )
             if p1 is None:
                 raise SystemExit(f"pass 1 returned no parseable JSON for {p} {s}")
-        frames, bad = parse_frames(p1, units, comp)
+        frames, bad = (parse_frames_v2 if pass1 == "v2" else parse_frames)(p1, units, comp)
         rec.update(
             pass1_noncompliant_units=bad if not dry else None, pass1_retries=retries
         )

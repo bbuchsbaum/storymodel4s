@@ -49,6 +49,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 
 from .account import (
+    CompositionReference,
     Destination,
     Hypothesis,
     PositionReference,
@@ -197,6 +198,8 @@ def reference_contributions(ref, comp, allocation="units", broad_rule="scene-set
         out.append((("work_ref", ref.work), ref.weight))
     elif isinstance(ref, PositionReference):
         out.append((("position", ref.position, ref.resolved_work or ""), ref.weight))
+    elif isinstance(ref, CompositionReference):
+        out.append((("composition",), ref.weight))
     else:
         raise ProjectionError("not-a-reference", type(ref).__name__)
     if ref.unassigned > 0:
@@ -433,6 +436,9 @@ class CoverageMeasure:
                 if isinstance(ref, PositionReference):
                     k = ("position", ref.position, ref.resolved_work or "")
                     held[k] = max(held[k], ref.weight)
+                    continue
+                if isinstance(ref, CompositionReference):
+                    held[("composition",)] = max(held[("composition",)], ref.weight)
                     continue
                 for m in ref.members:
                     t = m.target
