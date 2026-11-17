@@ -238,9 +238,9 @@ proof precedes scientific claims, but scientific qualification must not block un
 
 ## Next deliveries: execution order from the current branch
 
-Refreshed 2026-11-17 through Sherlock intake source `43c2f7e13` and correction
-`ac9926c26`, following raw-input preparation `092228d86` and qualification `512feab4f`.
-Sherlock intake is locally qualified; the complete study and phase exits remain open.
+Refreshed 2026-11-17 through offline import recovery `ed99b50fd`, following Sherlock
+intake `43c2f7e13` and correction `ac9926c26`. These slices are locally qualified;
+the complete study and phase exits remain open.
 This is the next-work plan within P2–P6,
 not a second phase numbering system. Mote owns live status. Completed checkpoints move
 out of the future queue; capability obligations remain until their complete exit is met.
@@ -319,9 +319,17 @@ omissions. The implementation preserves
 part-local source clocks and exact selected recall onsets, but does not yet supply composed
 source-time consumers, recording/scanner links or measured-time analysis.
 
-**Next action:** implement explicit recovery of interrupted imported recordings.
-Follow with native source composition and measured recall
-timing consumed by analysis. Reuse the existing intake, execution and analysis code.
+[Explicit offline recovery](import-recovery.md), source `ed99b50fd`, now connects all ten
+existing importers to one exact-intent completion path. It preserves completed replies and
+manifests, refuses changed supplied inputs, and releases writer locks on process termination.
+[Evidence](../evidence/import-recovery.json) records the full suite plus subsequent targeted
+regression checks, 12 installed CLI checks, cold review and independent mutation probes.
+Recovered stages reproduce the previous Sherlock analysis bytes. This closes interrupted
+offline imports with durable intent; it does not authorize retrying uncertain remote requests
+or adopting legacy directories without intent. Existing importer permission behavior is retained.
+
+**Next action:** native source composition and measured recall timing consumed by analysis.
+Reuse the existing intake, execution and analysis code.
 
 ### Immediate work queue
 
@@ -331,18 +339,17 @@ do not wait for an entire phase to finish before putting its useful outputs into
 
 | Order | Work and researcher-visible result | Exit evidence |
 |---|---|---|
-| 2. Recover interrupted work (P5) | Resume imported recordings against their exact prepared inputs, model/prompt profile and existing completed stages. Reuse the recording executor; keep recovery explicit. | Inject interruption before/after reply persistence and import publication; recovery agrees with an uninterrupted run, retains original replies and refuses changed inputs. No implicit provider call or overwrite of completed assessments. |
-| 3. Make timing computationally useful (P4/P5) | Compose native source parts while preserving native anchors and declared part order. Bind measured recall onsets only through explicit recording/clock relationships, then feed existing temporal allocation and feature/projection consumers. | A two-part reset-clock fixture and recalls with missing onsets produce independently calculated allocation/readouts. Unestablished links remain unavailable; no inferred origin, duration or scanner equivalence. Save outputs through API and CLI. |
-| 4. Expand computational parity (P2/P3/P4) | Add remaining graph/recall families and semantic evidence, duration/refinement and retained transport methods, then feature tracks and scientific summaries. Select the next family from actual Scala callers/tests and the preservation map. | Every family has a producer and executed consumer, independent small-case oracle, Scala comparison where executable, and explicit support/denominator/missingness semantics. Measure sparse resource use. The existing sequence kernel is not the full inference surface. |
-| 5. Broaden studies and finish inspection (P5/P6) | Expand the same workflow to FilmFestival/Friends, retained providers, media, proposition/AMR, embedding backends and interviews. Add React inspection of real artifacts, then saved investigations and exports. | Executed coverage and compatibility/recovery checks for every retained capability. A researcher can trace a result to its evidence and processing gaps. Visual polish follows useful inspection; full closure requires the capability audit below. |
+| 1. Make timing computationally useful (P4/P5) | Compose native source parts while preserving native anchors and declared part order. Bind measured recall onsets only through explicit recording/clock relationships, then feed existing temporal allocation and feature/projection consumers. | A two-part reset-clock fixture and recalls with missing onsets produce independently calculated allocation/readouts. Unestablished links remain unavailable; no inferred origin, duration or scanner equivalence. Save outputs through API and CLI. |
+| 2. Expand computational parity (P2/P3/P4) | Add remaining graph/recall families and semantic evidence, duration/refinement and retained transport methods, then feature tracks and scientific summaries. Select the next family from actual Scala callers/tests and the preservation map. | Every family has a producer and executed consumer, independent small-case oracle, Scala comparison where executable, and explicit support/denominator/missingness semantics. Measure sparse resource use. The existing sequence kernel is not the full inference surface. |
+| 3. Broaden studies and finish inspection (P5/P6) | Expand the same workflow to FilmFestival/Friends, retained providers, media, proposition/AMR, embedding backends and interviews. Add React inspection of real artifacts, then saved investigations and exports. | Executed coverage and compatibility/recovery checks for every retained capability. A researcher can trace a result to its evidence and processing gaps. Visual polish follows useful inspection; full closure requires the capability audit below. |
 
-**The next three implementation beads after Sherlock qualification:**
+**The next three implementation beads:**
 
-1. Input-bound recovery of interrupted imported recordings, demonstrated against an
-   uninterrupted run.
-2. Exact composed source coordinates with native-anchor roundtrip and part-order controls.
-3. Explicit recall timing linkage into one saved temporal allocation/readout workflow,
-   including missing and unlinked observations.
+1. Exact composed source coordinates with native-anchor roundtrip and part-order controls.
+2. Explicit recording/clock linkage for measured recall timing, preserving missing and
+   unlinked observations.
+3. Consume those source and recall coordinates in one saved temporal allocation/readout
+   workflow, with independently calculated outputs.
 
 If a bead reveals a missing representation, implement that bounded dependency first. Reuse
 existing examples and recordings; do not build a general workflow engine or a second model.

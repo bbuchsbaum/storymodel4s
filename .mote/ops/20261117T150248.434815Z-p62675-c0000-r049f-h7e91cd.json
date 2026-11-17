@@ -1,0 +1,1 @@
+{"actor":"codex-port-p4","entity":"bd-01M7N0C9NT3TJ5KXTZ4XHVF5K1","kind":"reserve_open","mode":"exclusive","op":"20261117T150248.434815Z-p62675-c0000-r049f-h7e91cd","paths":["port/examples/fixtures/sherlock-synthetic-repair.json"],"reservation_id":"rv-01M7N0GCVJW4KSJYPDWN0WK3F4","ts":"2026-11-17T15:02:48.434815Z","ttl_s":3600,"v":2}

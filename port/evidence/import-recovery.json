@@ -1,0 +1,112 @@
+{
+  "scope": "Exact-input interrupted offline import recovery across all ten existing importer APIs and CLI commands",
+  "status": "Qualified local implementation; not merged/published and not full P2-P6 parity",
+  "source_commit": "ed99b50fdd38c4f031e789af5d2d8f53efffa975",
+  "tests": {
+    "full_command": "cd port && .venv/bin/pytest -q",
+    "full_passed": 1056,
+    "full_seconds": 30.36,
+    "subsequent_targeted_command": ".venv/bin/pytest -q tests/test_execution.py tests/test_import_recovery.py tests/test_recovery_workflow.py tests/test_study_workflow.py",
+    "targeted_passed": 64,
+    "targeted_seconds": 3.9,
+    "note": "After the full run, added a named malformed-journal regression, reproduced inherited unhashable-list TypeError, then added the string guard and ran the affected execution/recovery/workflow suites. Do not report1057 as a full-suite result."
+  },
+  "typing": {
+    "command": ".venv/bin/mypy src/storymodel",
+    "passed": true,
+    "source_files": 67
+  },
+  "lint": {
+    "changed_source_and_tests": true,
+    "evidence_drivers": true
+  },
+  "installed": {
+    "installed_package": "/Users/bbuchsbaum/code/scala/storymodel4s/port/data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "cli_checks": 12,
+    "commands": [
+      "import-prepared-construction",
+      "import-prepared-construction",
+      "import-details",
+      "import-details",
+      "import-mapping",
+      "import-mapping",
+      "import-fidelity",
+      "import-fidelity",
+      "replay-analysis",
+      "verify-analysis",
+      "replay-analysis",
+      "verify-analysis"
+    ],
+    "recovered_stages": [
+      "prepared-construction",
+      "details",
+      "mapping",
+      "fidelity"
+    ],
+    "analysis_sha256": {
+      "1": "b22d8289dea2bfa7757ae55ce3614c438612dc96e9dbb1d66a09ff997e99c589",
+      "2": "5455adbe3b7b95c9d36ff514a3826e8b6c338f84ebd5785a03f1b4423f575375"
+    },
+    "prior_analysis_artifacts_unchanged": true
+  },
+  "wheel": {
+    "source_commit": "ed99b50fdd38c4f031e789af5d2d8f53efffa975",
+    "python_files": 67,
+    "sha256": "b03e972946ed88dd83a20c5212de381c15f468271918629f9a12835682648088",
+    "exact_source_match": true
+  },
+  "review": {
+    "verdict": "PASS; no BLOCK in reviewed scope",
+    "existing_tests": 42,
+    "independent_probes": 10,
+    "probe": "port/evidence/import-recovery-independent.py",
+    "mutation_driver": "port/evidence/import-recovery-mutations.py",
+    "parent_rerun": {
+      "revision": "ed99b50fd",
+      "root": "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/storymodel-import-recovery-mutations-4ien25yx",
+      "results": [
+        {
+          "name": "baseline",
+          "exit": 0,
+          "summary": "10 passed",
+          "log": "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/storymodel-import-recovery-mutations-4ien25yx/baseline.log"
+        },
+        {
+          "name": "intent",
+          "exit": 1,
+          "summary": "4 failed, 6 passed",
+          "log": "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/storymodel-import-recovery-mutations-4ien25yx/intent.log"
+        },
+        {
+          "name": "preflight",
+          "exit": 1,
+          "summary": "4 failed, 6 passed",
+          "log": "/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/storymodel-import-recovery-mutations-4ien25yx/preflight.log"
+        }
+      ]
+    },
+    "mutations": "Intent identity and preflight-before-mutation guards separately removed; each compiles, four discriminating assertions fail and six sibling controls pass."
+  },
+  "behavior": [
+    "Durable intent binds full profile, ordered prompts/responses and manifest including origin.",
+    "New-root default unchanged; explicit recover=True/--recover requires matching intent.",
+    "Validate existing state before creating missing profile/replies/import receipt; preserve completed bytes.",
+    "SIGKILL after temporary-file fsync and before profile/reply publication leaves recoverable staging; advisory lock releases on death.",
+    "Unknown remote-dispatch journal entries without replies remain refused; no network transport used.",
+    "Legacy recordings remain replayable; missing legacy intent cannot be adopted."
+  ],
+  "review_corrections": [
+    "Close lock descriptors on all acquisition failures and retain stable inode without rewriting PID.",
+    "Preserve only recognized regular staging files from interrupted atomic writes; do not interpret/delete staged contents.",
+    "Compare canonical JSON identity rather than bool/numeric-coercing Python equality.",
+    "Reuse shared strict JSON; refuse duplicate keys, nonfinite overflow and dangling expected symlinks.",
+    "Malformed journal collection values produce typed refusal rather than an unhashable-type crash."
+  ],
+  "limits": [
+    "Local macOS/POSIX filesystem evidence; Windows, network filesystem and power-loss durability unqualified.",
+    "Older PID-file and new advisory-lock protocols must not run concurrently on the same recording root.",
+    "Existing source/extraction/time-study import permission behavior is preserved: they do not themselves refuse denied export. Do not infer a new universal access policy.",
+    "No hostile concurrent filesystem mutation or provenance authentication claim.",
+    "Provider execution/retry, native timing integration, remaining study/algorithm/graph families and full P2-P6 remain owed."
+  ]
+}

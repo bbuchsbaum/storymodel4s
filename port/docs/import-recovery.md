@@ -17,8 +17,9 @@ do not change.
 
 Before any profile or reply write, a new import saves `import-intent.json`. It retains the
 exact recording profile, prompts, supplied replies and complete supplied manifest, including
-origin. Recovery checks the request and export permission as usual, then requires that intent
-and all existing artifacts to agree. It fills only missing writes, preserving completed reply
+origin. Recovery retains each importer's existing request and permission checks, then requires
+that intent and all existing artifacts to agree. It does not grant export permission. It fills
+only missing writes, preserving completed reply
 and import-manifest bytes. A different reply, origin, input, prompt or profile refuses; it is
 not a new attempt. Completed assessments remain the replay of their original recorded input.
 

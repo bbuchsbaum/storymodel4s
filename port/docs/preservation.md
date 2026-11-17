@@ -772,3 +772,29 @@ scan-break continuity and mandatory provenance checks that an initial passing su
 Still owed: native composed-axis/evidence consumers, general recording/clock/scanner links,
 measured-time analysis, other study adapters, interrupted-import recovery and the full P2–P6
 exits. This is synthetic contract qualification, not extraction accuracy or scientific proof.
+
+
+## Exact-input offline import recovery (P5)
+
+Source `ed99b50fd` extends the existing recording executor and all ten offline importer
+functions/CLI commands with explicit recovery. Durable import intent binds actual profile,
+ordered prompts, raw supplied replies and origin/manifest before profile or reply writes.
+Complete recordings and partial recordings both revalidate before filling missing artifacts;
+completed bytes remain untouched. Prepared construction, details, mapping and fidelity rejoin
+the saved analysis with byte-identical results. Multi-chunk time studies use the same mechanism.
+
+This recovers known local imports; it does not retry an uncertain remote dispatch. Legacy
+recordings remain readable but cannot acquire invented intent. Existing importer permission
+behavior is preserved, including source/extraction/time-study local import semantics. POSIX
+advisory locks release on termination; do not mix with live old-version PID-file writers.
+
+[Contract](import-recovery.md) and [evidence](../evidence/import-recovery.json) retain the
+1,056-test full run, subsequent 64-test check after a journal-type correction, 12 installed
+CLI checks, 10 independent probes and cold review. Process-kill controls interrupt actual
+atomic writes. Two compiling guard removals each fail four independent assertions while
+six controls pass. The installed analysis hashes equal those qualified before recovery.
+
+This closes the interrupted offline-import gap noted above for new intent-bearing imports.
+Remote execution/retry qualification, native composition and clock linkage, remaining studies
+and computational families, and full P2–P6 closure remain owed. No Windows, network-filesystem,
+power-loss or scientific-validation claim follows from these local checks.
