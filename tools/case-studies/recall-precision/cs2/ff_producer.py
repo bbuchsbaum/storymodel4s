@@ -76,6 +76,7 @@ from cs2.account import (  # noqa: E402
     RefSample,
     Shape,
     StateSample,
+    TalkSample,
     Uncovered,
     WordCell,
     WorkReference,
@@ -226,28 +227,47 @@ def _mmss(t):
     return f"{t // 60}:{t % 60:02d}"
 
 
-def film_outline(comp, texts, works, rng, salt, with_rows):
+OUTLINE_ORDERS = ("part-order", "start-only")
+
+
+def film_outline(comp, texts, works, rng, salt, with_rows, order_rule="part-order"):
     """Annotation text of `works` in a seeded random order under cover names. With rows: per-call
-    row numbers, 8-hex scene labels and film-relative times; returns the row map."""
+    row numbers, 8-hex scene labels and film-relative times; returns the row map.
+
+    order_rule 'part-order' (fixed 2026-11-17): units in presentation order (occurrence, then
+    its segments' parts in order, then seconds), times relative to their segment, with the part
+    named when an occurrence spans parts. 'start-only' (the rule the first Sherlock two-level run
+    used, kept for exact replay): (occurrence, seconds), which interleaves the parts of an
+    occurrence that spans parts. The two agree whenever each occurrence has one segment."""
+    if order_rule not in OUTLINE_ORDERS:
+        raise ValueError(f"unknown outline order {order_rule!r}")
     order = list(works)
     rng.shuffle(order)
     lines, rowmap, n = [], {}, 0
     for w in order:
         lines.append(f"\n##### FILM: {comp.work[w].label}")
-        units = sorted(
-            (u for u in comp.units if comp.work_of_unit(u.id) == w),
-            key=lambda u: (comp.occurrence[u.occurrence].position, u.start_s),
-        )
+        def seg_index(u):
+            parts = [g.part for g in comp.occurrence[u.occurrence].segments]
+            return parts.index(u.part)
+
+        if order_rule == "part-order":
+            key = lambda u: (comp.occurrence[u.occurrence].position, seg_index(u), u.start_s)  # noqa: E731
+        else:
+            key = lambda u: (comp.occurrence[u.occurrence].position, u.start_s)  # noqa: E731
+        units = sorted((u for u in comp.units if comp.work_of_unit(u.id) == w), key=key)
         occ_start, scene = {}, None
         for u in units:
-            o0 = occ_start.setdefault(u.occurrence, u.start_s)
+            multi = len(comp.occurrence[u.occurrence].segments) > 1
+            seg = (u.occurrence, u.part) if (order_rule == "part-order" and multi) else u.occurrence
+            o0 = occ_start.setdefault(seg, u.start_s)
+            tag = f"part {u.part} " if (order_rule == "part-order" and multi) else ""
             if with_rows and u.scene != scene:
                 scene = u.scene
                 lines.append(f"=== SCENE {opaque(salt, scene, 8)}")
             if with_rows:
                 n += 1
                 rowmap[n] = u.id
-                lines.append(f"{n} [{_mmss(u.start_s - o0)}] {texts[u.id]}")
+                lines.append(f"{n} [{tag}{_mmss(u.start_s - o0)}] {texts[u.id]}")
             else:
                 lines.append(f"- {texts[u.id]}")
     return "\n".join(lines).strip(), rowmap, order
@@ -637,17 +657,55 @@ def parse_frames(p1, units, comp):
     return frames, bad
 
 
+def new_conv():
+    return dict(references=0, refused={}, frame_mismatch=0, pass2_missing=0, shapes={},
+                broad_cases={}, positions=dict(resolved=0, unresolved=0), fragment_words=0,
+                non_addressed_words={}, anchored_non_narration_units=0, modes={})
+
+
 def convert_session(
-    key, words, units, frames, answers, items_by_k, comp, conds, refs, conv
+    key, words, units, frames, answers, items_by_k, comp, conds, refs, conv,
+    rules=None, framing=None, unit_talk=None,
 ):
-    """Word cells of one session; adds its references to `refs`."""
+    """Word cells of one session; adds its references to `refs`.
+
+    rules['talk']: 'orthogonal' (owner, 2026-11-17; default) or 'state-map-v1' (previous).
+    Under 'orthogonal' talk type is a field, not an address: commentary, metamemory (memory
+    search, giving up) and fragments are non-addressed talk (TalkSample: a ledger count) unless
+    the reply anchors a reference to film content; off-task speech is the non-film state
+    off_task; a pass-1 'work' unit is identification (rules['talk_work_variant'] =
+    'identifying': a framed or positioned unit is a work-level reference) or, under
+    'position-only', only a positioned unit is. `framing` receives each framed unit's pass-1
+    frame and `unit_talk` each unit's talk type."""
+    rules = rules or dict(talk="orthogonal", talk_work_variant="identifying")
+    talk_rule = rules.get("talk", "orthogonal")
+    variant = rules.get("talk_work_variant", "identifying")
+    framing = {} if framing is None else framing
+    unit_talk = {} if unit_talk is None else unit_talk
     p, s = key
-    refuse = lambda why: conv["refused"].__setitem__(
+    refuse = lambda why: conv["refused"].__setitem__(  # noqa: E731
         why, conv["refused"].get(why, 0) + 1
-    )  # noqa: E731
+    )
     in_unit = {}
     cells_samples = {}
     current = None
+
+    def talk_only(uid, wids, talk):
+        conv["non_addressed_words"][talk] = conv["non_addressed_words"].get(talk, 0) + len(wids)
+        return {w: TalkSample(uid, talk) for w in wids}
+
+    def work_ref(uid, top, f, cond, talk="identification"):
+        rid = f"{uid}:work"
+        if f["position"]:
+            resolved = resolve_position(comp, f["position"], current)
+            conv["positions"]["resolved" if resolved else "unresolved"] += 1
+            w = top[1] if top else 1.0
+            refs[rid] = PositionReference(rid, str(f["position"]), resolved, w,
+                                          condition=cond, talk=talk)
+        else:
+            refs[rid] = WorkReference(rid, top[0], top[1], condition=cond, talk=talk)
+        return rid
+
     for i, (u, f) in enumerate(zip(units, frames)):
         uid = f"{p}:{s}:u{i}"
         wids = list(range(u["first"], u["last"] + 1))
@@ -655,47 +713,72 @@ def convert_session(
             in_unit[w] = uid
         sample_of = {w: Uncovered(uid) for w in wids}
         top = f["frame"][0] if f["frame"] else None
+        if f["frame"]:
+            framing[(p, s, uid)] = tuple(f["frame"])
         kind = f["kind"]
-        if kind in ("work", "memory_search") and top is not None:
-            rid = f"{uid}:work"
-            if kind == "work" and f["position"]:
-                resolved = resolve_position(comp, f["position"], current)
-                conv["positions"]["resolved" if resolved else "unresolved"] += 1
-                refs[rid] = PositionReference(
-                    rid,
-                    str(f["position"]),
-                    resolved,
-                    top[1],
-                    condition=conds["pass1"]["id"],
-                )
-            else:
-                refs[rid] = WorkReference(
-                    rid, top[0], top[1], condition=conds["pass1"]["id"]
-                )
-            sample_of = {w: RefSample(rid) for w in wids}
-        elif kind == "fragment":
-            conv["fragment_words"] += len(wids)  # a ledger count, never a destination
-        elif kind == "work":  # a remark with no framed work: the non-film commentary state
-            sample_of = {w: StateSample(uid, "commentary") for w in wids}
-        elif kind in ("memory_search", "gave_up", "off_task"):  # between films, or no film
-            sample_of = {w: StateSample(uid, kind) for w in wids}
-        elif kind == "content" and i in items_by_k:
+        talk = {"content": "narration", "work": "identification", "memory_search": "metamemory",
+                "gave_up": "metamemory", "off_task": "off_task",
+                "fragment": "fragment"}.get(kind, "unknown")
+        if talk_rule == "state-map-v1":
+            if kind in ("work", "memory_search") and top is not None:
+                rid = f"{uid}:work"
+                if kind == "work" and f["position"]:
+                    resolved = resolve_position(comp, f["position"], current)
+                    conv["positions"]["resolved" if resolved else "unresolved"] += 1
+                    refs[rid] = PositionReference(rid, str(f["position"]), resolved, top[1],
+                                                  condition=conds["pass1"]["id"])
+                else:
+                    refs[rid] = WorkReference(rid, top[0], top[1], condition=conds["pass1"]["id"])
+                sample_of = {w: RefSample(rid) for w in wids}
+            elif kind == "fragment":
+                conv["fragment_words"] += len(wids)
+            elif kind == "work":
+                sample_of = {w: StateSample(uid, "commentary") for w in wids}
+            elif kind in ("memory_search", "gave_up", "off_task"):
+                sample_of = {w: StateSample(uid, kind) for w in wids}
+        elif talk_rule == "orthogonal":
+            if kind == "work" and (f["position"] or (top is not None and variant == "identifying")):
+                rid = work_ref(uid, top, f, conds["pass1"]["id"])
+                sample_of = {w: RefSample(rid) for w in wids}
+            elif kind == "work":
+                talk = "commentary"  # names no work it can be resolved to
+                sample_of = talk_only(uid, wids, talk)
+            elif kind in ("memory_search", "gave_up", "fragment"):
+                if kind == "fragment":
+                    conv["fragment_words"] += len(wids)
+                sample_of = talk_only(uid, wids, talk)
+            elif kind == "off_task":
+                sample_of = {w: StateSample(uid, "off_task") for w in wids}
+        else:
+            raise ValueError(f"unknown talk rule {talk_rule!r}")
+        if kind == "content" and i in items_by_k:
             got = answers.get(items_by_k[i]["oid"])
             if got is None:
                 conv["pass2_missing"] += 1
             else:
                 x, rowmap = got
                 conv["frame_mismatch"] += bool(x.get("frame_mismatch"))
-                talk = x.get("talk")
-                if talk == "fragment":
-                    conv["fragment_words"] += len(wids)  # a ledger count, never a destination
-                elif talk in ("metamemory", "commentary"):
-                    # memory search or commentary inside the framed film: work-level
-                    rid = f"{uid}:work"
-                    refs[rid] = WorkReference(rid, top[0], top[1],
-                                              condition=conds["pass2"]["id"])
-                    sample_of = {w: RefSample(rid) for w in wids}
+                t2 = x.get("talk")
+                anchored = bool(x.get("refs"))
+                if t2 == "fragment":
+                    talk = "fragment"
+                    conv["fragment_words"] += len(wids)
+                    if talk_rule == "orthogonal":
+                        sample_of = talk_only(uid, wids, "fragment")
+                elif t2 in ("metamemory", "commentary") and (talk_rule == "state-map-v1"
+                                                             or not anchored):
+                    talk = t2
+                    if talk_rule == "state-map-v1":
+                        rid = f"{uid}:work"
+                        refs[rid] = WorkReference(rid, top[0], top[1],
+                                                  condition=conds["pass2"]["id"])
+                        sample_of = {w: RefSample(rid) for w in wids}
+                    else:
+                        sample_of = talk_only(uid, wids, t2)
                 else:
+                    if t2 in ("metamemory", "commentary"):
+                        talk = t2  # anchored to film content: its references carry address
+                        conv["anchored_non_narration_units"] += 1
                     pairs = [(w, t) for w in wids for t in toks(words[w].text)]
                     utoks = [t for _, t in pairs]
                     best = {}
@@ -708,31 +791,29 @@ def convert_session(
                         mem = members(r, rowmap, top[0], top[1], comp, refuse, conv)
                         if not mem:
                             continue
+                        md = r.get("mode") or "unstated"
+                        conv["modes"][md] = conv["modes"].get(md, 0) + 1
                         rid = f"{uid}:r{ri}"
                         try:
-                            refs[rid] = Reference(
-                                rid, mem, condition=conds["pass2"]["id"]
-                            )
+                            refs[rid] = Reference(rid, mem, condition=conds["pass2"]["id"],
+                                                  talk=talk if talk != "content" else "narration")
                         except AccountError as e:
                             refuse(e.reason)
                             continue
                         conv["references"] += 1
                         for w in {pairs[t][0] for t in range(j, j + len(anchor))}:
-                            if (
-                                w not in best or len(anchor) < best[w][0]
-                            ):  # innermost wins
+                            if w not in best or len(anchor) < best[w][0]:  # innermost wins
                                 best[w] = (len(anchor), rid)
                     for w, (_, rid) in best.items():
                         sample_of[w] = RefSample(rid)
+        unit_talk[(p, s, uid)] = talk
         if top is not None:
             current = top[0]
         cells_samples.update(sample_of)
     cells = []
     for w in range(len(words)):
         uid = in_unit.get(w, "")
-        cells.append(
-            WordCell(w, words[w].onset, uid, cells_samples.get(w, Uncovered("")))
-        )
+        cells.append(WordCell(w, words[w].onset, uid, cells_samples.get(w, Uncovered(""))))
     return cells
 
 
@@ -750,6 +831,8 @@ def run(
     dry: bool = False,
     arm: str = "coverage",
     jobs: int = 1,
+    rules: dict | None = None,
+    outline_order: str = "part-order",
 ):
     """Both passes over `sessions` (development only), pass 2 pooled across them.
 
@@ -763,6 +846,8 @@ def run(
     sys1, sys2 = corpus_text(PASS1_SYSTEM, A, 1), corpus_text(PASS2_ARMS[arm], A, 2)
     conds = conditions(seed, salt, sample, arm, A.WORD_CLOCK_RECEIPT, (sys1, sys2),
                        getattr(A, "PRODUCER_SEGMENTER", None))
+    for c in conds.values():
+        c["outline_order"] = outline_order
     log, ledger = (
         [],
         dict(
@@ -787,7 +872,7 @@ def run(
         ]
         rng = random.Random(f"{seed}:{sample}:pass1:{p}:{s}")
         outline1, _, order1 = film_outline(
-            comp, texts, works, rng, f"{salt}:{sample}", False
+            comp, texts, works, rng, f"{salt}:{sample}", False, outline_order
         )
         prompt1 = pass1_prompt([u["text"] for u in units], outline1)
         rec = dict(
@@ -850,7 +935,7 @@ def run(
         rng = random.Random(f"{seed}:{sample}:pass2:call{bi}")
         bworks = sorted({it["work"] for it in batch})
         outline2, rowmap, order2 = film_outline(
-            comp, texts, bworks, rng, f"{salt}:{sample}:call{bi}", True
+            comp, texts, bworks, rng, f"{salt}:{sample}:call{bi}", True, outline_order
         )
         rendered.append((pass2_prompt(batch, outline2), rowmap, order2))
     if not dry:
@@ -886,32 +971,14 @@ def run(
         (out / "dry-ledger.json").write_text(json.dumps(ledger, indent=1))
         return None, ledger, log, conds
 
-    refs, cells = {}, {}
-    conv = dict(
-        references=0,
-        refused={},
-        frame_mismatch=0,
-        pass2_missing=0,
-        shapes={},
-        broad_cases={},
-        positions=dict(resolved=0, unresolved=0),
-        fragment_words=0,
-    )
+    refs, cells, framing, unit_talk = {}, {}, {}, {}
+    conv = new_conv()
     for key, d in data.items():
         by_k = {it["k"]: it for it in items if it["session_key"] == key}
-        cells[key] = convert_session(
-            key,
-            d["words"],
-            d["units"],
-            d["frames"],
-            answers,
-            by_k,
-            comp,
-            conds,
-            refs,
-            conv,
-        )
-    acc = Account(comp, refs, cells, condition=json.dumps(conds, sort_keys=True))
+        cells[key] = convert_session(key, d["words"], d["units"], d["frames"], answers, by_k,
+                                     comp, conds, refs, conv, rules, framing, unit_talk)
+    acc = Account(comp, refs, cells, framing_work=framing, unit_talk=unit_talk,
+                  condition=json.dumps(dict(conds, rules=rules), sort_keys=True))
     ledger["conversion"] = conv
     (out / "units.json").write_text(
         json.dumps(  # recall text: ignored data directory

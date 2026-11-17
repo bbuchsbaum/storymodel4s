@@ -332,12 +332,28 @@ def strata(scores, comp, work_applicable=True):
         by = {}
         for s in film:
             by.setdefault((s.participant, s.session), []).append(s)
+        tol = dict(tp=0, fp=0, fn=0)
         for seq in by.values():
-            for a, b in zip(seq, seq[1:]):
-                gold_sw.append(a.work != b.work)
-                pred_sw.append(a.top_work != b.top_work)
+            g = [a.work != b.work for a, b in zip(seq, seq[1:])]
+            q = [a.top_work != b.top_work for a, b in zip(seq, seq[1:])]
+            gold_sw += g
+            pred_sw += q
+            # tolerance +-1 row: a predicted switch counts if a gold switch lies within one row
+            gi = [i for i, x in enumerate(g) if x]
+            qi = [i for i, x in enumerate(q) if x]
+            used = set()
+            for i in qi:
+                hit = next((j for j in gi if abs(j - i) <= 1 and j not in used), None)
+                if hit is None:
+                    tol["fp"] += 1
+                else:
+                    used.add(hit)
+                    tol["tp"] += 1
+            tol["fn"] += len(gi) - len(used)
+        den = 2 * tol["tp"] + tol["fp"] + tol["fn"]
         out["film_switch_f1"] = dict(
-            n=len(gold_sw), switches=int(sum(gold_sw)), f1=binary_f1(pred_sw, gold_sw)
+            n=len(gold_sw), switches=int(sum(gold_sw)), f1=binary_f1(pred_sw, gold_sw),
+            f1_tolerance_1_row=(2 * tol["tp"] / den) if den else float("nan"),
         )
         out["top_work_agreement"] = dict(
             n=len(film),
@@ -372,7 +388,7 @@ def strata(scores, comp, work_applicable=True):
 
     non = [s for s in film if s.cls != "specific"]
     loc_spec, loc_non = shares(spec), shares(non)
-    out["gist_vs_detail"] = dict(
+    out["localizability"] = dict(
         n_specific_scored=len(loc_spec), n_specific_total=len(spec),
         n_nonspecific_scored=len(loc_non), n_nonspecific_total=len(non),
         note="a row with no claimed mass (full abstention) has no located share and is left "
@@ -388,6 +404,15 @@ def strata(scores, comp, work_applicable=True):
             continue
         lab = s.nonfilm_label if s.cls == "nonfilm" else f"gold:{s.cls}"
         nf.setdefault(lab, []).append(s.nonwork)
+    nfr = [s for s in scores if s.cls == "nonfilm"]
+    by_lab = {}
+    for s in nfr:
+        by_lab.setdefault(s.nonfilm_label, []).append(s.film_bits)
+    out["nonfilm_rows"] = dict(
+        n=len(nfr),
+        film_bits=float(np.mean([s.film_bits for s in nfr])) if nfr else None,
+        by_label={k: dict(n=len(v), film_bits=float(np.mean(v))) for k, v in sorted(by_lab.items())},
+    )
     out["nonwork_mass_by_gold_label"] = {
         k: dict(n=len(v), mean=float(np.mean(v))) for k, v in sorted(nf.items())
     }
@@ -397,7 +422,7 @@ def strata(scores, comp, work_applicable=True):
     if em:
         out["typed_absence"] = {
             k: dict(n=sum(1 for e in em if e == k), share=sum(1 for e in em if e == k) / len(em))
-            for k in ("no_sample", "only_uncovered")
+            for k in ("no_sample", "only_uncovered", "only_non_addressed")
         }
         sampled = [s.abstain for s in scores if s.empty == ""]
         out["fallback_mass_sampled_rows"] = dict(

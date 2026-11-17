@@ -16,6 +16,7 @@ from metrics import (
     log_loss_bits,
     midrank_spearman_matrix,
     paired_difference,
+    sign_flip_p,
     tfidf_cosine,
     within_unit_ranks,
 )
@@ -132,6 +133,15 @@ def test_tfidf_cosine():
     close(cos[1], 1 / np.sqrt(2))
     close(cos[2], 0.0)
     close(tfidf_cosine(["zzz"], {1: ["a"]})[1], 0.0)  # unknown words carry no weight
+
+
+def test_sign_flip_p():
+    # n = 3, all differences +1: only the all-plus and all-minus flips reach |mean| = 1 -> 2/8
+    close(sign_flip_p([1.0, 1.0, 1.0]), 0.25)
+    # d = [1, -1]: every flip has |mean| 0 or 1; observed 0 -> all 4 are as extreme -> 1
+    close(sign_flip_p([1.0, -1.0]), 1.0)
+    # ten positive differences: 2 / 1024
+    close(sign_flip_p([1.0] * 10), 2 / 1024)
 
 
 if __name__ == "__main__":

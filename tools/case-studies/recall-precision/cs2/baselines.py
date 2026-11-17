@@ -19,6 +19,8 @@ import math
 import re
 from dataclasses import dataclass
 
+import numpy as np
+
 from metrics import tfidf_cosine
 
 
@@ -175,4 +177,201 @@ def tfidf(comp, row_words: list, docs: dict, cfg, dur: Forecast) -> list:
             if m > 0:
                 scene[w] = {s: cos.get(s, 0.0) / m for s in sw}
         out.append(mix(Forecast(work, scene, dur.nonfilm), dur, lam))
+    return out
+
+
+# ---------------------------------------------------------------- revision 2026-11-17
+
+
+def with_nonfilm(f: Forecast, rate: float) -> Forecast:
+    return Forecast(f.work, f.scene, rate)
+
+
+def lopo_nonfilm_rate(gold_by_participant: dict, participant: str, cfg) -> float:
+    """Leave-one-participant-out non-film rate, additively smoothed (alpha over two outcomes).
+    The scored participant's rows never enter it."""
+    a = cfg["lopo_nonfilm_alpha"]
+    n = k = 0
+    for p, rows in gold_by_participant.items():
+        if p == participant:
+            continue
+        for r in rows:
+            n += 1
+            k += r.cls == "nonfilm"
+    return (k + a) / (n + 2 * a)
+
+
+def frame_fallback(dur: Forecast, mix: dict) -> Forecast:
+    """Fallback that spreads unassigned mass over the producer's own frame film first, then by
+    duration within it: P(w) = mix(w) + (1 - sum mix) dur(w); scenes within a work by duration.
+    An empty mix is the duration prior itself (the same object, so a null producer is exact)."""
+    if not mix:
+        return dur
+    rest = 1 - math.fsum(mix.values())
+    work = {w: mix.get(w, 0.0) + rest * p for w, p in dur.work.items()}
+    return Forecast(work, dur.scene, dur.nonfilm)
+
+
+def presentation_order(comp, cfg) -> list:
+    """Valid scenes in presentation order (occurrence position, then scene id)."""
+    valid = valid_scenes(comp, cfg)
+    occ = sorted(comp.occurrences, key=lambda o: o.position)
+    out, seen = [], set()
+    for o in occ:
+        for s in sorted({u.scene for u in comp.units if u.occurrence == o.id
+                         and u.scene is not None}):
+            w = comp.work_of_scene(s)
+            if s in valid.get(w, []) and s not in seen:
+                seen.add(s)
+                out.append(s)
+    return out
+
+
+def works_in_order(comp) -> list:
+    out = []
+    for o in sorted(comp.occurrences, key=lambda o: o.position):
+        if o.work not in out:
+            out.append(o.work)
+    return out
+
+
+def _top(r, valid):
+    inside = [s for s in valid.get(r.work, []) if s in r.scenes]
+    return inside[-1] if inside else None
+
+
+def fit_gold_context(comp, gold_by_participant, participant, cfg) -> dict:
+    """LOPO rates for the fitted gold-context forecast: stay in the previous row's work, move to
+    the next work in presentation order; within the same work, stay on the previous top scene,
+    move to the next scene. Counted on the other participants' sessions."""
+    valid = valid_scenes(comp, cfg)
+    order = works_in_order(comp)
+    c = dict(n_w=0, stay=0, nxt=0, n_s=0, s_stay=0, s_next=0)
+    for p, rows in gold_by_participant.items():
+        if p == participant:
+            continue
+        by = {}
+        for r in rows:
+            by.setdefault(r.session, []).append(r)
+        for rs in by.values():
+            prev = None
+            for r in rs:
+                if r.work is None:
+                    continue
+                if prev is not None:
+                    c["n_w"] += 1
+                    c["stay"] += r.work == prev.work
+                    i = order.index(prev.work)
+                    c["nxt"] += i + 1 < len(order) and r.work == order[i + 1]
+                    if r.work == prev.work and r.specific and prev.specific:
+                        m, t = _top(prev, valid), _top(r, valid)
+                        ss = valid.get(r.work, [])
+                        if m is not None and t is not None:
+                            c["n_s"] += 1
+                            c["s_stay"] += t == m
+                            j = ss.index(m)
+                            c["s_next"] += j + 1 < len(ss) and t == ss[j + 1]
+                prev = r
+    a = cfg["lopo_alpha"]
+    f = lambda k, n: (k + a) / (n + 3 * a)  # noqa: E731  (three outcomes: stay, next, other)
+    return dict(stay=f(c["stay"], c["n_w"]), next=f(c["nxt"], c["n_w"]),
+                scene_stay=f(c["s_stay"], c["n_s"]), scene_next=f(c["s_next"], c["n_s"]),
+                counts=c)
+
+
+def gold_context_fitted(comp, rows, cfg, dur: Forecast, rates: dict) -> list:
+    """A ceiling that reads the previous gold row, with LOPO-fitted (then frozen) rates."""
+    valid = valid_scenes(comp, cfg)
+    order = works_in_order(comp)
+    out, prev = [], None
+    for r in rows:
+        if prev is None:
+            out.append(dur)
+        else:
+            i = order.index(prev.work)
+            nxt = order[i + 1] if i + 1 < len(order) else None
+            rest = 1 - rates["stay"] - (rates["next"] if nxt else 0.0)
+            work = {w: rest * p for w, p in dur.work.items()}
+            work[prev.work] += rates["stay"]
+            if nxt:
+                work[nxt] += rates["next"]
+            scene = dict(dur.scene)
+            m = _top(prev, valid) if prev.specific else None
+            ss = valid.get(prev.work, [])
+            if m is not None:
+                j = ss.index(m)
+                n2 = ss[j + 1] if j + 1 < len(ss) else None
+                rs = 1 - rates["scene_stay"] - (rates["scene_next"] if n2 else 0.0)
+                d = {s: rs * p for s, p in dur.scene[prev.work].items()}
+                d[m] += rates["scene_stay"]
+                if n2:
+                    d[n2] += rates["scene_next"]
+                scene[prev.work] = d
+            out.append(Forecast(work, scene, dur.nonfilm))
+        if r.work is not None:
+            prev = r
+    return out
+
+
+def fit_hmm(comp, gold_by_participant, participant, cfg) -> dict:
+    """LOPO transition rates over presentation order: stay on the scene, advance to the next
+    scene in presentation order; counted on consecutive specific rows of other participants."""
+    valid = valid_scenes(comp, cfg)
+    order = presentation_order(comp, cfg)
+    pos = {s: i for i, s in enumerate(order)}
+    n = st = nx = 0
+    for p, rows in gold_by_participant.items():
+        if p == participant:
+            continue
+        by = {}
+        for r in rows:
+            by.setdefault(r.session, []).append(r)
+        for rs in by.values():
+            prev = None
+            for r in rs:
+                if not r.specific:
+                    continue
+                t = _top(r, valid)
+                if t is None:
+                    continue
+                if prev is not None:
+                    n += 1
+                    st += t == prev
+                    nx += pos[t] == pos[prev] + 1
+                prev = t
+    a = cfg["lopo_alpha"]
+    return dict(stay=(st + a) / (n + 3 * a), next=(nx + a) / (n + 3 * a), n=n)
+
+
+def hmm_tfidf(comp, row_words: list, docs: dict, cfg, dur: Forecast, rates: dict) -> list:
+    """A sequential non-oracle forecast: an HMM over scenes in presentation order with TF-IDF
+    emissions exp(beta * cosine), filtered on the session's recall words only (row k uses rows
+    1..k). Transitions: stay, next scene, or a uniform jump; computed in O(scenes) per row."""
+    order = presentation_order(comp, cfg)
+    beta = cfg["hmm_beta"]
+    n = len(order)
+    prior = np.array([dur.work[comp.work_of_scene(s)] * dur.scene[comp.work_of_scene(s)][s]
+                      for s in order])
+    alpha = prior / prior.sum()
+    ps, pn = rates["stay"], rates["next"]
+    pj = 1 - ps - pn
+    out = []
+    for k, q in enumerate(row_words):
+        if k:
+            shifted = np.concatenate([[0.0], alpha[:-1]])
+            shifted[-1] += alpha[-1]  # the last scene has no next scene: its advance stays
+            alpha = ps * alpha + pn * shifted + pj * (1 - alpha) / (n - 1)
+            alpha = alpha / alpha.sum()
+        if q:
+            cos = tfidf_cosine(q, docs)
+            e = np.exp(beta * np.array([cos.get(s, 0.0) for s in order]))
+            alpha = alpha * e
+            alpha = alpha / alpha.sum()
+        work, scene = {}, {}
+        for w in dur.work:
+            idx = [i for i, s in enumerate(order) if comp.work_of_scene(s) == w]
+            m = float(alpha[idx].sum())
+            work[w] = m
+            scene[w] = {order[i]: float(alpha[i]) / m for i in idx}
+        out.append(Forecast(work, scene, dur.nonfilm))
     return out

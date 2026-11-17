@@ -38,6 +38,7 @@ from cs2.account import (  # noqa: E402
     Shape,
     StateSample,
     Uncovered,
+    TalkSample,
     WordCell,
     WorkReference,
 )
@@ -84,24 +85,94 @@ def bins_of(rows):
     return [Bin(g.lo, g.hi, g.closed) for g in rows]
 
 
-def baseline_forecasts(A, comp, gold, cfg):
-    """{name: {(participant, session): [forecast per row]}}"""
-    dur = B.duration_prior(comp, cfg)
-    docs = B.scene_tokens(comp, A.unit_texts(), cfg)
-    out = {k: {} for k in ("duration", "lopo", "order_oracle", "tfidf")}
+BASELINES = ("duration", "lopo", "gold_context_ceiling", "gold_context_fitted", "tfidf",
+             "hmm_tfidf")
+
+
+def resolve_rules(cfg, which="new", overrides=None):
+    rules = dict(cfg["rules"] if which == "new" else cfg["old_rules"])
+    rules.update(overrides or {})
+    return rules
+
+
+def baseline_forecasts(A, comp, gold, cfg, rules=None):
+    """dur_by_participant, {name: {(participant, session): [forecast per row]}}.
+
+    rules['film_level_baseline'] 'lopo' (owner, 2026-11-17): every forecast's non-film level is
+    the participant's LOPO non-film rate; 'flat': the config's nonfilm_fallback_rate.
+    'gold_context_ceiling' is the previous order oracle, relabelled; it reads the previous gold
+    row, as does 'gold_context_fitted' (LOPO-fitted rates). 'hmm_tfidf' reads recall words only."""
+    rules = rules or resolve_rules(cfg)
+    dur0 = B.duration_prior(comp, cfg)
+    docs = B.scene_tokens(comp, A.producer_unit_texts(), cfg)
+    out = {k: {} for k in BASELINES}
+    durs = {}
     for p, rows in gold.items():
-        lo = B.lopo(comp, gold, p, cfg)
+        rate = (B.lopo_nonfilm_rate(gold, p, cfg) if rules["film_level_baseline"] == "lopo"
+                else cfg["nonfilm_fallback_rate"])
+        dur = B.with_nonfilm(dur0, rate)
+        durs[p] = dur
+        lo = B.with_nonfilm(B.lopo(comp, gold, p, cfg), rate)
+        gc = B.fit_gold_context(comp, gold, p, cfg)
+        hm = B.fit_hmm(comp, gold, p, cfg)
         for s, rs in by_session(rows).items():
             words = A.session_words(p, s)
             out["duration"][(p, s)] = [dur] * len(rs)
             out["lopo"][(p, s)] = [lo] * len(rs)
-            out["order_oracle"][(p, s)] = B.order_oracle(comp, rs, cfg, dur)
-            toks = [
-                [t for w in words if b.contains(w.onset) for t in B.tokens(w.text)]
-                for b in bins_of(rs)
-            ]
+            out["gold_context_ceiling"][(p, s)] = B.order_oracle(comp, rs, cfg, dur)
+            out["gold_context_fitted"][(p, s)] = B.gold_context_fitted(comp, rs, cfg, dur, gc)
+            toks = [[t for w in words if b.contains(w.onset) for t in B.tokens(w.text)]
+                    for b in bins_of(rs)]
             out["tfidf"][(p, s)] = B.tfidf(comp, toks, docs, cfg, dur)
-    return dur, out
+            out["hmm_tfidf"][(p, s)] = B.hmm_tfidf(comp, toks, docs, cfg, dur, hm)
+    return durs, out
+
+
+def row_frame_mixes(acc, key, rows):
+    """Per gold row: the mean over its words of their unit's pass-1 frame (work -> weight);
+    words without a framed unit contribute nothing."""
+    p, s = key
+    cells = acc.words[key]
+    out = []
+    for b in bins_of(rows):
+        inside = [c for c in cells if b.contains(c.onset)]
+        mix = {}
+        for c in inside:
+            for w, wt in acc.framing_work.get((p, s, c.unit), ()):
+                mix[w] = mix.get(w, 0.0) + wt / len(inside)
+        out.append(mix)
+    return out
+
+
+def score_corpus(A, comp, acc, sessions, dev, cfg, rules, wa):
+    """The yardstick for one producer account: baselines, producer and pass-1-only forecasts."""
+    all_gold = gold_by_participant(A, dev)
+    gold = {}
+    for p, s in sessions:
+        rows = [g for g in all_gold.get(p, []) if g.session == s]
+        if rows:
+            gold.setdefault(p, []).extend(rows)
+    durs, fc_all = baseline_forecasts(A, comp, all_gold, cfg, rules)
+    keys = sorted({(p, g.session) for p, rs in gold.items() for g in rs})
+    named = {k: score_map(comp, gold, {x: v[x] for x in keys}, cfg, wa)
+             for k, v in fc_all.items()}
+    pmap, p1map = {}, {}
+    for p, s in keys:
+        rows = [g for g in gold[p] if g.session == s]
+        ld = LocationDistribution.from_words(acc, acc.words[(p, s)], bins_of(rows),
+                                             cfg["allocation"], rules["cross_scene_broad"])
+        mixes = row_frame_mixes(acc, (p, s), rows)
+        fbs = [B.frame_fallback(durs[p], m) for m in mixes]
+        p1map[(p, s)] = fbs
+        pmap[(p, s)] = SC.producer_forecasts(
+            ld, durs[p], cfg, fbs if rules["fallback"] == "frame-film" else None)
+    named["producer"] = score_map(comp, gold, pmap, cfg, wa)
+    if acc.framing_work:
+        named["pass1_only"] = score_map(comp, gold, p1map, cfg, wa)
+    words = {f"{p}:{s}": word_ledger(acc.words[(p, s)],
+                                     bins_of([g for g in gold[p] if g.session == s]))
+             for p, s in keys}
+    return named, words
 
 
 def score_map(comp, gold, fmap, cfg, work_applicable):
@@ -190,7 +261,7 @@ def summarize_forecasts(named, cfg, work_applicable, reference="duration"):
     return out
 
 
-def abstain_check(A, comp, gold, cfg, dur, work_applicable):
+def abstain_check(A, comp, gold, cfg, durs, work_applicable):
     """A producer that abstains on every word must score the fallback on every row."""
     words, fmap = {}, {}
     for p, rows in gold.items():
@@ -204,10 +275,10 @@ def abstain_check(A, comp, gold, cfg, dur, work_applicable):
     for (p, s), cells in words.items():
         rs = by_session(gold[p])[s]
         ld = LocationDistribution.from_words(acc, cells, bins_of(rs))
-        fmap[(p, s)] = SC.producer_forecasts(ld, dur, cfg)
+        fmap[(p, s)] = SC.producer_forecasts(ld, durs[p], cfg)
     prod = score_map(comp, gold, fmap, cfg, work_applicable)
     base = score_map(
-        comp, gold, {k: [dur] * len(v) for k, v in fmap.items()}, cfg, work_applicable
+        comp, gold, {k: [durs[k[0]]] * len(v) for k, v in fmap.items()}, cfg, work_applicable
     )
     diff = 0.0
     for a, b in zip(prod, base):
@@ -265,7 +336,7 @@ def cmd_baselines(corpus, out):
     comp = A.composition()
     wa = WORK_APPLICABLE[corpus]
     gold = gold_by_participant(A, A.development())
-    dur, fc = baseline_forecasts(A, comp, gold, cfg)
+    dur, fc = baseline_forecasts(A, comp, gold, cfg, resolve_rules(cfg))
     named = {k: score_map(comp, gold, v, cfg, wa) for k, v in fc.items()}
     summary = dict(
         evidence="development data, engineering numbers; validation = the frozen-six run",
@@ -337,7 +408,10 @@ def hypotheses(form, alts):
     return tuple(out)
 
 
-def sherlock_account(A, comp, names):
+def sherlock_account(A, comp, names, rules=None):
+    """CS1 recorded answers as an account. rules['talk'] 'orthogonal': metamemory, commentary and
+    fragments are non-addressed talk (TalkSample); 'state-map-v1': work-level references."""
+    talk_rule = (rules or {}).get("talk", "orthogonal")
     refs, words, ledger = {}, {}, dict(converted=0, refused=0, forms={})
     seen_work = set()
     for name in names:
@@ -390,7 +464,10 @@ def sherlock_account(A, comp, names):
             s = x["sample"]
             if s.startswith("na:"):
                 talk = ans[uid]["talk"]
-                if talk in WORK_LEVEL_TALK:
+                if talk_rule == "orthogonal":
+                    sample = TalkSample(uid, talk)
+                    ledger["non_addressed_words"] = ledger.get("non_addressed_words", 0) + 1
+                elif talk in WORK_LEVEL_TALK:
                     rid = f"{short}:{uid}:work"
                     refs.setdefault(rid, WorkReference(rid, A.WORK, 1.0,
                                                        condition="llm-local-v2-a/state-map"))
@@ -421,105 +498,65 @@ def sherlock_account(A, comp, names):
     ), ledger
 
 
-def cmd_sherlock_smoke(out):
+def cmd_sherlock_smoke(out, which="new", eps=None, overrides=None):
+    """Score the CS1 recorded answers (no calls) under the given rules."""
     out.mkdir(parents=True, exist_ok=True)
     cfg = SC.load_config()
+    if eps is not None:
+        cfg["epsilon"] = eps
+    rules = resolve_rules(cfg, which, overrides)
     A = D.adapter("sherlock")
     comp = A.composition()
-    names = [
-        n
-        for n in A.development()
-        if (LIBRARY / f"{n.split('_')[0]}_ledger.json").exists()
-    ]
-    gold = gold_by_participant(A, names)
-    acc, conv = sherlock_account(A, comp, names)
-    dur, fc = baseline_forecasts(A, comp, gold, cfg)
-    pmap, ledgers, no_sample = {}, {}, 0
-    for p, rows in gold.items():
-        cells = acc.words[(p, "recall")]
-        bins = bins_of(rows)
-        ld = LocationDistribution.from_words(acc, cells, bins, cfg["allocation"])
-        no_sample += sum(1 for r in ld.rows if r.state == "no_sample")
-        pmap[(p, "recall")] = SC.producer_forecasts(ld, dur, cfg)
-        ledgers[p] = word_ledger(cells, bins)
-    named = {k: score_map(comp, gold, v, cfg, False) for k, v in fc.items()}
-    named["producer"] = score_map(comp, gold, pmap, cfg, False)
-    fsum = summarize_forecasts(named, cfg, False)
-    fsum["producer"].update(
-        {
-            f"skill_vs_{b}": {
-                t: SC.skill(named["producer"], named[b], cfg, t)
-                for t in ("film_bits", "scene_bits", "total_bits")
-            }
-            for b in ("lopo", "order_oracle", "tfidf")
-        }
-    )
-    tot = {
-        k: sum(L[k] for L in ledgers.values())
-        for k in (
-            "words",
-            "words_in_bins",
-            "reference_words",
-            "not_applicable_words",
-            "uncovered_words",
-        )
-    }
-    summary = dict(
-        evidence="development data, engineering numbers; validation = the frozen-six run",
-        corpus="sherlock",
-        work_identity="not applicable (one work)",
-        participants=sorted(gold),
-        participants_without_gold=sorted(set(names) - set(gold)),
-        conversion=conv,
-        rows=SC.strata(named["producer"], comp, False)["rows"],
-        no_sample_rows=no_sample,
-        words_total=tot,
-        words={f"{p}:recall": L for p, L in ledgers.items()},
-        forecasts=fsum,
-        producer_strata=SC.strata(named["producer"], comp, False),
-        refused_metrics=sorted(SC.REFUSED),
-        deferred=dict(
-            dialogue_quote_localization="needs producer quote spans; not in the v2 answers",
-            boundary_sensitivity="FilmFestival only (JL/KM/RC), step 4",
-            controls="step 4 (needs producer runs)",
-        ),
-    )
-    (out / "summary.json").write_text(json.dumps(summary, indent=1) + "\n")
-    write_rows(out / "rows.tsv", named)
-    (out / "unit_measures.json").write_text(json.dumps(unit_measures(acc, comp), indent=0))
+    names = [n for n in A.development()
+             if (LIBRARY / f"{n.split('_')[0]}_ledger.json").exists()]
+    acc, conv = sherlock_account(A, comp, names, rules)
+    named, words = score_corpus(A, comp, acc, [(n, "recall") for n in names], names, cfg,
+                                rules, False)
+    write_summary(out, "sherlock", named, words, comp, cfg, rules, False, conv,
+                  extra=dict(producer=acc.condition))
+    unit_measures_out(out, acc, comp, rules)
     inputs = [A.GOLD, A.RULE, LIBRARY / "manifest.json"]
     inputs += [ANSWERS / f"{n}.json" for n in names]
-    inputs += [
-        LIBRARY / f"{n.split('_')[0]}_desc-libraryparity_{k}.tsv"
-        for n in names
-        for k in ("references", "words")
-    ]
-    manifest(
-        out,
-        "sherlock-smoke",
-        SC.CONFIG,
-        inputs,
-        dict(
-            participants=sorted(gold),
-            producer=acc.condition,
-            allocation=cfg["allocation"],
-            composition_rules=comp.rules,
-        ),
-    )
-    print(
-        json.dumps(
-            dict(
-                forecasts=fsum,
-                rows=summary["rows"],
-                words=tot,
-                no_sample_rows=no_sample,
-            ),
-            indent=1,
-        )
-    )
+    inputs += [LIBRARY / f"{n.split('_')[0]}_desc-libraryparity_{k}.tsv"
+               for n in names for k in ("references", "words")]
+    manifest(out, "sherlock-smoke", SC.CONFIG, inputs,
+             dict(producer=acc.condition, rules=rules, epsilon=cfg["epsilon"],
+                  composition_rules=comp.rules))
 
 
-def unit_measures(acc, comp):
+def write_summary(out, corpus, named, words, comp, cfg, rules, wa, conv, extra=None):
+    fsum = summarize_forecasts(named, cfg, wa)
+    terms = ("film_bits", "work_bits", "scene_bits", "total_bits") if wa else (
+        "film_bits", "scene_bits", "total_bits")
+    fsum["producer"].update({f"skill_vs_{b}": {t: SC.skill(named["producer"], named[b], cfg, t)
+                                               for t in terms}
+                             for b in named if b not in ("producer", "duration")})
+    st = SC.strata(named["producer"], comp, wa)
+    shapes = (conv or {}).get("shapes") or {}
+    cases = (conv or {}).get("broad_cases") or {}
+    modes = (conv or {}).get("modes") or {}
+    nb = sum(cases.values())
+    st["localizability"]["pass2_mode_share"] = (
+        {k: round(v / sum(modes.values()), 4) for k, v in modes.items()} if modes else None)
+    st["localizability"]["cross_scene_broad_share"] = (
+        round((cases.get("scene_set", 0) + cases.get("work", 0)) / nb, 4) if nb else None)
+    summary = dict(
+        evidence="development data, engineering numbers; validation = the frozen-six run",
+        corpus=corpus, rules=rules, epsilon=cfg["epsilon"],
+        rows=st["rows"], forecasts=fsum, producer_strata=st,
+        baseline_strata={k: SC.strata(v, comp, wa) for k, v in named.items() if k != "producer"},
+        words=words, conversion=conv, shapes=shapes, **(extra or {}))
+    (out / "summary.json").write_text(json.dumps(summary, indent=1, default=str) + "\n")
+    write_rows(out / "rows.tsv", named)
+    return summary
+
+
+def unit_measures_out(out, acc, comp, rules):
+    (out / "unit_measures.json").write_text(json.dumps(
+        unit_measures(acc, comp, rules["cross_scene_broad"]), indent=0))
+
+
+def unit_measures(acc, comp, broad_rule="scene-set"):
     """Per recall unit, for between-sample reliability (declared):
     - top_scene: argmax scene of the unit's own words (one closed bin over their onsets), or
       null when no scene mass;
@@ -536,7 +573,8 @@ def unit_measures(acc, comp):
                 by.setdefault(c.unit, []).append(c)
         for uid, cs in by.items():
             ons = [c.onset for c in cs if c.onset is not None]
-            ld = LocationDistribution.from_words(acc, cs, [Bin(min(ons), max(ons), True)])
+            ld = LocationDistribution.from_words(acc, cs, [Bin(min(ons), max(ons), True)],
+                                                 broad_rule=broad_rule)
             row = ld.marginal("scene").rows[0]
             sc = {k[2]: v for k, v in row.mass.items() if k[0] == "at"}
             refs = {c.sample.ref for c in cs if isinstance(c.sample, RefSample)}
@@ -571,7 +609,7 @@ def cmd_ff_run(args):
     it = iter(args)
     for a in it:
         if a in ("--export", "--seed", "--salt", "--sample", "--sessions", "--arm", "--jobs",
-                 "--corpus"):
+                 "--corpus", "--rules", "--talk-work-variant", "--outline-order", "--epsilon"):
             opt[a[2:]] = next(it)
         elif a == "--dry":
             opt["dry"] = True
@@ -596,10 +634,18 @@ def cmd_ff_run(args):
             raise SystemExit(f"{p} is not a development participant")
     seed, sample = int(opt["seed"]), int(opt["sample"])
     export = Path(opt["export"]) if "export" in opt else None
+    cfg = SC.load_config()
+    if "epsilon" in opt:
+        cfg["epsilon"] = float(opt["epsilon"])
+    overrides = ({"talk_work_variant": opt["talk_work_variant"]}
+                 if "talk_work_variant" in opt else {})
+    rules = resolve_rules(cfg, opt.get("rules", "new"), overrides)
+    P.BROAD_RULE = rules["cross_scene_broad"]
     acc, ledger, log, conds = P.run(A, sessions, export, out, seed, opt["salt"],
                                     sample, dry=bool(opt.get("dry")),
                                     arm=opt.get("arm", "coverage"),
-                                    jobs=int(opt.get("jobs", 1)))
+                                    jobs=int(opt.get("jobs", 1)), rules=rules,
+                                    outline_order=opt.get("outline_order", "part-order"))
     calls = P.call_ledger(log)
     extra = dict(
         participants=sorted({p for p, _ in sessions}), sessions=[f"{p}:{s}" for p, s in sessions],
@@ -612,7 +658,8 @@ def cmd_ff_run(args):
         word_clock=A.WORD_CLOCK_RECEIPT,
         gold_clock=(A.gold_clock_receipt(sorted({p for p, _ in sessions}))
                     if hasattr(A, "gold_clock_receipt") else None),
-        corpus=corpus,
+        corpus=corpus, rules=rules, epsilon=cfg["epsilon"],
+        outline_order=opt.get("outline_order", "part-order"),
     )
     if corpus == "filmfestival":
         inputs = [A.GOLD, A.CODES, A.PARTITION, A.FF / "derived" / "annotation-JL.tsv",
@@ -626,41 +673,11 @@ def cmd_ff_run(args):
         print(json.dumps(dict(batches=ledger["batches"], calls=calls,
                               sessions=ledger["sessions"]), indent=1, default=str))
         return
-    cfg = SC.load_config()
     comp = A.producer_composition()
-    all_gold = gold_by_participant(A, dev)
-    gold = {}
-    for p, s in sessions:
-        rows = [g for g in all_gold.get(p, []) if g.session == s]
-        if rows:
-            gold.setdefault(p, []).extend(rows)
-    dur, fc_all = baseline_forecasts(A, comp, all_gold, cfg)
-    keys = {(p, g.session) for p, rs in gold.items() for g in rs}
-    named = {k: score_map(comp, gold, {x: v[x] for x in keys}, cfg, wa) for k, v in fc_all.items()}
-    pmap = {}
-    for p, s in keys:
-        rows = [g for g in gold[p] if g.session == s]
-        ld = LocationDistribution.from_words(acc, acc.words[(p, s)], bins_of(rows),
-                                             cfg["allocation"])
-        pmap[(p, s)] = SC.producer_forecasts(ld, dur, cfg)
-    named["producer"] = score_map(comp, gold, pmap, cfg, wa)
-    fsum = summarize_forecasts(named, cfg, wa)
-    fsum["producer"].update({
-        f"skill_vs_{b}": {t: SC.skill(named["producer"], named[b], cfg, t)
-                          for t in ("film_bits", "work_bits", "scene_bits", "total_bits")}
-        for b in ("lopo", "order_oracle", "tfidf")})
-    summary = dict(
-        evidence="development data, engineering numbers; validation = the frozen-six run",
-        corpus=corpus, sessions=extra["sessions"], ledger=ledger, calls=calls,
-        rows=SC.strata(named["producer"], comp, wa)["rows"], forecasts=fsum,
-        producer_strata=SC.strata(named["producer"], comp, wa),
-        words={f"{p}:{s}": word_ledger(acc.words[(p, s)],
-                                       bins_of([g for g in gold[p] if g.session == s]))
-               for p, s in keys},
-    )
-    (out / "summary.json").write_text(json.dumps(summary, indent=1, default=str) + "\n")
-    write_rows(out / "rows.tsv", named)
-    (out / "unit_measures.json").write_text(json.dumps(unit_measures(acc, comp), indent=0))
+    named, words = score_corpus(A, comp, acc, sessions, dev, cfg, rules, wa)
+    write_summary(out, corpus, named, words, comp, cfg, rules, wa, ledger["conversion"],
+                  extra=dict(sessions=extra["sessions"], ledger=ledger, calls=calls))
+    unit_measures_out(out, acc, comp, rules)
     manifest(out, "ff-run", SC.CONFIG, inputs, dict(extra, producer=acc.condition), state,
              calls["model_calls"])
 
@@ -670,8 +687,11 @@ def main(argv):
         cmd_baselines(argv[1], Path(argv[2]))
     elif argv[:1] == ["ff-run"] and len(argv) >= 2:
         cmd_ff_run(argv[1:])
-    elif argv[:1] == ["sherlock-smoke"] and len(argv) == 2:
-        cmd_sherlock_smoke(Path(argv[1]))
+    elif argv[:1] == ["sherlock-smoke"] and len(argv) >= 2:
+        a = argv[1:]
+        which = a[a.index("--rules") + 1] if "--rules" in a else "new"
+        eps = float(a[a.index("--epsilon") + 1]) if "--epsilon" in a else None
+        cmd_sherlock_smoke(Path(a[0]), which, eps)
     else:
         print(__doc__, file=sys.stderr)
         return 2

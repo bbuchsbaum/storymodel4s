@@ -867,7 +867,7 @@ def test_condition_ids_follow_prompt_digests():
     assert a["pass2"]["renderer_sha256"] == P.renderer_sha256()
 
 
-def test_state_mapping_matches_the_gold_definitions():
+def test_state_mapping_old_rule():
     # fragment -> ledger count; commentary or metamemory inside the framed film -> work-level;
     # memory search between films, gave up, off task -> non-film; an unframed remark -> non-film
     # commentary.
@@ -891,10 +891,9 @@ def test_state_mapping_matches_the_gold_definitions():
                "o3": (dict(talk="fragment"), {})}
     conds = P.conditions(1, "s", 1)
     refs = {}
-    conv = dict(references=0, refused={}, frame_mismatch=0, pass2_missing=0, shapes={},
-                broad_cases={}, positions=dict(resolved=0, unresolved=0), fragment_words=0)
+    conv = P.new_conv()
     cells = P.convert_session(("P", "s"), words, units, frames, answers, items, comp, conds,
-                              refs, conv)
+                              refs, conv, dict(talk="state-map-v1"))
     kinds = [type(c.sample).__name__ for c in cells[::2]]
     assert kinds == ["Uncovered", "RefSample", "RefSample", "Uncovered", "StateSample",
                      "StateSample", "StateSample"], kinds
@@ -909,7 +908,7 @@ def test_state_mapping_matches_the_gold_definitions():
     assert row.state == "only_uncovered"  # a fragment unit is never non-film mass
 
 
-def test_memory_search_in_a_framed_film_is_work_level():
+def test_memory_search_in_a_framed_film_old_rule():
     # pass-1 memory search with a frame, and pass-2 metamemory inside its framed film, are
     # work-level references to that film, never non-film mass
     P = _producer()
@@ -920,12 +919,12 @@ def test_memory_search_in_a_framed_film_is_work_level():
     units = [dict(first=0, last=1), dict(first=2, last=3)]
     frames = [dict(kind="memory_search", frame=[("C", 0.7)], position=None),
               dict(kind="content", frame=[("B", 1.0)], position=None)]
-    conv = dict(references=0, refused={}, frame_mismatch=0, pass2_missing=0, shapes={},
-                broad_cases={}, positions=dict(resolved=0, unresolved=0), fragment_words=0)
+    conv = P.new_conv()
     refs = {}
     cells = P.convert_session(("P", "s"), words, units, frames,
                               {"o1": (dict(talk="metamemory"), {})}, {1: dict(oid="o1")}, comp,
-                              P.conditions(1, "s", 1), refs, conv)
+                              P.conditions(1, "s", 1), refs, conv,
+                              dict(talk="state-map-v1"))
     for c, work in ((cells[0], "C"), (cells[2], "B")):
         assert isinstance(c.sample, RefSample), c.sample
         r = refs[c.sample.ref]
@@ -947,6 +946,61 @@ def test_gold_alignment_refuses_non_monotone_onsets():
     spans, rec = F.align_gold([(10.0, 0), (10.0, 0), (12.0, 13.0)],
                               [(10.0, None), (10.0, None), (12.0, 2.0)])
     assert spans[0] == (10.0, 10.0) and rec["zero_length_bins"] == 1
+
+
+def _orthogonal_session(frames, answers, items, variant="identifying"):
+    P = _producer()
+    from cs2.source import RecallWord
+
+    comp = fixture()
+    words = [RecallWord(i, f"w{i}", float(i)) for i in range(2 * len(frames))]
+    units = [dict(first=2 * i, last=2 * i + 1) for i in range(len(frames))]
+    refs, conv, framing, talk = {}, P.new_conv(), {}, {}
+    cells = P.convert_session(("P", "s"), words, units, frames, answers, items, comp,
+                              P.conditions(1, "s", 1), refs, conv,
+                              dict(talk="orthogonal", talk_work_variant=variant), framing, talk)
+    return comp, cells, refs, conv, framing, talk
+
+
+def test_talk_is_orthogonal_and_non_addressed_talk_has_no_mass():
+    # memory search (even inside a framed film), giving up, unanchored commentary and fragments
+    # are non-addressed talk: ledger counts, never a destination. Off-task is the non-film
+    # state. Anchored commentary keeps its references (talk recorded on them). An identifying
+    # 'work' unit is a work-level reference.
+    frames = [
+        dict(kind="memory_search", frame=[("C", 0.7)], position=None),
+        dict(kind="gave_up", frame=[], position=None),
+        dict(kind="content", frame=[("B", 1.0)], position=None),  # unanchored commentary
+        dict(kind="content", frame=[("B", 1.0)], position=None),  # anchored commentary
+        dict(kind="off_task", frame=[], position=None),
+        dict(kind="work", frame=[("C", 0.9)], position=None),
+        dict(kind="fragment", frame=[("C", 0.9)], position=None),
+    ]
+    answers = {"o2": (dict(talk="commentary", refs=[]), {}),
+               "o3": (dict(talk="commentary", refs=[dict(words="w7", alts=[
+                   {"w": 1.0, "iv": [[1, 1]]}])]), {1: "b2"})}
+    comp, cells, refs, conv, framing, talk = _orthogonal_session(
+        frames, answers, {2: dict(oid="o2"), 3: dict(oid="o3")})
+    kinds = [type(c.sample).__name__ for c in cells[::2]]
+    assert kinds == ["TalkSample", "TalkSample", "TalkSample", "Uncovered", "StateSample",
+                     "RefSample", "TalkSample"], kinds
+    assert type(cells[7].sample).__name__ == "RefSample"  # the anchored word
+    assert refs[cells[7].sample.ref].talk == "commentary"
+    assert isinstance(refs[cells[10].sample.ref], WorkReference)
+    assert conv["non_addressed_words"] == {"metamemory": 4, "commentary": 2, "fragment": 2}
+    assert talk[("P", "s", "P:s:u0")] == "metamemory" and framing[("P", "s", "P:s:u0")]
+    acc = Account(comp, refs, {("P", "s"): cells})
+    ld = LocationDistribution.from_words(acc, cells, [Bin(0, 1.5), Bin(1.5, 3.5)])
+    assert [r.state for r in ld.rows] == ["only_non_addressed", "only_non_addressed"]
+
+
+def test_talk_work_variant_position_only():
+    frames = [dict(kind="work", frame=[("C", 0.9)], position=None),
+              dict(kind="work", frame=[("C", 0.9)], position="the last one")]
+    _, cells, refs, _, _, _ = _orthogonal_session(frames, {}, {}, variant="position-only")
+    assert type(cells[0].sample).__name__ == "TalkSample"
+    r = refs[cells[2].sample.ref]
+    assert isinstance(r, PositionReference) and r.resolved_work == "C"
 
 
 # ---------------------------------------------------------------- runner
