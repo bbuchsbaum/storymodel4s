@@ -290,5 +290,90 @@ def main(argv):
     print(out_json)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" and sys.argv[1:2] != ["round2"]:
     main(sys.argv[1:])
+
+
+# ---------------------------------------------------------------- round 2 (pooled, cache-only)
+
+TAUS_R2 = [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0]
+ALL10 = sorted(TUNE + CONFIRM)
+
+
+def pooled(v, ref, band):
+    d = [v[p] - ref[p] for p in ALL10]
+    return dict(delta=round(float(np.mean(d)), 4), band=round(band, 4),
+                beyond_band=abs(float(np.mean(d))) > band, better=float(np.mean(d)) < 0,
+                p=round(sign_flip_p(d), 4), wins=f"{sum(x < 0 for x in d)}/{len(d)}")
+
+
+def pass_rule(r):
+    return r["better"] and r["beyond_band"] and r["p"] <= 0.01
+
+
+def round2(out_json):
+    state = git_state()
+    cfg0 = SC.load_config()
+    rules = resolve_rules(cfg0)
+    A = D.adapter("filmfestival")
+    comp = A.producer_composition()
+    dev = A.development()
+    sessions = [(p, s) for p in dev for s in A.sessions(p)]
+    work = C / "hillclimb-r2"
+    accs = {k: build(A, sessions, k, work / f"s{k}", rules) for k in (1, 2)}
+    gold = gold_by_participant(A, dev)
+    keys = sorted({(p, g.session) for p, rs in gold.items() for g in rs})
+    durs, _ = baseline_forecasts(A, comp, gold, cfg0, rules)
+
+    def pm(scores):
+        return summarize(scores, ALL10, comp)
+
+    def ens(tau):
+        cfg = dict(cfg0, located_temperature=tau)
+        f = {k: forecasts(accs[k], comp, gold, keys, durs, cfg, rules) for k in (1, 2)}
+        return score_map(comp, gold, {x: [SC.EnsembleForecast([a, b])
+                                          for a, b in zip(f[1][x], f[2][x])] for x in keys},
+                         cfg0, True)
+
+    base = {k: score_map(comp, gold, forecasts(accs[k], comp, gold, keys, durs, cfg0, rules),
+                         cfg0, True) for k in (1, 2)}
+    s1, s2 = pm(base[1]), pm(base[2])
+    bands = {t: 2 * float(np.std([s2["terms"][t][p] - s1["terms"][t][p] for p in ALL10],
+                                 ddof=1)) / np.sqrt(10) for t in TERMS}
+    res = dict(schema="storymodel4s.case-study-2.hillclimb-r2/v1", **state, model_calls=0,
+               evidence="development data, engineering numbers; validation = the frozen-six run",
+               participants=ALL10, pooled_bands=bands, levers={})
+    # lever: ensemble of distributions vs mean of bits
+    mb = pm(mean_bits(base[1], base[2]))
+    e1 = ens(1.0)
+    ev = pm(e1)
+    lev = dict(result={t: float(np.mean(list(ev["terms"][t].values()))) for t in TERMS},
+               mean_of_bits={t: float(np.mean(list(mb["terms"][t].values()))) for t in TERMS},
+               top_scene=(ev["top_scene"], mb["top_scene"]),
+               test={t: pooled(ev["terms"][t], mb["terms"][t], bands[t]) for t in TERMS})
+    lev["verdict"] = "KEEP" if (pass_rule(lev["test"]["scene_bits"]) and not any(
+        lev["test"][t]["delta"] > bands[t] for t in TERMS)) else "DROP"
+    res["levers"]["ensemble_distributions"] = lev
+    # lever: sharpening on the ensemble, tau fitted leave-one-participant-out
+    runs = {tau: pm(ens(tau)) for tau in TAUS_R2}
+    obj = {tau: {p: float(np.mean([r["terms"][t][p] for t in TERMS])) for p in ALL10}
+           for tau, r in runs.items()}
+    chosen = {p: min(TAUS_R2, key=lambda tau: np.mean([obj[tau][q] for q in ALL10 if q != p]))
+              for p in ALL10}
+    sharp = {t: {p: runs[chosen[p]]["terms"][t][p] for p in ALL10} for t in TERMS}
+    lev = dict(tau_lopo=chosen,
+               grid_pooled_objective={str(t): float(np.mean(list(o.values())))
+                                      for t, o in obj.items()},
+               result={t: float(np.mean(list(sharp[t].values()))) for t in TERMS},
+               reference_tau1={t: float(np.mean(list(ev["terms"][t].values()))) for t in TERMS},
+               test={t: pooled(sharp[t], ev["terms"][t], bands[t]) for t in TERMS})
+    lev["verdict"] = "KEEP" if (pass_rule(lev["test"]["scene_bits"]) and not any(
+        lev["test"][t]["delta"] > bands[t] for t in TERMS)) else "DROP"
+    res["levers"]["sharpening_on_ensemble"] = lev
+    out_json.parent.mkdir(parents=True, exist_ok=True)
+    out_json.write_text(json.dumps(res, indent=1, default=str) + "\n")
+    print(out_json)
+
+
+if __name__ == "__main__" and len(sys.argv) > 2 and sys.argv[1] == "round2":
+    round2(Path(sys.argv[2]))
