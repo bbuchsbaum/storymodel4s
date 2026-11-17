@@ -238,8 +238,8 @@ proof precedes scientific claims, but scientific qualification must not block un
 
 ## Next deliveries: execution order from the current branch
 
-Refreshed 2026-11-17 through native-source assessment source `8fdd57013` and its
-local qualification, following contextual fidelity `3e8e7367c` / `5a98a3d59`.
+Refreshed 2026-11-17 through connected saved-analysis source `83a25cda5` and
+qualification `a4b35df97`, following recorded semantic inference `3255f57d9`.
 This is the next-work plan within P2–P6,
 not a second phase numbering system. Mote owns live status. Completed checkpoints move
 out of the future queue; capability obligations remain until their complete exit is met.
@@ -313,8 +313,8 @@ recovery and remaining capability families still keep their full phases open.
 
 | Order | Work and researcher-visible result | Exit evidence |
 |---|---|---|
-| 1. Semantic evidence through inference (P3/P4) | Complete recorded surface embeddings, model/space/payload-bound cache, bounded nominations and the existing local-evidence → sequence consumer. Retain the lexical-only path. | Installed API/CLI replay on identical inputs; independent distance and candidate expectations; explicit missing/failure/budget diagnostics; unchanged source across two recalls; cold review of consequential semantics. |
-| 2. One study-shaped Python workflow (P2/P3/P5) | Connect construction, identity, details, reference, conditional fidelity and all three analysis views behind a small public API. Add a synthetic Sherlock-contract intake path and preserve the native-source/text-recall variant. | One installed command and notebook-friendly functions reproduce saved outputs offline; interrupted runs resume against the correct inputs; recurring occurrences, joint/broad/alternative/external references and pending assessments survive readback. |
+| 1. Study inputs through analysis (P2/P3/P5) | Feed checked synthetic source annotations and recall inputs into existing construction and saved analysis. Preserve declared part order, native clocks, row/occurrence identity and original bytes. Extend to the actual Sherlock annotation and word-CSV contracts. | One installed command and notebook-friendly functions run inputs → accounts → details → mapping → fidelity → views; two recalls reuse one source; malformed inputs and foreign recordings are refused. Generic text intake alone does not close Sherlock coverage. |
+| 2. Recover interrupted work (P5) | Resume imported recordings against their exact prepared inputs, model/prompt profile and existing completed stages. Reuse the recording executor; keep recovery explicit. | Inject interruption before/after reply persistence and import publication; recovery agrees with an uninterrupted run, retains original replies and refuses changed inputs. No implicit provider call or overwrite of completed assessments. |
 | 3. Complete computational families (P2/P4) | Extend that workflow with remaining graph/recall families, duration/refinement and retained transport methods, then feature tracks, clock maps and measured-time readouts. Port each method into the existing interfaces as its inputs become stable. | Per-family producer and consumer; independent small-case oracle; executable Scala comparison where available; support/denominator/missingness contract; measured sparse resource use. No claim that the existing sequence kernel is the entire Scala inference surface. |
 | 4. Close operational and inspection coverage (P5/P6) | Expand to FilmFestival/Friends, retained providers, media, proposition/AMR, embedding backends and interview workflows. Add React inspection of actual artifacts, then saved investigations and exports. | Capability-by-capability executed workflow coverage, compatibility/recovery checks and a clear disposition for every retained Scala/Atlas behavior. Visual polish follows useful inspection. |
 
@@ -324,6 +324,35 @@ graph/target family needed by that journey. Reuse existing intake, execution, ex
 recordings. If a workflow bead needs a missing graph family, implement that bounded dependency
 first.
 Do not wait for every graph family or numerical method before exercising a complete workflow.
+
+### First implementation slice: checked intake into saved analysis
+
+Start with admitted synthetic fixtures. Preserve raw UTF-8 recall input and the existing
+checked canonicalization/segmentation receipt. For source rows, retain declared part and row
+ordinals, stable keys, and the mapping into constructed text spans. A part-local clock restart
+must not reorder the narrative. Keep exact native timing in a part-qualified sidecar; ordering
+offsets are not elapsed-time measurements. Original occurrence supports and separator coverage
+must remain distinguishable.
+
+The proposed implementation is a small prepared-construction wrapper around the existing rich
+request, not another graph representation. Derive the rich request from validated intake;
+bind recordings to the complete prepared input. Preserve the original construction receipt
+and expose a separately provenance-bound account to the existing saved-analysis consumer.
+Record this compatibility choice before adding public vocabulary. Existing rich request
+versions continue to describe graph/context capability, not intake format.
+
+**Discriminating checks:** two raw inputs that canonicalize identically may share document
+identity, but must not silently share intake-bound recordings; forged derived fields fail;
+multipart rows stay in declared order despite reset clocks; supplementary Unicode and
+separators retain correct supports; legacy rich replay remains unchanged. An installed
+source-plus-two-recalls example must reach the analysis views through the actual consumer.
+
+**Follow immediately:** implement the retained Sherlock annotation TSV and word-timestamp CSV
+adapters using their checked Scala contracts and synthetic fixtures. Preserve point versus
+interval rows, missing TR bounds, scene/cast/location metadata, all supplied recall timing
+columns and byte lineage. Do not substitute convenience run tables or gold-derived boundaries
+for canonical intake. Only then claim Sherlock intake coverage; FilmFestival and Friends stay
+explicitly owed in P5.
 
 **Checkpoint 3 ordering:** complete causal/referential/entity relations, auxiliary hierarchy,
 recall grouping/discourse and retained event/episode targets alongside their actual consumers.
