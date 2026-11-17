@@ -492,6 +492,25 @@ def pass2_prompt_prefix(batch):
     return PASS2_TEMPLATE_PREFIX.format(items=items, n=len(batch))
 
 
+def shuffle_unit_texts(units, seed, sample, key):
+    """Stage-3 content ablation: unit texts shuffled across the session's units (seeded); the
+    units keep their positions, word cells and frames."""
+    perm = list(range(len(units)))
+    random.Random(f"{seed}:{sample}:shuffle:{key[0]}:{key[1]}").shuffle(perm)
+    return [dict(u, text=units[perm[i]]["text"]) for i, u in enumerate(units)]
+
+
+def swap_contexts(items, seed, sample):
+    """Stage-3 wrong-context control: each item's CONTEXT becomes the context of a seeded random
+    item from another session."""
+    rng = random.Random(f"{seed}:{sample}:wrongctx")
+    pool = [(it["ctx"], it["session_key"]) for it in items]
+    for it in items:
+        choices = [c for c, k in pool if k != it["session_key"]]
+        it["ctx"] = rng.choice(choices) if choices else it["ctx"]
+    return items
+
+
 def make_film_batches(items, seed, sample, batch=BATCH, window=WINDOW):
     """Batches grouped by framed film (so calls share a film's outline prefix); within each film
     the no-chaining rule of make_batches holds unchanged."""
@@ -997,10 +1016,12 @@ def convert_session(
                             except (TypeError, ValueError):
                                 refuse("span-invalid")
                                 continue
-                            if not (0 <= a_ <= b_ < len(wids)):
+                            if not (0 <= a_ <= b_ < len(wids)) and rules.get(
+                                    "span_coverage") != "unit":
                                 refuse("span-invalid")
                                 continue
-                            covered_w = wids[a_:b_ + 1]
+                            covered_w = (wids if rules.get("span_coverage") == "unit"
+                                         else wids[a_:b_ + 1])
                         else:
                             anchor = toks(r.get("words") or "")
                             j, why = match_anchor(utoks, anchor)
@@ -1067,6 +1088,8 @@ def run(
     layout: str = "per-call",
     pass1: str = "v1",
     pass1_from: Path | None = None,
+    films: list | None = None,
+    control: str | None = None,
 ):
     """Both passes over `sessions` (development only), pass 2 pooled across them.
 
@@ -1092,6 +1115,9 @@ def run(
     cast_line = A.producer_cast_line() if rendering == "cs1-extras" else None
     for c in conds.values():
         c["outline_order"] = outline_order
+    if films or control:
+        conds["pass2"]["control"] = dict(films=films, control=control)
+        conds["pass2"]["id"] += f"+control:{control or 'none'}:{','.join(films or [])}"
     # declared: the pass-2 rendering condition carries its own id when it is not 'plain'
     conds["pass2"]["rendering"] = rendering
     if rendering != "plain":
@@ -1185,9 +1211,13 @@ def run(
         ledger["sessions"][f"{p}:{s}"] = rec
         data[(p, s)] = dict(words=words, units=units, frames=frames, p1=p1)
 
+    if control not in (None, "wrong-context", "content-shuffle"):
+        raise ValueError(f"unknown control {control!r}")
     items = []
     for key, d in data.items():
         units, frames = d["units"], d["frames"]
+        if control == "content-shuffle":
+            units = shuffle_unit_texts(units, seed, sample, key)
         for i, (u, f) in enumerate(zip(units, frames)):
             if dry or (f["kind"] == "content" and f["frame"]):
                 ctx = context_of(units, i)
@@ -1205,6 +1235,10 @@ def run(
                         oid=opaque(f"{salt}:{sample}", f"{key[0]}:{key[1]}:{i}"),
                     )
                 )
+    if films:
+        items = [it for it in items if it["work"] in films]
+    if control == "wrong-context":
+        swap_contexts(items, seed, sample)
     batches = (make_film_batches(items, seed, sample) if layout == "prefix"
                else make_batches(items, seed, sample))
     ledger["batches"] = batch_report(batches)
@@ -1266,8 +1300,9 @@ def run(
     conv = new_conv()
     for key, d in data.items():
         by_k = {it["k"]: it for it in items if it["session_key"] == key}
+        r_ = dict(rules, span_coverage="unit") if control == "content-shuffle" else rules
         cells[key] = convert_session(key, d["words"], d["units"], d["frames"], answers, by_k,
-                                     comp, conds, refs, conv, rules, framing, unit_talk)
+                                     comp, conds, refs, conv, r_, framing, unit_talk)
     acc = Account(comp, refs, cells, framing_work=framing, unit_talk=unit_talk,
                   condition=json.dumps(dict(conds, rules=rules), sort_keys=True))
     ledger["conversion"] = conv

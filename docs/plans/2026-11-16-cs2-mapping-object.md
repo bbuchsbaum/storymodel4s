@@ -397,6 +397,47 @@ This ablation separates them.
 - **New runs use `--layout prefix --pass1 v1`.** The CLI default stays `per-call`, so that
   cache-only replays of earlier runs reproduce exactly.
 
+### Stage 3 controls (2026-11-17; predictions and pass/fail rules recorded before any call)
+
+**Design.**
+- Every new call uses `--layout prefix --pass1 v1`, with v1 frames reused from full-run
+  sample 1 and the develop five's sessions.
+- **Film restriction (a deviation from "3 participants").** Pass 2 runs only for the two films
+  with the most framed content items: the_boyfriend (280 items) and bus_stop (218). Batches
+  are grouped by film and seeded per film, so restricting films leaves the reference run's
+  batches unchanged. The reference (v1 + prefix) is therefore exactly reproducible from cache.
+  Restricting participants instead would have needed new reference calls.
+- **Comparisons** use the gold rows of those two films on the develop five, paired over
+  participants. The noise bands are the ones measured above: scene 0.026, work 0.011.
+- **Projection.** 13 calls for each of controls 2–4, plus 2 for the probe: 41 of the remaining
+  58.
+
+**Controls**, each with its prediction and pass rule:
+
+1. **Free checks, from cache:** null producer, gold-blind windows, and ε 0.001 and 0.05.
+   - Prediction: the null producer equals the baseline; the rest is descriptive.
+   - Pass: max abs bits difference = 0.
+2. **Id and label permutation:** a new salt (`cs2-ff-s3-perm`) with the same seed and batches.
+   With one film per call, film order is moot in pass 2.
+   - Prediction: no effect.
+   - Pass: |Δscene| ≤ 0.026 and |Δwork| ≤ 0.011.
+3. **Wrong-context swap:** each item's CONTEXT is replaced by the context of a seeded random
+   item from another session.
+   - Prediction: no gain; the scene term may worsen.
+   - Pass: Δscene ≥ −0.026.
+4. **Content ablation:** unit texts are shuffled across units within each session, seeded. A
+   shuffled unit's references cover all its word cells.
+   - Prediction: the scene term falls to about the HMM or duration level.
+   - Pass: the control's scene term is nearer the HMM baseline than the reference, i.e.
+     ≥ (reference + HMM) / 2.
+5. **Memorization probe:** 2 calls, each asking for the film and scene codes of 40 develop-five
+   gold rows, given only dataset, participant, session and row ids.
+   - Prediction: chance.
+   - Pass: film accuracy ≤ 1/10 + 2 binomial SE, and specific-row scene accuracy ≤ chance +
+     2 SE, where chance is the mean of 1 / (number of valid scenes in the gold film).
+6. **Utterance-unit control:** deferred. New units need new pass-1 and pass-2 calls beyond the
+   budget.
+
 **Gaps for the vocabulary ADR.**
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the

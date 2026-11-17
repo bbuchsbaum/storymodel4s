@@ -1287,6 +1287,32 @@ def test_frame_fallback_floor_keeps_every_work_positive():
     assert B.frame_fallback(dur, {}, f) is dur
 
 
+def test_stage3_control_manipulations():
+    P = _producer()
+    items = [dict(session_key=("P1", "s"), ctx=f"p1-{k}", k=k) for k in range(4)]
+    items += [dict(session_key=("P2", "s"), ctx=f"p2-{k}", k=k) for k in range(4)]
+    out = P.swap_contexts([dict(i) for i in items], 1, 1)
+    for it in out:  # every context comes from the other session
+        assert it["ctx"].startswith("p2-" if it["session_key"] == ("P1", "s") else "p1-")
+    units = [dict(k=i, text=f"t{i}", first=i, last=i) for i in range(6)]
+    sh = P.shuffle_unit_texts(units, 1, 1, ("P", "s"))
+    assert sorted(u["text"] for u in sh) == sorted(u["text"] for u in units)
+    assert [u["first"] for u in sh] == [u["first"] for u in units]
+    assert [u["text"] for u in sh] != [u["text"] for u in units]
+    # a shuffled unit's references cover all of its word cells
+    from cs2.source import RecallWord
+
+    comp = fixture()
+    words = [RecallWord(i, f"w{i}", float(i)) for i in range(4)]
+    frames = [dict(kind="content", frame=[("B", 1.0)], position=None)]
+    answers = {"o0": (dict(talk="episodic", refs=[dict(span=[0, 0], alts=[
+        {"w": 1.0, "iv": [[1, 1]]}])]), {1: "b2"})}
+    cells = P.convert_session(("P", "s"), words, [dict(first=0, last=3)], frames, answers,
+                              {0: dict(oid="o0")}, comp, P.conditions(1, "s", 1), {},
+                              P.new_conv(), dict(talk="orthogonal", span_coverage="unit"))
+    assert all(type(c.sample).__name__ == "RefSample" for c in cells)
+
+
 # ---------------------------------------------------------------- runner
 
 

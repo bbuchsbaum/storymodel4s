@@ -669,7 +669,7 @@ def cmd_ff_run(args):
         if a in ("--export", "--seed", "--salt", "--sample", "--sessions", "--arm", "--jobs",
                  "--corpus", "--rules", "--talk-work-variant", "--outline-order", "--epsilon",
                  "--windows", "--rendering", "--layout", "--pass1", "--mismatch-rule",
-                 "--pass1-from"):
+                 "--pass1-from", "--films", "--control"):
             opt[a[2:].replace("-", "_")] = next(it)
         elif a == "--dry":
             opt["dry"] = True
@@ -711,7 +711,9 @@ def cmd_ff_run(args):
                                     rendering=opt.get("rendering", "plain"),
                                     layout=opt.get("layout", "per-call"),
                                     pass1=opt.get("pass1", "v1"),
-                                    pass1_from=opt.get("pass1_from"))
+                                    pass1_from=opt.get("pass1_from"),
+                                    films=opt["films"].split(",") if "films" in opt else None,
+                                    control=opt.get("control"))
     calls = P.call_ledger(log)
     extra = dict(
         participants=sorted({p for p, _ in sessions}), sessions=[f"{p}:{s}" for p, s in sessions],

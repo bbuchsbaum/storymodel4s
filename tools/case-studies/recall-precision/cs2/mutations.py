@@ -427,6 +427,14 @@ MUTANTS = [
         test="test_frame_fallback_floor_keeps_every_work_positive",
     ),
     dict(
+        id="M50",
+        guard="the wrong-context control draws contexts from other sessions only",
+        file="cs2/ff_producer.py",
+        edits=[('        choices = [c for c, k in pool if k != it["session_key"]]\n',
+                '        choices = [c for c, k in pool]\n')],
+        test="test_stage3_control_manipulations",
+    ),
+    dict(
         id="M16",
         guard="the part marginal places a unit's mass on the unit's own part",
         file="cs2/projections.py",
