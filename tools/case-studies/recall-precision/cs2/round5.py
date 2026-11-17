@@ -304,7 +304,30 @@ def top_share(sc, key="scene_hit"):
     return float(np.mean(v)) if v else None
 
 
-def order_variant(X, k, pick, bands=None):
+def write_order_rows(path, prod, lev, fl):
+    """Per row, no text: what the producer and the lever scored, and the mass order placed."""
+    import csv
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    num = lambda x: "" if x is None else f"{x:.6f}"  # noqa: E731
+    with open(path, "w", newline="") as f:
+        w = csv.writer(f, delimiter="\t")
+        w.writerow(["participant", "session", "row", "cls", "gold_step", "producer_scene_bits",
+                    "lever_scene_bits", "producer_top_scene", "lever_top_scene",
+                    "producer_scene_hit", "lever_scene_hit", "order_mass",
+                    "order_mass_unassigned", "order_mass_within", "top_source"])
+        for a, b, x in zip(prod, lev, fl):
+            w.writerow([a.participant, a.session, a.row, a.cls, a.gold_step or "",
+                        num(a.scene_bits), num(b.scene_bits),
+                        "" if a.top_scene is None else a.top_scene,
+                        "" if b.top_scene is None else b.top_scene,
+                        "" if a.scene_hit is None else int(a.scene_hit),
+                        "" if b.scene_hit is None else int(b.scene_hit),
+                        num(x.order_mass), num(x.order_mass_unassigned),
+                        num(x.order_mass_within), x.top_source])
+
+
+def order_variant(X, k, pick, bands=None, rows_out=None):
     acc = X.account(k)
     fmap, _, mixes = producer_parts(X, acc)
     bmap, dcd = order_forecasts(X, fmap, mixes, pick)
@@ -378,6 +401,9 @@ def order_variant(X, k, pick, bands=None):
                 },
             }
     fl = flat(X, bmap)
+    if rows_out is not None:
+        write_order_rows(rows_out, prod, lev, fl)
+        out["rows_file"] = str(rows_out)
     idx = [i for i, s in enumerate(prod) if s.scene_bits is not None]
     for cat in ("miss", "hit", "fallback"):
         ii = [i for i in idx if R.category(prod[i]) == cat]
@@ -449,8 +475,9 @@ def order(out_json):
         bands[t] = 2 * float(np.std(d, ddof=1)) / math.sqrt(len(d))
     res["pooled_bands"] = bands
     F = res["corpora"]["filmfestival"] = {}
-    F["sample_1"], d1 = order_variant(ff, 1, lopo_alpha, bands)
-    F["sample_2"], _ = order_variant(ff, 2, lopo_alpha, bands)
+    rows = out_json.parent / "order-rows"
+    F["sample_1"], d1 = order_variant(ff, 1, lopo_alpha, bands, rows / "filmfestival-s1.tsv")
+    F["sample_2"], _ = order_variant(ff, 2, lopo_alpha, bands, rows / "filmfestival-s2.tsv")
     a_ff = d1._all  # the FilmFestival value: the minimiser over all ten participants
     S = res["corpora"]["sherlock"] = {}
     S["part_order_run"], _ = order_variant(
@@ -458,8 +485,21 @@ def order(out_json):
         1,
         lambda dcd: {p: a_ff for p in sh.participants},
         dict(scene_bits=bands["scene_bits"]),
+        rows / "sherlock-part-order.tsv",
     )
     res["sherlock_alpha"] = a_ff
+    # sensitivity, not part of the rule: the gold-blind windows, every fitted quantity refitted
+    ffw, shw = R.Corpus("filmfestival", "median"), R.Corpus("sherlock", "median")
+    ffw._acc, shw._acc = ff._acc, sh._acc
+    W = res["sensitivity_gold_blind_windows"] = dict(
+        note="not part of the rule: the same lever on fixed windows (median gold-row "
+        "duration) labelled by the gold row they overlap most; transitions and alpha "
+        "refitted on the windowed rows as in round 4")
+    W["filmfestival_sample_1"], dw = order_variant(ffw, 1, lopo_alpha)
+    W["filmfestival_sample_1"]["window_seconds"] = ffw.window_seconds
+    W["sherlock_part_order_run"], _ = order_variant(
+        shw, 1, lambda dcd: {p: dw._all for p in shw.participants})
+    W["sherlock_part_order_run"]["window_seconds"] = shw.window_seconds
     p, q = F["sample_1"], S["part_order_run"]
     band = bands["scene_bits"]
     sc = p["tests"]["scene_bits"]
