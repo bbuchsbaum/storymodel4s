@@ -26,7 +26,8 @@ readout = situation_playback(account, account.events[0].id, media_source.id, bin
 Each observation records its origin, procedure, input hashes and physical envelope. Proposals
 bind the complete request digest, use local graph keys, and supply their own native evidence.
 The deterministic resolver checks evidence against the exact observation union. Context
-scopes must be nested or disjoint; situations occupy their deepest applicable scope. Roles
+scopes must be nested or disjoint; a nested cue also lies within its parent scope.
+Situations occupy their deepest applicable scope. Roles
 must cite support within their situation. A rejected row contributes no graph claims; valid
 neighbors survive. Omitted, failed, unsupported and search-limited observations remain explicit.
 Recall detail inventories start unattempted; constructing a graph does not complete extraction.
@@ -84,3 +85,7 @@ accounts containing media sources explicitly. They do not strip native evidence.
 versions remain owed, along with clock maps/composition, shot/track anchors, acquisition,
 automatic holder/identity proposals and complete graph/detail construction. No new media tool,
 live provider call or participant data is needed for this supplied-observation path.
+
+See [verification evidence](../evidence/playback.json) and the retained
+[mutation](../evidence/playback-mutations.py) and
+[installed-workflow](../evidence/playback-installed.py) reproduction scripts.

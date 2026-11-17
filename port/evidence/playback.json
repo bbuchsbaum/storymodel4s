@@ -1,0 +1,424 @@
+{
+  "source_commit": "71c9248e048022caa8602472ba3b448dab7dc7be",
+  "scope": "Native primary-axis playback support and document-free supplied observation construction in RichAccount v6, exact situation readout, recording/replay and explicit text-consumer refusal",
+  "checks": {
+    "tests": {
+      "command": ".venv/bin/pytest -q",
+      "exit_code": 0,
+      "summary": "813 passed in 13.17s",
+      "log_sha256": "596da82cc1548cf0037312d1a4c707799c992adec74fff8a854846004fb3a71e"
+    },
+    "mypy": {
+      "command": ".venv/bin/mypy src/storymodel",
+      "exit_code": 0,
+      "summary": "Success: no issues found in 53 source files",
+      "log_sha256": "1495598f2b8e6a09df4f1631545361d6c6e3e3204e506255935ef84876641cc6"
+    },
+    "ruff": {
+      "command": ".venv/bin/ruff check src tests examples",
+      "exit_code": 0,
+      "summary": "All checks passed!",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "format": {
+      "command": ".venv/bin/ruff format --check src tests examples",
+      "exit_code": 0,
+      "summary": "130 files already formatted",
+      "log_sha256": "1797ba33db9c9ef754817e0f9ed6324336a2128b9e103101798411f3ccf41704"
+    }
+  },
+  "additional_context_checks": {
+    "included_in_full_suite": true,
+    "coverage": "All8 nonroot contexts x2 native sides, nested cue positive/refusal, both numerical consumers x2 hidden opposite-media sides withtextpositive"
+  },
+  "mutations": [
+    {
+      "mutation": "nested-cue",
+      "file": "playback_construction.py",
+      "old": "not contains_playback(context_proposal.cue, enclosing)",
+      "new": "False",
+      "test": "test_playback_construction.py::test_nested_context_cue_must_belong_to_parent_scope[29-rejected]",
+      "controls": [
+        "test_playback.py::test_union_retains_gaps_and_explicit_points_inside_intervals",
+        "test_playback.py::test_public_projection_and_containment_refuse_typed_forgeries"
+      ],
+      "baseline": "3 passed in 0.24s",
+      "mutant": "1 failed, 2 passed in 0.26s",
+      "compiled": true
+    },
+    {
+      "mutation": "organization-modality",
+      "file": "organization.py",
+      "old": "value = require_text_account(value)",
+      "new": "from .rich_account import validate_supported_account\n    value = validate_supported_account(value)",
+      "test": "test_playback_construction.py::test_numerical_consumers_refuse_native_side_hidden_by_text_documents[organization-recall]",
+      "controls": [
+        "test_playback.py::test_union_retains_gaps_and_explicit_points_inside_intervals",
+        "test_playback.py::test_public_projection_and_containment_refuse_typed_forgeries"
+      ],
+      "baseline": "3 passed in 0.26s",
+      "mutant": "1 failed, 2 passed in 0.29s",
+      "compiled": true
+    },
+    {
+      "mutation": "reconstruction-modality",
+      "file": "reconstruction.py",
+      "old": "checked = require_text_account(account)",
+      "new": "from .rich_account import validate_supported_account\n    checked = validate_supported_account(account)",
+      "test": "test_playback_construction.py::test_numerical_consumers_refuse_native_side_hidden_by_text_documents[reconstruction-source]",
+      "controls": [
+        "test_playback.py::test_union_retains_gaps_and_explicit_points_inside_intervals",
+        "test_playback.py::test_public_projection_and_containment_refuse_typed_forgeries"
+      ],
+      "baseline": "3 passed in 0.30s",
+      "mutant": "1 failed, 2 passed in 0.31s",
+      "compiled": true
+    },
+    {
+      "mutation": "drop-points",
+      "file": "playback.py",
+      "old": "points=tuple(p for p in checked.points if lo <= tick(p) < hi),",
+      "new": "points=(),",
+      "test": "test_playback.py::test_projection_measures_union_not_hull_and_never_gives_points_duration",
+      "controls": [
+        "test_playback.py::test_union_retains_gaps_and_explicit_points_inside_intervals",
+        "test_playback.py::test_public_projection_and_containment_refuse_typed_forgeries"
+      ],
+      "baseline": "3 passed in 0.20s",
+      "mutant": "1 failed, 2 passed in 0.22s",
+      "compiled": true
+    },
+    {
+      "mutation": "hull-duration",
+      "file": "playback.py",
+      "old": "sum(tick(i.end) - tick(i.start) for i in checked.intervals) * timebase",
+      "new": "(tick(checked.intervals[-1].end) - tick(checked.intervals[0].start)) * timebase if checked.intervals else Fraction(0)",
+      "test": "test_playback.py::test_projection_measures_union_not_hull_and_never_gives_points_duration",
+      "controls": [
+        "test_playback.py::test_union_retains_gaps_and_explicit_points_inside_intervals",
+        "test_playback.py::test_public_projection_and_containment_refuse_typed_forgeries"
+      ],
+      "baseline": "3 passed in 0.20s",
+      "mutant": "1 failed, 2 passed in 0.23s",
+      "compiled": true
+    },
+    {
+      "mutation": "closed-point-end",
+      "file": "playback.py",
+      "old": "not start <= tick(p) < end",
+      "new": "not start <= tick(p) <= end",
+      "test": "test_playback.py::test_annotation_timeline_and_half_open_extent_are_not_silent_media_evidence",
+      "controls": [
+        "test_playback.py::test_union_retains_gaps_and_explicit_points_inside_intervals",
+        "test_playback.py::test_public_projection_and_containment_refuse_typed_forgeries"
+      ],
+      "baseline": "3 passed in 0.22s",
+      "mutant": "1 failed, 2 passed in 0.22s",
+      "compiled": true
+    },
+    {
+      "mutation": "root-promotion",
+      "file": "playback_construction.py",
+      "old": "if situation_proposal.context != deepest:",
+      "new": "if False and situation_proposal.context != deepest:",
+      "test": "test_playback_construction.py::test_invalid_native_claims_are_row_atomic[root]",
+      "controls": [
+        "test_playback.py::test_union_retains_gaps_and_explicit_points_inside_intervals",
+        "test_playback.py::test_public_projection_and_containment_refuse_typed_forgeries"
+      ],
+      "baseline": "3 passed in 0.26s",
+      "additional_replacement": [
+        "if _overlap(situation_proposal.evidence, c.scope) and key not in (",
+        "if False and _overlap(situation_proposal.evidence, c.scope) and key not in ("
+      ],
+      "mutant": "1 failed, 2 passed in 0.29s",
+      "compiled": true
+    },
+    {
+      "mutation": "request-binding",
+      "file": "playback_construction.py",
+      "old": "or supplied[\"request_sha256\"] != request_sha",
+      "new": "or False",
+      "test": "test_playback_construction.py::test_rejected_observation_does_not_erase_valid_neighbor_or_provenance_binding",
+      "controls": [
+        "test_playback.py::test_union_retains_gaps_and_explicit_points_inside_intervals",
+        "test_playback.py::test_public_projection_and_containment_refuse_typed_forgeries"
+      ],
+      "baseline": "3 passed in 0.26s",
+      "mutant": "1 failed, 2 passed in 0.28s",
+      "compiled": true
+    },
+    {
+      "mutation": "historical-field",
+      "file": "rich_account.py",
+      "old": "if self.schema_version != \"storymodel.account/v6\" and (",
+      "new": "if False and self.schema_version != \"storymodel.account/v6\" and (",
+      "test": "test_playback_construction.py::test_old_rich_versions_refuse_explicit_media_field_even_when_empty[v4]",
+      "controls": [
+        "test_playback.py::test_union_retains_gaps_and_explicit_points_inside_intervals",
+        "test_playback.py::test_public_projection_and_containment_refuse_typed_forgeries"
+      ],
+      "baseline": "3 passed in 0.26s",
+      "mutant": "1 failed, 2 passed in 0.29s",
+      "compiled": true
+    }
+  ],
+  "installed": {
+    "summary": {
+      "source_unchanged": true,
+      "source_documents": 0,
+      "event_duration": "5/3",
+      "point_state_duration": "0/1"
+    },
+    "import_path": "/Users/bbuchsbaum/code/scala/storymodel4s/port/data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "cli_invocations": 13,
+    "commands": [
+      "import-playback",
+      "playback-prompt",
+      "prepare-playback",
+      "replay-playback",
+      "replay-rich",
+      "situation-playback",
+      "situation-table",
+      "verify-situation-playback"
+    ],
+    "legacy_replay_equal": true,
+    "denied_before_recording_read": true,
+    "api_cli_equal": true,
+    "artifacts": {
+      "bins.json": {
+        "bytes": 79,
+        "sha256": "19a2baf4bec9a1060b563a4bfec22c32fd63768faa924d71e0bc9189d76c5858"
+      },
+      "cli-account.json": {
+        "bytes": 3262,
+        "sha256": "96caf0970696429a92306df9d089e4fdba53814ecdd76f14373ea925f73e674f"
+      },
+      "cli-construction.json": {
+        "bytes": 4036,
+        "sha256": "85125850681a26eebb137d52be392048ebc893d89dff7546ef5a2d5e6656e471"
+      },
+      "cli-event-playback.json": {
+        "bytes": 1540,
+        "sha256": "6d4ff57e1a13e74ae90ba11b6d958001588b2677ca6129630329a6bb95f3ef06"
+      },
+      "cli-paired-playback-1.json": {
+        "bytes": 1540,
+        "sha256": "15beabaf43a283d7ad6e4db7a65297e0ff78103535d8d4ef776b56c8ac96a57e"
+      },
+      "cli-paired-playback-2.json": {
+        "bytes": 1540,
+        "sha256": "6e157538b3334c232d2a149e209d503f7080c44766c895cef9fb362e5fbc97e1"
+      },
+      "cli-prompt.json": {
+        "bytes": 6427,
+        "sha256": "06156867717f87a91c7274dff8b7425b46341a13dbea35f05a8b66eedd2ebb07"
+      },
+      "cli-recording/import.json": {
+        "bytes": 1971,
+        "sha256": "c6ca6c82949c9f7c87c710904a74e4e7d65e75e1e16f43ac6a6e5310e78cc693"
+      },
+      "cli-recording/journal.json": {
+        "bytes": 141,
+        "sha256": "fbb8529967658760abfa6f2dcff29d6b1f52a707a853c7b74b8cd82f80f3cebd"
+      },
+      "cli-recording/profile.json": {
+        "bytes": 352,
+        "sha256": "7d659007e6d6c0868825c9b84ea699b5f9c4063940e39ee2ffc6005195119007"
+      },
+      "cli-recording/replies/5ff8db0780356714da62f4e9e3e84465170e49ccd6736c47d11995cd8751d9c5.json": {
+        "bytes": 2176,
+        "sha256": "95a38be07375af3bf1fb0c5c6e1f6c063912d39f9c7c74f296b164142f0b24e7"
+      },
+      "cli-request.json": {
+        "bytes": 853,
+        "sha256": "43fbb37d79677f1ee1ec87b9c93bc44e9c97d6a620c12f9a12df61aad5ea39f8"
+      },
+      "cli-situations.json": {
+        "bytes": 1407,
+        "sha256": "03a69475c3d09c248513356faa2ba58d9a0f0c85c1c82cf9f472a298d8b511d6"
+      },
+      "cli-state-playback.json": {
+        "bytes": 1492,
+        "sha256": "a2124b30525331ce247d481773d3aee46c4ff4ed4c8edf15c1a39546d68a7a43"
+      },
+      "construction.json": {
+        "bytes": 4036,
+        "sha256": "85125850681a26eebb137d52be392048ebc893d89dff7546ef5a2d5e6656e471"
+      },
+      "denied.json": {
+        "bytes": 902,
+        "sha256": "9522ed630aac3f7c7080bc802d7354be4b8471628dcb8764b9db8b447005bffd"
+      },
+      "event-playback.json": {
+        "bytes": 1540,
+        "sha256": "6d4ff57e1a13e74ae90ba11b6d958001588b2677ca6129630329a6bb95f3ef06"
+      },
+      "media-source.json": {
+        "bytes": 391,
+        "sha256": "29cd83ffface9bd72fddfd125eae89f5df97f85a69300909ca158768bb5c6762"
+      },
+      "observations.json": {
+        "bytes": 356,
+        "sha256": "21782d04cc47011952eda6824374baa6b0930db9ee95cffdac8bcad1ff31e336"
+      },
+      "paired-1.json": {
+        "bytes": 4979,
+        "sha256": "443295acf749a6075bc08a18ded10e94818f3995eae44d9c09391c8085c6ace8"
+      },
+      "paired-2.json": {
+        "bytes": 4979,
+        "sha256": "baa0286f8574c79736a98bc041b6b5b4c073ca0caf582afffccbbb192bd87a23"
+      },
+      "paired-playback-1.json": {
+        "bytes": 1540,
+        "sha256": "15beabaf43a283d7ad6e4db7a65297e0ff78103535d8d4ef776b56c8ac96a57e"
+      },
+      "paired-playback-2.json": {
+        "bytes": 1540,
+        "sha256": "6e157538b3334c232d2a149e209d503f7080c44766c895cef9fb362e5fbc97e1"
+      },
+      "proposals.json": {
+        "bytes": 1583,
+        "sha256": "46652d0525e80a1391e48162d2037d0da7ae3225627c6181e0bf80072d1fb968"
+      },
+      "recall-1/account.json": {
+        "bytes": 2154,
+        "sha256": "25ff5e6245cf7627ecc6bf235d16d65ca919b63de4320cc382035df93a0c8bfb"
+      },
+      "recall-1/construction.json": {
+        "bytes": 2769,
+        "sha256": "a49a1154c096f720d213ca0e1389763cf1293b7aa3679ff9dc097c6893f988b9"
+      },
+      "recall-1/recording/import.json": {
+        "bytes": 716,
+        "sha256": "ee114553e0f5d89dac2d0a542e3d1c149a6121b5044656fe4e2380a25377e4ba"
+      },
+      "recall-1/recording/journal.json": {
+        "bytes": 141,
+        "sha256": "38672d0b96e846f75c2eb6243707381d2a9502782a27af7185989a7c0f232f4e"
+      },
+      "recall-1/recording/profile.json": {
+        "bytes": 343,
+        "sha256": "edc510e61e648a773044b0fb86bdcdd1aea03083dc58721f73358d713fdbc769"
+      },
+      "recall-1/recording/replies/48d7eea6e6231c588fa87f2ddafc9c72f11a43fcabb9605c0477634b47c8acef.json": {
+        "bytes": 918,
+        "sha256": "56c196782cc36b241dc84ab21231136713c4244bfd1969252fe589100bf57f3a"
+      },
+      "recall-1/request.json": {
+        "bytes": 432,
+        "sha256": "1388ec287ef33e83c9277d32e22288db39bdbd45637fb547897af8d944630ac9"
+      },
+      "recall-2/account.json": {
+        "bytes": 2154,
+        "sha256": "fc56fdedb8bab656e47f62b52ebf690a78ca6b677e029a4568d8eba5a6ac0ca3"
+      },
+      "recall-2/construction.json": {
+        "bytes": 2769,
+        "sha256": "2b25ffeddfad33f0b4178c1f3f7c3ea6607cd3ab80362aff204770939c6af3dd"
+      },
+      "recall-2/recording/import.json": {
+        "bytes": 716,
+        "sha256": "c8283aecf59b712a740c2940b8a3d061260c29b4a0ec9eead35f9c2f38e6ba1f"
+      },
+      "recall-2/recording/journal.json": {
+        "bytes": 141,
+        "sha256": "eff4c895167b47c36c0e9eb2823f20b236429dbdcba3d7174c2da709d89a5f61"
+      },
+      "recall-2/recording/profile.json": {
+        "bytes": 343,
+        "sha256": "7db36d61b856a35bc16c832a88fdd897df9999bd27c2fd18feb3a6af83f22b5b"
+      },
+      "recall-2/recording/replies/a2ec05a3dada9763db12bfba76a829a939eaa291cfeec34df962a3347214f69e.json": {
+        "bytes": 918,
+        "sha256": "d4b097eb7a7860f86460f65ccd973901ecbce9e44c845829676153412281d823"
+      },
+      "recall-2/request.json": {
+        "bytes": 432,
+        "sha256": "db75c5db12e2bc744b2e129c6cb287209a70e8e7b3593348afe6fde6e620553a"
+      },
+      "recording/import.json": {
+        "bytes": 1971,
+        "sha256": "c6ca6c82949c9f7c87c710904a74e4e7d65e75e1e16f43ac6a6e5310e78cc693"
+      },
+      "recording/journal.json": {
+        "bytes": 141,
+        "sha256": "fbb8529967658760abfa6f2dcff29d6b1f52a707a853c7b74b8cd82f80f3cebd"
+      },
+      "recording/profile.json": {
+        "bytes": 352,
+        "sha256": "7d659007e6d6c0868825c9b84ea699b5f9c4063940e39ee2ffc6005195119007"
+      },
+      "recording/replies/5ff8db0780356714da62f4e9e3e84465170e49ccd6736c47d11995cd8751d9c5.json": {
+        "bytes": 2176,
+        "sha256": "95a38be07375af3bf1fb0c5c6e1f6c063912d39f9c7c74f296b164142f0b24e7"
+      },
+      "request.json": {
+        "bytes": 853,
+        "sha256": "43fbb37d79677f1ee1ec87b9c93bc44e9c97d6a620c12f9a12df61aad5ea39f8"
+      },
+      "source-account.json": {
+        "bytes": 3262,
+        "sha256": "96caf0970696429a92306df9d089e4fdba53814ecdd76f14373ea925f73e674f"
+      },
+      "source-situations.json": {
+        "bytes": 1407,
+        "sha256": "03a69475c3d09c248513356faa2ba58d9a0f0c85c1c82cf9f472a298d8b511d6"
+      },
+      "state-playback.json": {
+        "bytes": 1492,
+        "sha256": "a2124b30525331ce247d481773d3aee46c4ff4ed4c8edf15c1a39546d68a7a43"
+      }
+    }
+  },
+  "reproduce": [
+    "cd port && .venv/bin/pytest -q tests/test_playback.py tests/test_playback_construction.py tests/test_playback_workflow.py",
+    "cd port && .venv/bin/python evidence/playback-mutations.py",
+    "cd port && UV_CACHE_DIR=./data/uv-cache uv build --out-dir data/dist",
+    "cd port && UV_CACHE_DIR=./data/uv-cache uv venv --python 3.12 data/wheel-env # only if the environment does not exist",
+    "cd port && UV_CACHE_DIR=./data/uv-cache uv pip install --reinstall-package storymodel-pilot --python data/wheel-env/bin/python data/dist/storymodel_pilot-0.1.0-py3-none-any.whl",
+    "cd port && .venv/bin/python evidence/playback-installed.py"
+  ],
+  "wheel_sha256": "6210f087e04713f5ed9e222fe5cd86bac5acfea6e913d69ff629f23493584f69",
+  "review": {
+    "status": "no remaining BLOCK",
+    "original_commit": "ba049de6161073a17891205a48d0ec9b3b37fb89",
+    "repaired_commit": "71c9248e048022caa8602472ba3b448dab7dc7be",
+    "findings": [
+      "Nested context cue escaped parent scope",
+      "Numerical source/recall ownership checked only text documents"
+    ],
+    "regressions": "tests/test_playback_construction.py::test_nested_context_cue_must_belong_to_parent_scope and test_numerical_consumers_refuse_native_side_hidden_by_text_documents",
+    "reproduction": "Both bugs reproduced on original commit before repair; positive controls retained. Mutation scripts reproduce guard deletions.",
+    "reviewed_commit": "71c9248e048022caa8602472ba3b448dab7dc7be",
+    "independent_checks": [
+      {
+        "tests": 70,
+        "scope": "construction, organization, reconstruction"
+      },
+      {
+        "tests": 52,
+        "scope": "playback geometry/workflow and historical mapping/relations/workflow"
+      },
+      {
+        "scope": "separate public API fixed-commit acceptance probes",
+        "result": "passed"
+      }
+    ],
+    "limits": "Reviewer did not rerun full suite, parent mutations or installed wheel; no Scala runtime or audiovisual accuracy qualification."
+  },
+  "remaining": [
+    "Native clock mapping/composition and shot/track anchors",
+    "Media-aware identity, mapping, assessment and scientific analysis",
+    "Acquisition and automatic semantic proposals",
+    "Cross-unit full graph construction and remaining P2-P6 capabilities"
+  ],
+  "claim_boundary": "Local engineering contracts, independent small-case arithmetic and installed integration; not audiovisual accuracy, scientific qualification, measured productivity improvement or full Scala parity",
+  "initial_source_commit": "ba049de6161073a17891205a48d0ec9b3b37fb89",
+  "reproduction_script_sha256": {
+    "playback-installed.py": "2dea90f85d8261f29a60de2834013250acfd8ec0e2fb3e40694ef09a8bc0f6a1",
+    "playback-mutations.py": "f6d8aa7884490e01a55184c878a8ecd20891797c1cce82e19b2ad0f59fd1f382"
+  },
+  "shared_memory": "shared-memory/projects/storymodel4s/2026-11-17-story-model-native-playback-and-modality-boundary-lessons-f835a26d"
+}

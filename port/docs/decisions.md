@@ -335,3 +335,10 @@ an attachment-only sidecar that no claim can cite, converting points or annotati
 duration, and silently stripping media in text consumers. A narrow schema adapter preserves
 legacy-only contracts without duplicating graph algorithms. Media-aware assessment and native
 clock mappings remain subsequent work, not exclusions. [Contract](playback.md).
+
+Cold review caught two modality-boundary omissions: nested media cues lacked the text
+compiler's parent-scope requirement, and organization/reconstruction inspected only document
+sides when checking independent accounts. Preserve the parent-cue rule and reject unqualified
+media inputs at those numerical entry points too. A paired account cannot masquerade as an
+independent input because its opposite side happens to be media. Regression and mutation
+checks cover both directions; this does not yet qualify media-aware numerical consumers.

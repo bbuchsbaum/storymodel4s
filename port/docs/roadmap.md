@@ -42,8 +42,9 @@ construction, native media ordering and registered measurement eligibility remai
 Recorded [context-holder resolution](attribution.md) now connects existing text contexts to
 verified identity and event/state inspection. [Holder-dependent identity](held-identity.md)
 now supplies a checked second pass and final role readout. [Full context vocabulary](contexts.md)
-adds explicit v5 construction and holderless-scope behavior. Attribution-aware assessment,
-playback and semantic channels remain owed. Mote owns
+adds explicit v5 construction and holderless-scope behavior. [Native playback](playback.md)
+now adds supplied media observations, document-free v6 construction and exact support readouts.
+Media-aware assessment, full clock/anchor coverage and semantic channels remain owed. Mote owns
 live status; the preservation map records each slice's behavioral coverage and limitations.
 
 Do not require a complete event graph for basic categorical localization. Conversely, graph
@@ -255,11 +256,18 @@ checks, the frozen pre-change replay, version refusals, mutations and installed 
 agreement. Context-bearing and holderless scopes remain distinct. This closes the vocabulary
 slice, not all context-aware assessment or P2 construction obligations.
 
-**Immediate action: finish the playback workflow already in progress.** At this planning
-checkpoint, HEAD is `104956fa3`; the working tree contains uncommitted native-support,
-construction, replay, CLI and example changes. They are implementation in progress, not a
-verified delivery. Complete and check this path before opening another representation family.
-The active work is tracked by `bd-01M7MFZVEDNCEGYVD5MCDP92DT`; Mote owns its subsequent status.
+**Playback checkpoint:** implementation `ba049de61` and boundary repairs `71c9248e0` provide
+document-free v6 construction, recorded replay and exact situation readouts. The full suite,
+installed example/API/CLI and targeted mutations have passed; [evidence](../evidence/playback.json)
+records exact checks and review disposition. Work is tracked by `bd-01M7MFZVEDNCEGYVD5MCDP92DT`;
+Mote owns live status. This closes the supplied-observation path, not media-aware assessment,
+acquisition or full clock/anchor coverage.
+
+**Next implementation action:** cross-unit graph construction through the existing rich
+compiler and relation consumers. Relation admission already accepts account IDs; the missing
+construction seam is resolving row-local proposal keys against verified construction receipts,
+without requiring researchers to manufacture IDs. Start with a connected executable relation
+path, then expand containment/grouping. Reuse existing inference and analysis implementations.
 
 ### The next three executable checkpoints
 
