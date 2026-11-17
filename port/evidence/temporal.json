@@ -1,0 +1,223 @@
+{
+  "scope": "Retained story-world chronology, v7 account admission/query and v3 text inference consumption",
+  "source_commit": "f2610fcb1ac3b9344c2bae60128567f7f1342cb9",
+  "status": "locally qualified on task branch; not merged or pushed",
+  "tests": {
+    "command": ".venv/bin/pytest -q",
+    "passed": 863,
+    "failed": 0,
+    "seconds": 18.1
+  },
+  "typecheck": {
+    "command": ".venv/bin/mypy src/storymodel",
+    "source_files": 57,
+    "passed": true
+  },
+  "format_and_lint": {
+    "passed": true,
+    "scope": "src tests examples evidence/temporal-{installed,mutations}.py",
+    "files_formatted": 143
+  },
+  "independent_three_interval_oracle": {
+    "proper_intervals": 15,
+    "assignments": 3375,
+    "atomic_constraint_triples": 2197,
+    "consumer": "v7 account admission",
+    "mismatches": 0
+  },
+  "installed": {
+    "import_path": "/Users/bbuchsbaum/code/scala/storymodel4s/port/data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "example": [
+      {
+        "source_unchanged": true,
+        "source_documents": 0,
+        "event_duration": "5/3",
+        "point_state_duration": "0/1"
+      },
+      {
+        "composed_before": true,
+        "native_temporal_query": true,
+        "new_precedence_consumed": true,
+        "recalls": 2,
+        "source_unchanged": true
+      }
+    ],
+    "commands": [
+      "admit-temporal",
+      "infer-accounts",
+      "query-temporal",
+      "temporal-table",
+      "verify-account-inference",
+      "verify-temporal",
+      "verify-temporal-query"
+    ],
+    "cli_invocations": 28,
+    "api_cli_equal": true,
+    "denied_before_supplementary_reads": true
+  },
+  "wheel": {
+    "sha256": "9dd46c2b778182b7008fb5f6aa587a63a80864b3e73536e8deae26dfcffb60db",
+    "source_and_resource_files": 61,
+    "match_checkout": true
+  },
+  "legacy_compatibility": {
+    "reference": "ec1e91f45",
+    "artifacts": 85,
+    "bytes": 529889,
+    "byte_identical": true
+  },
+  "mutations": [
+    {
+      "mutation": "account-binding",
+      "file": "chronology_workflow.py",
+      "old": "if proposals.account_sha256 != account_sha:",
+      "new": "if False and proposals.account_sha256 != account_sha:",
+      "test": "test_proposals_pin_raw_account_and_adjudication_and_replay_atomically",
+      "controls": [
+        "test_canonical_creation_rejects_raw_aliases_and_semantic_duplicates_including_during_contains",
+        "test_legacy_before_rows_are_retained_and_new_duplicates_are_refused"
+      ],
+      "baseline": "3 passed in 0.62s",
+      "mutant": "1 failed, 2 passed in 0.65s",
+      "compiled": true
+    },
+    {
+      "mutation": "endpoint-equality",
+      "file": "chronology.py",
+      "old": "\"meets\": ((), ((1, 2),)),",
+      "new": "\"meets\": (((1, 2),), ()),",
+      "test": "test_meets_endpoint_equality_is_not_before_and_strict_constraints_remain_sparse",
+      "controls": [
+        "test_canonical_creation_rejects_raw_aliases_and_semantic_duplicates_including_during_contains",
+        "test_legacy_before_rows_are_retained_and_new_duplicates_are_refused"
+      ],
+      "baseline": "3 passed in 0.51s",
+      "mutant": "1 failed, 2 passed in 0.73s",
+      "compiled": true
+    },
+    {
+      "mutation": "premise-scope",
+      "file": "chronology.py",
+      "old": "or not _within(contexts, claim.context, known[1])",
+      "new": "or False",
+      "test": "test_scope_premise_cannot_leak_from_a_descendant_context_to_root",
+      "controls": [
+        "test_canonical_creation_rejects_raw_aliases_and_semantic_duplicates_including_during_contains",
+        "test_legacy_before_rows_are_retained_and_new_duplicates_are_refused"
+      ],
+      "baseline": "3 passed in 0.50s",
+      "mutant": "1 failed, 2 passed in 0.89s",
+      "compiled": true
+    },
+    {
+      "mutation": "structural-entailment",
+      "file": "chronology.py",
+      "old": "if possible != (claim.relation,):",
+      "new": "if False and possible != (claim.relation,):",
+      "test": "test_structural_entailment_requires_cited_exact_context_constraints_and_one_allen_atom",
+      "controls": [
+        "test_canonical_creation_rejects_raw_aliases_and_semantic_duplicates_including_during_contains",
+        "test_legacy_before_rows_are_retained_and_new_duplicates_are_refused"
+      ],
+      "baseline": "3 passed in 0.73s",
+      "mutant": "1 failed, 2 passed in 0.56s",
+      "compiled": true
+    },
+    {
+      "mutation": "premise-filter",
+      "file": "chronology_workflow.py",
+      "old": "excluded = [row.id for row in rows if row.id not in eligible]",
+      "new": "excluded = []",
+      "test": "test_policy_excludes_status_and_legacy_dependent_conclusions_transitively",
+      "controls": [
+        "test_canonical_creation_rejects_raw_aliases_and_semantic_duplicates_including_during_contains",
+        "test_legacy_before_rows_are_retained_and_new_duplicates_are_refused"
+      ],
+      "baseline": "3 passed in 0.50s",
+      "mutant": "1 failed, 2 passed in 0.75s",
+      "compiled": true
+    }
+  ],
+  "cold_review": {
+    "reviewed_sha": "f2610fcb1ac3b9344c2bae60128567f7f1342cb9",
+    "verdict": "no BLOCK or actionable follow-up",
+    "targeted_tests_passed": 35,
+    "oracle": {
+      "reviewed_sha": "f2610fcb1ac3b9344c2bae60128567f7f1342cb9",
+      "numeric_assignments": 614656,
+      "feasible_signatures": 23917,
+      "positive_networks": 2000,
+      "negative_networks": 2000,
+      "mismatches": 0,
+      "v6_schema_equal_to_ec1e91f45": true,
+      "cross_context_policy_exclusion": true,
+      "root_child_query_isolation": true,
+      "falsy_policy_rejections": 4,
+      "empty_temporal_projection_legacy_graph_equal": true
+    },
+    "reproducible_probe": "evidence/temporal-independent.py",
+    "reviewer_limits": [
+      "did not rerun full suite, installed wheel, byte replay or mutations",
+      "no Scala runtime or scientific qualification"
+    ]
+  },
+  "retained_probe_rerun": {
+    "reviewed_sha": "f2610fcb1ac3b9344c2bae60128567f7f1342cb9",
+    "executed_sha": "f2610fcb1ac3b9344c2bae60128567f7f1342cb9",
+    "numeric_assignments": 614656,
+    "feasible_signatures": 23917,
+    "positive_networks": 2000,
+    "negative_networks": 2000,
+    "mismatches": 0,
+    "v6_schema_equal_to_ec1e91f45": true,
+    "cross_context_policy_exclusion": true,
+    "root_child_query_isolation": true,
+    "falsy_policy_rejections": 4,
+    "empty_temporal_projection_legacy_graph_equal": true
+  },
+  "logs": {
+    "chronology-full-tests.log": {
+      "bytes": 981,
+      "sha256": "cd9215dad66b952d2ba0de02922052527d34e062265878fdeeb347cb3de52665"
+    },
+    "chronology-mypy.log": {
+      "bytes": 44,
+      "sha256": "caf4cb276b1b834b69b4a51aa776668a80ee64e1a2fd04bb890970c67d4fd7e7"
+    },
+    "chronology-ruff.log": {
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "chronology-format.log": {
+      "bytes": 28,
+      "sha256": "964318833f36fc4b46ef2579d502bee6dacc9e35a11a75f619e781887df03cb9"
+    },
+    "chronology-installed.log": {
+      "bytes": 716,
+      "sha256": "e7802d6f87219b44b60e284133b25f2388226cb8d8d3af557a55ca3c1863bcd0"
+    },
+    "chronology-mutations.log": {
+      "bytes": 225,
+      "sha256": "0009ae7038fa47962183b6e0f3d93c566078db4f09c9e626d9905dbdd8d3c1b2"
+    },
+    "chronology-independent.log": {
+      "bytes": 451,
+      "sha256": "a4af3395cf69ae7ed97aba4a43adbdfbd6794da275a081b02b0c209055204f9f"
+    }
+  },
+  "reproduction": [
+    ".venv/bin/pytest -q tests/test_chronology.py tests/test_temporal_version.py tests/test_source_transitions.py",
+    ".venv/bin/python evidence/temporal-mutations.py",
+    ".venv/bin/python evidence/temporal-independent.py",
+    "uv build --out-dir data/dist; install wheel into data/wheel-env; .venv/bin/python evidence/temporal-installed.py"
+  ],
+  "remaining": [
+    "native numerical mapping and assessment",
+    "context/holder-aware assessment workflow",
+    "retained causal/referential/entity families",
+    "auxiliary hierarchy and boundary beliefs",
+    "temporal trajectory and measured clock mappings",
+    "calibrated credence and full P2-P6 coverage"
+  ],
+  "shared_memory_note": "7b92f6e4-4f26-4a1b-98cb-89e01361f8f0"
+}

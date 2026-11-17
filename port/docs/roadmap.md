@@ -235,8 +235,7 @@ proof precedes scientific claims, but scientific qualification must not block un
 
 ## Next deliveries: execution order from the current branch
 
-Refreshed 2026-11-17 through hierarchy source `b229cbddd` and inspection of the uncommitted
-chronology implementation. Chronology is work in progress, not a qualified checkpoint.
+Refreshed 2026-11-17 through chronology source `f2610fcb1` and its local qualification.
 This is the next-work plan within P2–P6,
 not a second phase numbering system. Mote owns live status. Completed checkpoints move
 out of the future queue; capability obligations remain until their complete exit is met.
@@ -260,32 +259,29 @@ The historical `scenes.py` operation keeps its documented reidentification behav
 uses the checked hierarchy artifact. Native construction and queries work, while native numerical
 mapping and assessment remain explicitly unsupported.
 
-**Next implementation action:** finish and qualify the chronology slice already in progress.
-It has v7 temporal claims, sparse interval consistency, admission/query functions and a connected
-example. Inspection found that `structurally-derived` currently checks premise existence without
-proving entailment. Fix that boundary before adding another relation family. Preserve the legacy
-`before` recipe and distinguish world time from text order and measured playback clocks.
+[Story-world chronology](chronology.md), source `f2610fcb1`, now adds v7 temporal claims,
+sparse interval consistency, actual cited-premise entailment and dependency-sensitive queries.
+V3 source projection consumes explicit narrated before/meets edges in text inference; native
+media construction and temporal queries also run. [Evidence](../evidence/temporal.json) records
+863 passing tests, five discriminating mutations, installed API/CLI agreement, byte-identical
+legacy workflows and cold review. These are local engineering results, not full Scala parity.
+
+**Next implementation action:** connect context/holder evidence to conditional assessment, then
+complete the native-source/text-recall mapping and assessment path. Preserve exact media evidence,
+processing missingness and the existing unit-only input condition under named recipes. Do not
+remove text-only guards before implementing actual native evidence and downstream consumption.
 
 ### Immediate work queue
 
 These are the next bounded work units inside the deliveries below, not additional phases.
 
-1. **Close chronology correctness and compatibility.** Validate structural derivations using
-   only cited temporal premises in the exact same context. Require the claimed relation to be
-   uniquely entailed; unrelated event evidence, uncited account edges and ancestor-world facts
-   cannot supply a missing proof. Keep linguistic/world-knowledge claims as attributed
-   declarations. Specify how status-filtered queries treat a derivation whose premises were
-   excluded, so a hypothesis cannot silently become stronger evidence. Prove the boundary with
-   an independent interval oracle and discriminating regressions. Finish the installed
-   text/native query and text inference workflow, old-format replay and cold review. Record
-   native numerical inference as still owed until it has an executed consumer.
-2. **Connect evidence to useful assessment.** Extend the existing construction-to-analysis
+1. **Connect evidence to useful assessment.** Extend the existing construction-to-analysis
    example with context/holder-aware assessment, then a native-source/text-recall path. Keep
    narrative reference, referent reference and conditional fidelity separate. Reuse one source
    unchanged across two recalls and produce the same three analysis views through API and CLI.
    This begins Delivery 2 immediately after chronology; it does not wait for every P2 graph
    family. Consolidate the public calls exposed by this journey before adding another wrapper.
-3. **Add one semantic channel with a real consumer.** Bind model/space/cache identity, nominate
+2. **Add one semantic channel with a real consumer.** Bind model/space/cache identity, nominate
    candidates sparsely, and retain channel-specific evidence and unavailable/search-limited
    outcomes. Compare lexical-only and semantic variants on the same saved inputs, with separate
    retrieval, ranking and decoding diagnostics. Use recorded/local inputs for engineering
@@ -432,10 +428,9 @@ with a broken old implementation needs repair or replacement, not silent deletio
 
 ## Execution rules for these deliveries
 
-- **Current bead:** finish retained temporal relation construction, entailment, consistency
-  and a consuming readout from Delivery 1. Then take the context/native assessment workflow
-  from Delivery 2. Split at a saved-artifact boundary if necessary; the larger connected-graph
-  delivery remains incomplete.
+- **Next bead:** context/holder-aware conditional assessment from Delivery 2, followed by
+  native-source/text-recall mapping and assessment. Split at a saved-artifact boundary; the
+  larger connected-graph delivery remains incomplete. Chronology is a qualified local checkpoint.
 - Use one bounded bead at a time, usually one session to one working day. Open subsequent
   beads when the input contract is clear; do not create a speculative ticket tree or assign
   an unsupported calendar estimate to full parity.
