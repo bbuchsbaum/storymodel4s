@@ -567,12 +567,13 @@ with a broken old implementation needs repair or replacement, not silent deletio
 
 ## Execution rules for these deliveries
 
-- **Next bead:** explicitly bind supplied recall timing to its recording and clock, then
-  feed a saved temporal allocation/readout workflow. Reuse the retained Sherlock intake and
-  exact playback composition; do not infer a recording identity, duration or scanner link
-  from word onsets. General clock maps, remaining graph, numerical, semantic-provider and
-  inspection deliveries remain open. The synthetic study and interrupted offline-import
-  recovery are completed local slices, not full P5 closure.
+- The [recall clock workflow](recall-clock.md) connects declared Sherlock recording clocks,
+  supplied unit intervals and saved detail/reference mappings to window-level measurements.
+  Next, connect aligned feature tracks and window plans to the existing exposure and timing
+  readouts. Keep raw feature coverage, missing observations and derived quantities explicit.
+  Review evolving Scala case-study results at computational milestones for confirmed fixes or
+  settled changes to shared contracts. General clock maps, additional study adapters and the
+  remaining graph, inference and inspection work stay on the phase plan.
 - Use one bounded bead at a time, usually one session to one working day. Open subsequent
   beads when the input contract is clear; do not create a speculative ticket tree or assign
   an unsupported calendar estimate to full parity.

@@ -134,6 +134,7 @@ from .prepared_construction import (
     replay_prepared_construction,
     verify_prepared_construction,
 )
+from .recall_clock import RecordingQuery, timed_recall
 from .reconstruction import (
     AccountReconstructionResult,
     ReconstructionSpec,
@@ -342,6 +343,20 @@ def main(argv: list[str] | None = None) -> int:
     sherlock_timing.add_argument("request")
     sherlock_timing.add_argument("--clock", required=True, choices=("princeton", "openneuro"))
     sherlock_timing.add_argument("--output")
+    for command in ("timed-recall", "verify-timed-recall"):
+        timed = commands.add_parser(
+            command,
+            help=(
+                "measure mapped recall details on a declared recording clock"
+                if command == "timed-recall"
+                else "recompute and verify a saved timed-recall readout"
+            ),
+        )
+        timed.add_argument("plan")
+        timed.add_argument("query")
+        if command == "verify-timed-recall":
+            timed.add_argument("result")
+        timed.add_argument("--output")
     sherlock_compose = commands.add_parser(
         "sherlock-compose", help="compose native source parts while retaining original anchors"
     )
@@ -1503,6 +1518,24 @@ def main(argv: list[str] | None = None) -> int:
                 raise ValueError("Sherlock recall timing requires a Sherlock recall intake")
             timing = sherlock_recall_timing(sherlock_prepared.intake, args.clock)
             emit(timing.model_dump(mode="json"), args.output)
+        elif args.command in ("timed-recall", "verify-timed-recall"):
+            timed_query = RecordingQuery.model_validate_json(
+                canonical(strict_json(Path(args.query).read_bytes()))
+            )
+            timed_result = timed_recall(Path(args.plan), timed_query)
+            if args.command == "timed-recall":
+                emit(timed_result.model_dump(mode="json"), args.output)
+            else:
+                # Pydantic would normalize JSON object keys such as "01" and "1"
+                # to the same strict integer dict key. Compare the parsed JSON shape
+                # exactly so aliases, omitted default fields, and extra structure fail.
+                timed_saved = strict_json(Path(args.result).read_bytes())
+                if canonical(timed_saved) != canonical(timed_result.model_dump(mode="json")):
+                    raise ValueError("timed recall differs from exact plan and recording query")
+                emit(
+                    {"verified": True, "analysis_sha256": timed_result.analysis_sha256},
+                    args.output,
+                )
         elif args.command in (
             "prepared-construction-prompt",
             "import-prepared-construction",

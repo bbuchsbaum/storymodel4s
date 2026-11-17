@@ -11,9 +11,8 @@ from ._base import Digest, Model, Name, _validate_instance
 from ._coordinates import exact, tick
 from .analysis import CorrespondenceRow, RecallRow
 from .analysis_workflow import replay_analysis_file
-from .model import Support, Unit
 from .playback import MediaSource, TickInterval
-from .prepared_construction import PreparedConstruction
+from .prepared_construction import PreparedConstruction, PreparedConstructionResult
 from .serialization import digest
 from .sherlock_recall import SherlockRecall, sherlock_recall_timing
 from .temporal import Interval, TemporalCell, allocate
@@ -149,14 +148,20 @@ def timed_recall(plan_path: Path, query: RecordingQuery) -> TimedRecall:
     media = query.recording
     intervals = {item.unit: item.native for item in query.intervals}
     word_onsets, onsets = _bind_onsets(intake, query, intervals)
+    construction = replay.recall.construction
+    if not isinstance(construction, PreparedConstructionResult):
+        raise ValueError("missing prepared recall construction receipt")
+    # Construction owns unit identity. Its covering rows include separators that
+    # the lexical intake excludes from occurrence support.
+    ordinal_by_row = {
+        row.key: occurrence.u
+        for row, occurrence in zip(request.request.rows, intake.prepared.units, strict=True)
+    }
     ordinals = {
-        Unit(
-            kind="recall", support=Support(document=intake.prepared.document.id, spans=(u.support,))
-        ).id: u.u
-        for u in intake.prepared.units
+        row.unit: ordinal_by_row[row.row] for row in construction.construction.resolutions
     }
     if ordinals.keys() != {u.id for u in replay.account.units if u.kind == "recall"}:
-        raise ValueError("analysis recall units differ from timed transcript spans")
+        raise ValueError("analysis recall units differ from the construction receipt")
     references: dict[str, list[CorrespondenceRow]] = defaultdict(list)
     for row in replay.views.correspondence:
         references[row.detail].append(row)
