@@ -41,8 +41,9 @@ consumes adjacent joint flow, with a separate explicitly independent-row path. R
 construction, native media ordering and registered measurement eligibility remain owed.
 Recorded [context-holder resolution](attribution.md) now connects existing text contexts to
 verified identity and event/state inspection. [Holder-dependent identity](held-identity.md)
-now supplies a checked second pass and final role readout. Additional context families,
-attribution-aware assessment, playback and semantic channels remain owed. Mote owns
+now supplies a checked second pass and final role readout. [Full context vocabulary](contexts.md)
+adds explicit v5 construction and holderless-scope behavior. Attribution-aware assessment,
+playback and semantic channels remain owed. Mote owns
 live status; the preservation map records each slice's behavioral coverage and limitations.
 
 Do not require a complete event graph for basic categorical localization. Conversely, graph
@@ -247,21 +248,22 @@ organization path. Do not rebuild it. The recorded evidence is in
 rich relations and independent source/recall construction also have existing consumers.
 These are bounded local implementations, not full Scala parity.
 
-At this planning checkpoint, full context vocabulary is **in progress** in the working tree:
-v5 rich accounts and v2 construction add desire, memory, imagination, hypothetical and
-counterfactual contexts. The current checkout passes 760 tests in 10.67 seconds, including
-the new context tests. This is a working-tree observation, not an immutable release receipt:
-installed verification, strengthened consumer assertions, documentation and cold review still
-need completion. The active bead is `bd-01M7ME0KMK58W71YTPKTD7FEGY`.
+The full context vocabulary now has a local implementation at `2c4aec1e6`: v5 rich accounts
+and v2 construction add desire, memory, imagination, hypothetical and counterfactual contexts.
+The [context contract](contexts.md) and [evidence](../evidence/contexts.json) record consumer
+checks, the frozen pre-change replay, version refusals, mutations and installed API/CLI
+agreement. Context-bearing and holderless scopes remain distinct. This closes the vocabulary
+slice, not all context-aware assessment or P2 construction obligations.
 
-The first implementation action is to finish that slice: require real alignment candidates
-in its consumer test, exercise saved construction/identity artifacts through installed API and
-CLI, preserve the frozen v1 recording, and document nested holderless versus unresolved-holder
-behavior. Commit and review it before expanding the representation again.
+**Next implementation action:** playback evidence from checked supplied observations, through
+construction, exchange and a consuming readout. Reuse the existing native-coordinate arithmetic;
+keep edition/playback identity distinct from annotation text and retain discontinuous support.
+Introduce only the representation needed for that complete path. Context-aware assessment and
+the remaining graph/identity families follow the deliveries below.
 
 | Order | Delivery | Researcher-visible result | Dependency |
 |---|---|---|---|
-| 1 | Contexts and playback evidence (P2/P3) | A claim can cite text or native media support and retain whose context it belongs to. | Close current context slice first. |
+| 1 | Contexts and playback evidence (P2/P3) | A claim can cite text or native media support and retain whose context it belongs to. | Reuse the verified context construction path. |
 | 2 | Connected rich graphs (P2/P3) | Source and recall construction can express cross-unit events, relations, grouping and summaries. | Existing construction/identity; playback only for media-backed cases. |
 | 3 | Richer computational evidence (P3/P4) | Structural and semantic channels feed mapping and assessment with separate diagnostics. | The particular representation each consumer needs. |
 | 4 | Numerical methods and scientific outputs (P4) | Retained inference/refinement methods feed feature, timing and trajectory outputs. | Stable inputs for each method; no blanket wait for delivery 3. |
@@ -274,7 +276,7 @@ of when full parity will finish.
 
 ### 1. Contexts and playback evidence — P2/P3
 
-After closing the context slice, add playback evidence through the existing account model,
+Add playback evidence through the existing account model,
 construction/admission and exchange path. Preserve edition identity, native coordinate units,
 discontinuous support and separate text, source playback, recall playback and story-world time.
 A caption or description remains an observation; it does not acquire the authority of the

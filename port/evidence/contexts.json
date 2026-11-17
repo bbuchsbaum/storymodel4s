@@ -1,0 +1,570 @@
+{
+  "source_commit": "2c4aec1e6ed00240ef0f8c0abe43013b2ac76482",
+  "bead": "bd-01M7ME0KMK58W71YTPKTD7FEGY",
+  "scope": "Full retained context vocabulary through v5 rich accounts, v2 recorded construction, attribution, two-pass identity, pairing and local alignment consumption",
+  "checks": {
+    "full_suite": {
+      "command": ".venv/bin/pytest -q",
+      "passed": 763,
+      "seconds": 10.99,
+      "exit_code": 0,
+      "log_sha256": "6f5ec88aa77b495e906de0c7985a09531912351862f5a6e23629eb343661efda"
+    },
+    "mypy_source_files": 47,
+    "ruff_check": "passed",
+    "ruff_format_files": 120,
+    "schema_drift": "passed"
+  },
+  "reference_blobs": {
+    "story/src/main/scala/storymodel4s/story/nodes.scala": "2064522b8b42adcaf40e032947a64fd48eacdc4e",
+    "document/src/main/scala/storymodel4s/document/compiler.scala": "45f78c1e683b7fa655b9f82c1c1840811d81e25e",
+    "document/src/main/scala/storymodel4s/document/coreference.scala": "d65d25dad9ce0670fb2196c11141719d53344d2d"
+  },
+  "reference_evidence": "Scala source and consumer inspected; no executed Scala runtime comparison",
+  "contracts": [
+    "Legacy Context, Account v1-v3 and v1 proposal schemas frozen; pre-change prompt and recording replay identical",
+    "V4 rejects extended vocabulary through object and JSON consumption; request/recipe/proposal/result versions correlated",
+    "Source and recall v5 construction uses shared exact UTF-16 scope admission; invalid row atomically refused",
+    "Desire/memory/imagination have checked holders; hypothetical/counterfactual have none and refuse holder proposals",
+    "Nearest held ancestor skips holderless frames but never unresolved held frames; multiple actual placements remain ambiguous",
+    "Explicit upgrade preserves every graph occurrence; any-v5 pairing retains graph collections and grants",
+    "Source reused unchanged across two recalls with detail admission, saved identity/inspection and non-root alignment diagnostics"
+  ],
+  "deliberate_difference": "Python keeps ambiguous actual placements open instead of choosing Scala first placement; held identity still requires explicit singular number",
+  "compatibility_limit": "Combined rich JSON schemas broaden for v4/v5; runtime checks enforce cross-field version and vocabulary correlations",
+  "mutations": [
+    {
+      "mutation": "version-vocabulary",
+      "file": "model.py",
+      "old": "isinstance(context, ExtendedContext)",
+      "new": "False and isinstance(context, ExtendedContext)",
+      "test": "test_v4_refuses_extended_contexts_and_forged_v5_objects_at_public_boundaries",
+      "controls": [
+        "test_root_first_person_stays_outside_held_context",
+        "test_context_upgrade_and_pairing_preserve_existing_ids_and_select_v5"
+      ],
+      "baseline": "3 passed in 0.26s",
+      "mutant": "1 failed, 2 passed in 0.27s",
+      "compiled": true
+    },
+    {
+      "mutation": "mental-holder",
+      "file": "model.py",
+      "old": "\"intended\", \"desire\", \"memory\"",
+      "new": "\"intended\", \"memory\"",
+      "test": "test_v2_construction_roundtrips_all_new_contexts_and_exposes_checked_consumers[source]",
+      "controls": [
+        "test_root_first_person_stays_outside_held_context",
+        "test_context_upgrade_and_pairing_preserve_existing_ids_and_select_v5"
+      ],
+      "baseline": "3 passed in 0.26s",
+      "mutant": "1 failed, 2 passed in 0.28s",
+      "compiled": true
+    },
+    {
+      "mutation": "holderless-ancestor",
+      "file": "model.py",
+      "old": "current = context.parent",
+      "new": "current = None",
+      "test": "test_holderless_inner_scope_uses_nearest_outer_holder_but_memory_gap_blocks_it",
+      "controls": [
+        "test_root_first_person_stays_outside_held_context",
+        "test_context_upgrade_and_pairing_preserve_existing_ids_and_select_v5"
+      ],
+      "baseline": "3 passed in 0.26s",
+      "mutant": "1 failed, 2 passed in 0.28s",
+      "compiled": true
+    },
+    {
+      "mutation": "unresolved-held-stop",
+      "file": "model.py",
+      "old": "if _has_holder(context):",
+      "new": "if _has_holder(context) and context.kind != \"memory\":",
+      "test": "test_holderless_inner_scope_uses_nearest_outer_holder_but_memory_gap_blocks_it",
+      "controls": [
+        "test_root_first_person_stays_outside_held_context",
+        "test_context_upgrade_and_pairing_preserve_existing_ids_and_select_v5"
+      ],
+      "baseline": "3 passed in 0.26s",
+      "mutant": "1 failed, 2 passed in 0.28s",
+      "compiled": true
+    },
+    {
+      "mutation": "holderless-proposal",
+      "file": "attribution.py",
+      "old": "context is None or not _has_holder(context)",
+      "new": "context is None",
+      "test": "test_holderless_frames_refuse_holder_proposals[hypothetical]",
+      "controls": [
+        "test_root_first_person_stays_outside_held_context",
+        "test_context_upgrade_and_pairing_preserve_existing_ids_and_select_v5"
+      ],
+      "baseline": "3 passed in 0.29s",
+      "mutant": "1 failed, 2 passed in 0.28s",
+      "compiled": true
+    },
+    {
+      "mutation": "request-version",
+      "file": "rich_construction.py",
+      "old": "if self.schema_version.rsplit(\"/\", 1)[-1] != self.recipe.rsplit(\"/\", 1)[-1]:",
+      "new": "if False and self.schema_version.rsplit(\"/\", 1)[-1] != self.recipe.rsplit(\"/\", 1)[-1]:",
+      "test": "test_request_reply_result_versions_cannot_be_crossed",
+      "controls": [
+        "test_root_first_person_stays_outside_held_context",
+        "test_context_upgrade_and_pairing_preserve_existing_ids_and_select_v5"
+      ],
+      "baseline": "3 passed in 0.26s",
+      "mutant": "1 failed, 2 passed in 0.28s",
+      "compiled": true
+    }
+  ],
+  "installed": {
+    "import_path": "/Users/bbuchsbaum/code/scala/storymodel4s/port/data/wheel-env/lib/python3.12/site-packages/storymodel/__init__.py",
+    "cli_invocations": 33,
+    "commands": [
+      "align",
+      "attributed-identity-roles",
+      "attribution-table",
+      "import-rich",
+      "prepare-rich",
+      "replay-rich",
+      "resolve-attributed-identity",
+      "resolve-holders",
+      "rich-prompt",
+      "situation-table",
+      "verify-attributed-identity",
+      "verify-attribution"
+    ],
+    "saved_api_cli_equal": true,
+    "source_reused_across_two_recalls": true,
+    "legacy_replay_equal": true,
+    "foreign_recording_refused": true,
+    "denied_before_recording_read": true,
+    "artifacts": {
+      "alignment-1.json": {
+        "bytes": 116605,
+        "sha256": "898eaacd02cb7c30dd3077c7da9671231d0b732cfc5108cbb52a6a7d59004141"
+      },
+      "alignment-2.json": {
+        "bytes": 116605,
+        "sha256": "19616474d570b92342a0118dc34c51c919a0ab6560b329b35de70ae88cbf1e93"
+      },
+      "cli-alignment-1.json": {
+        "bytes": 116605,
+        "sha256": "898eaacd02cb7c30dd3077c7da9671231d0b732cfc5108cbb52a6a7d59004141"
+      },
+      "cli-alignment-2.json": {
+        "bytes": 116605,
+        "sha256": "19616474d570b92342a0118dc34c51c919a0ab6560b329b35de70ae88cbf1e93"
+      },
+      "paired-1.json": {
+        "bytes": 41142,
+        "sha256": "c9b83dcc637586f6c33bd6baaa169c31368cbbd554c9aee5f3e5d251931fbeba"
+      },
+      "paired-2.json": {
+        "bytes": 41142,
+        "sha256": "933e6c004fe71ceb7e74ced78b367dbae5093ae96d7755879244a6a84630871c"
+      },
+      "recall-1/account.json": {
+        "bytes": 19742,
+        "sha256": "c868be43669db99ed54fb2ccbb522ed909e40f4544459513d66613100ce29ee3"
+      },
+      "recall-1/attributed-situations.json": {
+        "bytes": 14750,
+        "sha256": "66709380415be12f34d464ef0e1b08ce07f15a0cd3ebd205212f6405cfd7578a"
+      },
+      "recall-1/attribution.json": {
+        "bytes": 9071,
+        "sha256": "73d0d84ea6a45fe140b0dd3ba0d24f2685296ab2932427c8412fcc69075bb342"
+      },
+      "recall-1/cli-attributed-situations.json": {
+        "bytes": 14750,
+        "sha256": "66709380415be12f34d464ef0e1b08ce07f15a0cd3ebd205212f6405cfd7578a"
+      },
+      "recall-1/cli-attribution.json": {
+        "bytes": 9071,
+        "sha256": "73d0d84ea6a45fe140b0dd3ba0d24f2685296ab2932427c8412fcc69075bb342"
+      },
+      "recall-1/cli-construction.json": {
+        "bytes": 24242,
+        "sha256": "0a16f2a60cb862a029bbf2f47c11a6c77aeb64e39b6d88a5de87789664fa8591"
+      },
+      "recall-1/cli-identity-roles.json": {
+        "bytes": 11103,
+        "sha256": "9421c7fcbc86f2921b77697073149965d4dd9d300fdc61afa86d03dd0e61cd01"
+      },
+      "recall-1/cli-identity.json": {
+        "bytes": 15322,
+        "sha256": "6ccb687c070f64c7c87cab729816264ef8a6fc2ae49133af8cbaa74edda82020"
+      },
+      "recall-1/cli-prompt.json": {
+        "bytes": 8310,
+        "sha256": "064188da9f1bd898932d5c9bf6af630bc036178592dd5e6d1e293cfcee3195d8"
+      },
+      "recall-1/cli-situations.json": {
+        "bytes": 9502,
+        "sha256": "aa1b989b3c06d9894f970136845c8243d8127b7c449f3b1f0c9a15afc9bdfc94"
+      },
+      "recall-1/construction.json": {
+        "bytes": 24242,
+        "sha256": "0a16f2a60cb862a029bbf2f47c11a6c77aeb64e39b6d88a5de87789664fa8591"
+      },
+      "recall-1/detail-proposals.json": {
+        "bytes": 2746,
+        "sha256": "68a505fe723a2853ed8ec83721f6647c8afbac95ea5576aa787903ef6fc25445"
+      },
+      "recall-1/detail-request.json": {
+        "bytes": 20316,
+        "sha256": "05ea39e3be6d54d489843d16a600537d8211e4bb5aeeec3e5651fbe7c54ee268"
+      },
+      "recall-1/detail-result.json": {
+        "bytes": 24810,
+        "sha256": "10b819f31d22f87b303e11eeb45dabed026094687a2d69375073bfc9b986a64b"
+      },
+      "recall-1/detailed-account.json": {
+        "bytes": 22853,
+        "sha256": "5d1ffa5065847e3ad006f70739da02eeecb48e41e110b20fd13014948f56cf71"
+      },
+      "recall-1/holder-proposals.json": {
+        "bytes": 1851,
+        "sha256": "cb2103e2566f86280f4c72fef0cf7acfc3f5734aa4040bf44bb782e54502e82f"
+      },
+      "recall-1/identity-annotations.json": {
+        "bytes": 3111,
+        "sha256": "62a95106c209d922d2e51871702eef5bbd1b3e6b29bce300ba03426a1f23df5c"
+      },
+      "recall-1/identity-roles.json": {
+        "bytes": 11103,
+        "sha256": "9421c7fcbc86f2921b77697073149965d4dd9d300fdc61afa86d03dd0e61cd01"
+      },
+      "recall-1/identity.json": {
+        "bytes": 15322,
+        "sha256": "6ccb687c070f64c7c87cab729816264ef8a6fc2ae49133af8cbaa74edda82020"
+      },
+      "recall-1/prompt.json": {
+        "bytes": 8309,
+        "sha256": "df0431f561f970bb95858ee8a8df672fef8a288d84748a3ddc2f0d0fd3b30195"
+      },
+      "recall-1/recording/import.json": {
+        "bytes": 8374,
+        "sha256": "480fc91bb06a0410b5e01086a940f84a1a36cff4bb10293023d4d7b0e01b7079"
+      },
+      "recall-1/recording/journal.json": {
+        "bytes": 141,
+        "sha256": "7ef9fa8a810c958d37495042a9ac60a5a60bb472f544094da52b386c1f874ee2"
+      },
+      "recall-1/recording/profile.json": {
+        "bytes": 343,
+        "sha256": "e9b90e5532fe8ef359e487e12e376268f365a3976448133ff586ce57b061268d"
+      },
+      "recall-1/recording/replies/2afa85a4c31c2ae775de2c35020080fd18f8401080a63683e19912e68792dc52.json": {
+        "bytes": 8556,
+        "sha256": "5947a7d03b5e61679eb89e1981561683013d1e879734bb57943e3b7c759d92d8"
+      },
+      "recall-1/request.json": {
+        "bytes": 891,
+        "sha256": "ee8c60f82bf1e36656208a2e613713ee92fc65d4e856d99348c7877c21f320e0"
+      },
+      "recall-1/situations.json": {
+        "bytes": 9502,
+        "sha256": "aa1b989b3c06d9894f970136845c8243d8127b7c449f3b1f0c9a15afc9bdfc94"
+      },
+      "recall-2/account.json": {
+        "bytes": 19742,
+        "sha256": "c43299be2358c07a1164e8a9b09a6244a120309e1e1ba37670a6e19cd920f516"
+      },
+      "recall-2/attributed-situations.json": {
+        "bytes": 14750,
+        "sha256": "186e47b5e5e6c6bdeb29d6ffb8869f0189b726dcbc71d3bc14bfb9bfbc405f99"
+      },
+      "recall-2/attribution.json": {
+        "bytes": 9071,
+        "sha256": "388c2e03e1fe730d868bd7d2d9c66518c98fd0351b0927850cf29549a5b4699b"
+      },
+      "recall-2/cli-attributed-situations.json": {
+        "bytes": 14750,
+        "sha256": "186e47b5e5e6c6bdeb29d6ffb8869f0189b726dcbc71d3bc14bfb9bfbc405f99"
+      },
+      "recall-2/cli-attribution.json": {
+        "bytes": 9071,
+        "sha256": "388c2e03e1fe730d868bd7d2d9c66518c98fd0351b0927850cf29549a5b4699b"
+      },
+      "recall-2/cli-construction.json": {
+        "bytes": 24242,
+        "sha256": "33ac754927de576f75ef73a49d3c6da0ad6d074a2f850a6e70f62afffa7733e4"
+      },
+      "recall-2/cli-identity-roles.json": {
+        "bytes": 11103,
+        "sha256": "89ce355b2d17d20dd0195f8c2b9de9f41e202d8c3dcea4b8759d60acb0bb2dae"
+      },
+      "recall-2/cli-identity.json": {
+        "bytes": 15322,
+        "sha256": "9364d4031faf3affec9e4e6d4f6a74211dde83ac046387b9991807ad6da9d9f8"
+      },
+      "recall-2/cli-prompt.json": {
+        "bytes": 8310,
+        "sha256": "c7acd73d05dcf2cc94f732b920df6d972106c81c6505d22ad28817472066304b"
+      },
+      "recall-2/cli-situations.json": {
+        "bytes": 9502,
+        "sha256": "47fec9dfa128b01fb6bf560538591dd40a22df357e9755e3f7f45fd3f54af233"
+      },
+      "recall-2/construction.json": {
+        "bytes": 24242,
+        "sha256": "33ac754927de576f75ef73a49d3c6da0ad6d074a2f850a6e70f62afffa7733e4"
+      },
+      "recall-2/detail-proposals.json": {
+        "bytes": 2746,
+        "sha256": "a98b586831c36f367de93ba560faf9831a9bd930ef7245111dcd663bdf19cacf"
+      },
+      "recall-2/detail-request.json": {
+        "bytes": 20316,
+        "sha256": "02990a8a4c2866537ceb64094fd619f401e4ef512622acba060d9be3a444a8fc"
+      },
+      "recall-2/detail-result.json": {
+        "bytes": 24810,
+        "sha256": "b1c07c0566324d795e1c3cdf9a88840e4ac01e018f19f76f60ac891c97656192"
+      },
+      "recall-2/detailed-account.json": {
+        "bytes": 22853,
+        "sha256": "c18d8762dc9a179491d4eabb39aa660de0af237fb4f64351b2a362b30d47d173"
+      },
+      "recall-2/holder-proposals.json": {
+        "bytes": 1851,
+        "sha256": "7ec0fc6f05ee5590ce9e1c10d30709083c7956ce5642abd22e3f1a7bdab57727"
+      },
+      "recall-2/identity-annotations.json": {
+        "bytes": 3111,
+        "sha256": "891705c7e8d0697049b1695c90378b4db8bbfbfc24c0dbcb39fcaade398b5ba9"
+      },
+      "recall-2/identity-roles.json": {
+        "bytes": 11103,
+        "sha256": "89ce355b2d17d20dd0195f8c2b9de9f41e202d8c3dcea4b8759d60acb0bb2dae"
+      },
+      "recall-2/identity.json": {
+        "bytes": 15322,
+        "sha256": "9364d4031faf3affec9e4e6d4f6a74211dde83ac046387b9991807ad6da9d9f8"
+      },
+      "recall-2/prompt.json": {
+        "bytes": 8309,
+        "sha256": "7da6816d09373198ea7f6b962ebdc9395e9f4a482b180e488be0e2fa925b97b1"
+      },
+      "recall-2/recording/import.json": {
+        "bytes": 8374,
+        "sha256": "31ca408c9a610ff4d740ec8b8ca33e3769c25777bc5968938af5cdd590cccd93"
+      },
+      "recall-2/recording/journal.json": {
+        "bytes": 141,
+        "sha256": "c996976fd572a0976f632d0b2fef66f1eb7abe84534d6b1331d3c4413b82d455"
+      },
+      "recall-2/recording/profile.json": {
+        "bytes": 343,
+        "sha256": "de2bc879ef9360ef416dc8d9e36fd7ddfd081df3c89f428beb99cb1a0bf9b7a5"
+      },
+      "recall-2/recording/replies/7c86e55ba6b5af0c2897e42508dda4888c95aa9880a402b43e668a85ab2306bd.json": {
+        "bytes": 8556,
+        "sha256": "c32b395a48760ba89abf3e0aad5fa1d41a23554c7b12a35c8bc52bd024753298"
+      },
+      "recall-2/request.json": {
+        "bytes": 891,
+        "sha256": "bd46bb2a1af4f35efa1a8cb6902c8f49c43f0438cbd3c8e1da60f4640a973bf6"
+      },
+      "recall-2/situations.json": {
+        "bytes": 9502,
+        "sha256": "47fec9dfa128b01fb6bf560538591dd40a22df357e9755e3f7f45fd3f54af233"
+      },
+      "source/account.json": {
+        "bytes": 18719,
+        "sha256": "e5eb7e8c502a7c06efba122b7d1b08cc6bc5f300c89dc0646beba6db7de82f68"
+      },
+      "source/attributed-situations.json": {
+        "bytes": 14750,
+        "sha256": "c6c30a64ac592faade02e20a96609fe43a7571a15c16ef0b3659f75d22fff7fb"
+      },
+      "source/attribution.json": {
+        "bytes": 9071,
+        "sha256": "b9fcc1b898656c41cb16dc82525c9c765ed3238ee1ca3988b9f24bce3fec4a55"
+      },
+      "source/cli-attributed-situations.json": {
+        "bytes": 14750,
+        "sha256": "c6c30a64ac592faade02e20a96609fe43a7571a15c16ef0b3659f75d22fff7fb"
+      },
+      "source/cli-attribution.json": {
+        "bytes": 9071,
+        "sha256": "b9fcc1b898656c41cb16dc82525c9c765ed3238ee1ca3988b9f24bce3fec4a55"
+      },
+      "source/cli-construction.json": {
+        "bytes": 23219,
+        "sha256": "8f77be7d108c1a54142afa1e95f8be1a7327c0c5d9fbb11a97cdbd84fca07fe9"
+      },
+      "source/cli-identity-roles.json": {
+        "bytes": 11103,
+        "sha256": "7b270281f5156380daa18839cd4ccb2865d17d4d4643f1a5640613648f944017"
+      },
+      "source/cli-identity.json": {
+        "bytes": 15322,
+        "sha256": "b7b4b0e7e9134bee964d3e1eb6997a9b4fc859a9cb2acc0bb8289dfc185d8d18"
+      },
+      "source/cli-import-replay.json": {
+        "bytes": 23219,
+        "sha256": "8f77be7d108c1a54142afa1e95f8be1a7327c0c5d9fbb11a97cdbd84fca07fe9"
+      },
+      "source/cli-prompt.json": {
+        "bytes": 8308,
+        "sha256": "42c34fbc099067f0fcd68669789d9343e9f5c17129424aa527217fddcca0975a"
+      },
+      "source/cli-recording/import.json": {
+        "bytes": 8374,
+        "sha256": "088cc1a7fef5fcd98951e32612d64e6ae04e645acbb8ae294dadbf4ce0d5e707"
+      },
+      "source/cli-recording/journal.json": {
+        "bytes": 141,
+        "sha256": "9d54f9ac575765d7c2dbcea4e3f7593a1ed43fa66ed92aadad83465e2a96bfb3"
+      },
+      "source/cli-recording/profile.json": {
+        "bytes": 343,
+        "sha256": "caf41f7abbe814fed49e37c394952b79bf522deb1df9af0eb42c57e0026c911b"
+      },
+      "source/cli-recording/replies/5e7edb5dae47b05905cedf0b2adb324f229b42a1c71fd9a62691fa3da5034a39.json": {
+        "bytes": 8556,
+        "sha256": "eb95762c4a13ff922552b0049f334bb97c0087194f4eb52b3dc011c202a43525"
+      },
+      "source/cli-situations.json": {
+        "bytes": 9502,
+        "sha256": "5ac5b1b8c58aaac18995f54598b5a4d3f1adbedba9a04fcee7d12cfe2e6ee570"
+      },
+      "source/construction.json": {
+        "bytes": 23219,
+        "sha256": "8f77be7d108c1a54142afa1e95f8be1a7327c0c5d9fbb11a97cdbd84fca07fe9"
+      },
+      "source/holder-proposals.json": {
+        "bytes": 1851,
+        "sha256": "35a5e15ce60b198d63900b68e4b814321822789eac1fae130db5573eabb193f7"
+      },
+      "source/identity-annotations.json": {
+        "bytes": 3111,
+        "sha256": "42240f521fa5ea7e12b8d37bb8271574105e2b7d8332a70c2a2f668125706c9c"
+      },
+      "source/identity-roles.json": {
+        "bytes": 11103,
+        "sha256": "7b270281f5156380daa18839cd4ccb2865d17d4d4643f1a5640613648f944017"
+      },
+      "source/identity.json": {
+        "bytes": 15322,
+        "sha256": "b7b4b0e7e9134bee964d3e1eb6997a9b4fc859a9cb2acc0bb8289dfc185d8d18"
+      },
+      "source/prompt.json": {
+        "bytes": 8307,
+        "sha256": "bceac80fb05a2156f21879fbec95656e20879c9ca731e73eb693a35dae59409d"
+      },
+      "source/recording/import.json": {
+        "bytes": 8374,
+        "sha256": "088cc1a7fef5fcd98951e32612d64e6ae04e645acbb8ae294dadbf4ce0d5e707"
+      },
+      "source/recording/journal.json": {
+        "bytes": 141,
+        "sha256": "9d54f9ac575765d7c2dbcea4e3f7593a1ed43fa66ed92aadad83465e2a96bfb3"
+      },
+      "source/recording/profile.json": {
+        "bytes": 343,
+        "sha256": "caf41f7abbe814fed49e37c394952b79bf522deb1df9af0eb42c57e0026c911b"
+      },
+      "source/recording/replies/5e7edb5dae47b05905cedf0b2adb324f229b42a1c71fd9a62691fa3da5034a39.json": {
+        "bytes": 8556,
+        "sha256": "eb95762c4a13ff922552b0049f334bb97c0087194f4eb52b3dc011c202a43525"
+      },
+      "source/request.json": {
+        "bytes": 889,
+        "sha256": "049e28c4fb141db1df6bbf6e3acc4fc2327298c9da0ad85d58e14fb8ce6358f5"
+      },
+      "source/situations.json": {
+        "bytes": 9502,
+        "sha256": "5ac5b1b8c58aaac18995f54598b5a4d3f1adbedba9a04fcee7d12cfe2e6ee570"
+      }
+    }
+  },
+  "fixture_origin": {
+    "captured_before_change_at": "43a05b65b2c6edf99fdd283302fa45c55ba45eea",
+    "content": "Abstract AA/BB/CC/DD token control; no narrative or participant data",
+    "files": {
+      "tests/fixtures/context-v1/prompt.sha256": {
+        "bytes": 65,
+        "sha256": "ab1c3cb06d811a7b2d6a1660c0373c197432e042c2783dfc04552bd0261e0f2b"
+      },
+      "tests/fixtures/context-v1/recording/import.json": {
+        "bytes": 1092,
+        "sha256": "0036b8d08da365b698ffcb4cdf4a5941dc5a44f7b03976429497df86a123cc60"
+      },
+      "tests/fixtures/context-v1/recording/journal.json": {
+        "bytes": 141,
+        "sha256": "85e1a1218acc298acd2ddb3a7306ab7702188f9b0a55af62f0a988f9f198a8f9"
+      },
+      "tests/fixtures/context-v1/recording/profile.json": {
+        "bytes": 343,
+        "sha256": "8f193d42e7d27a6f725ee46464f55a5f923a78071e9e24367080193187a34614"
+      },
+      "tests/fixtures/context-v1/recording/replies/e5d3068ee21f6f6325239ff94f1472bcf53b1968577342d27ef10cc511da498e.json": {
+        "bytes": 1260,
+        "sha256": "4e3c7554e4327d816a3d2a0681a9bc7a8c2ba2c3e9c25d9b819fa27f6898fc39"
+      },
+      "tests/fixtures/context-v1/request.json": {
+        "bytes": 443,
+        "sha256": "f0cc83e8ee210162dbf33aa461ede9cb575860f78e8ada9c316553a2edceb55e"
+      },
+      "tests/fixtures/context-v1/result.json": {
+        "bytes": 3521,
+        "sha256": "3a743485c34f8e118acc4ea497cc97b3d507cfcd02666105efa068ee3c5b9fb4"
+      }
+    }
+  },
+  "remaining": [
+    "Playback evidence",
+    "Automatic holder and form acquisition",
+    "Number/addressee/group inference",
+    "Attribution-aware assessment",
+    "Other retained P2-P6 capabilities"
+  ],
+  "claim_boundary": "Local engineering behavior and installed integration; not linguistic accuracy, full parity or empirical productivity measurement",
+  "independent_review": {
+    "agent": "contexts_review",
+    "commit": "2c4aec1e6ed00240ef0f8c0abe43013b2ac76482",
+    "verdict": "No BLOCK; accept bounded context vocabulary slice",
+    "full_suite": {
+      "passed": 763,
+      "seconds": 11.68,
+      "exit_code": 0
+    },
+    "probes": [
+      "384 end-to-end combinations:8 middle kinds x8 inner kinds x6 holder outcomes; nearest held frame, blocking and actual context checked",
+      "Two holderless placements with one named ancestor remain ambiguous",
+      "Both root-level holderless kinds remain outside-held-context",
+      "Copied legacy Context(kind=memory) rejected in v4 and v5",
+      "V2 import/replay reproduces direct compilation; same-document v1 request refuses recording",
+      "Invalid first row rejected without leakage; valid second row admitted"
+    ],
+    "reproduction": {
+      "command": "PYTHONPATH=port/tests port/.venv/bin/python - <<PY (inline probe)",
+      "fixtures": "test_attribution.control(labels=(AA,BB,CC)); test_identity.annotation/raw; final mention first/singular at span6:8",
+      "kinds": [
+        "reported",
+        "believed",
+        "intended",
+        "desire",
+        "memory",
+        "imagination",
+        "hypothetical",
+        "counterfactual"
+      ],
+      "holder_outcomes": [
+        "named",
+        "missing",
+        "failed",
+        "unsupported",
+        "empty",
+        "unresolved"
+      ],
+      "recipe": "Nest middle and inner under reported outer; place state in inner. Outer candidate first mention. Middle/inner named candidate second mention, unresolved candidate final first-person mention; empty completed list, or omit/process outcome. Expected holder:inner if held, else middle if held, else outer. Resolve only if nearest scope outer or its status named; otherwise holder-unresolved. Preserve original inner placement and match final base referent to expected holder."
+    },
+    "limits": "Exploratory probes ran inline; no durable probe scripts/logs retained. Reviewer did not rerun parent mutations, mypy, Ruff or installed wheel. No Scala runtime or semantic accuracy qualification."
+  }
+}
