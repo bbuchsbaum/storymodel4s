@@ -1,0 +1,31 @@
+{
+  "source_commit": "5ec425338f0b8bf851ad4d6e3afef7cc8fc5d104",
+  "checks": {
+    "full_suite_at_9978ef47d": "325 passed in 3.71s",
+    "after_review_delta": "38 mapping tests passed",
+    "mypy": "29 source files pass",
+    "ruff": "lint and format73 files pass",
+    "quote_mutation": "baseline3 pass; mutant1 named fail with2 passing controls",
+    "alias_mutation": "baseline3 pass; mutant visibility regression fails with2 passing controls"
+  },
+  "review": {
+    "reviewer": "direct_mapping_review",
+    "initial_block": "9978ef47d allowed indistinguishable visible aliases ordered by hidden content",
+    "resolution": "5ec425338 rejects duplicate visible descriptors and removes hidden-content ordering",
+    "verdict": "No remaining BLOCK within P3.1; reviewer independently ran38 tests and identical-prompt/different-occurrence replay probe"
+  },
+  "installed_wheel": {
+    "tested_commit": "9978ef47d",
+    "outside_checkout": true,
+    "site_packages_import_verified": true,
+    "console_script_replay_and_three_views_match_api": true,
+    "note": "Installed CLI is storymodel; python -m storymodel is not provided.",
+    "final_guard_probe": "Rebuilt5ec425338 wheel: positive example and duplicate-visible-alias refusal pass outside checkout."
+  },
+  "limits": [
+    "Input audit and deterministic admission only; no model accuracy or order-independent detail-acquisition claim.",
+    "Row/scene targets and contiguous recall units only. Richer fixed-question claim receipt, event/episode targets and semantic channels remain owed.",
+    "Duplicate visible detail descriptors refuse; normalized hidden content cannot disambiguate aliases.",
+    "Full P2, P3 exit, P4-P6 remain incomplete."
+  ]
+}
