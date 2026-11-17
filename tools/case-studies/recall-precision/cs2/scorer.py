@@ -341,24 +341,31 @@ def strata(scores, comp, work_applicable=True):
     out["scene_bits_by_speech"] = {
         k: dict(n=len(v), mean=float(np.mean(v))) for k, v in sorted(sp.items())
     }
-    loc_spec = [
-        s.located_share
-        for s in spec
-        if s.located_share is not None and not math.isnan(s.located_share)
-    ]
-    loc_non = [
-        s.located_share
-        for s in film
-        if s.cls != "specific"
-        and s.located_share is not None
-        and not math.isnan(s.located_share)
-    ]
+    # declared: located shares are rounded before ranking, so float noise cannot break ties
+    nd = load_config()["auroc_round_decimals"]
+
+    def shares(rows, abstain_as=None):
+        out_ = []
+        for s in rows:
+            v = s.located_share
+            if v is None or math.isnan(v):
+                if abstain_as is None:
+                    continue
+                v = abstain_as
+            out_.append(round(v, nd))
+        return out_
+
+    non = [s for s in film if s.cls != "specific"]
+    loc_spec, loc_non = shares(spec), shares(non)
     out["gist_vs_detail"] = dict(
-        n_specific=len(loc_spec),
-        n_nonspecific=len(loc_non),
+        n_specific_scored=len(loc_spec), n_specific_total=len(spec),
+        n_nonspecific_scored=len(loc_non), n_nonspecific_total=len(non),
+        note="a row with no claimed mass (full abstention) has no located share and is left "
+        "out of 'auroc'; 'auroc_abstention_as_zero' counts it as located share 0",
         located_share_specific=float(np.mean(loc_spec)) if loc_spec else None,
         located_share_nonspecific=float(np.mean(loc_non)) if loc_non else None,
         auroc=auroc(loc_spec, loc_non),
+        auroc_abstention_as_zero=auroc(shares(spec, 0.0), shares(non, 0.0)),
     )
     nf = {}
     for s in scores:

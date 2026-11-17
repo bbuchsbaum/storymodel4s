@@ -268,6 +268,7 @@ def cmd_baselines(corpus, out):
     dur, fc = baseline_forecasts(A, comp, gold, cfg)
     named = {k: score_map(comp, gold, v, cfg, wa) for k, v in fc.items()}
     summary = dict(
+        evidence="development data, engineering numbers; validation = the frozen-six run",
         corpus=corpus,
         participants=sorted(gold),
         sessions=sorted({(p, g.session) for p, rs in gold.items() for g in rs}),
@@ -464,6 +465,7 @@ def cmd_sherlock_smoke(out):
         )
     }
     summary = dict(
+        evidence="development data, engineering numbers; validation = the frozen-six run",
         corpus="sherlock",
         work_identity="not applicable (one work)",
         participants=sorted(gold),
@@ -648,6 +650,7 @@ def cmd_ff_run(args):
                           for t in ("film_bits", "work_bits", "scene_bits", "total_bits")}
         for b in ("lopo", "order_oracle", "tfidf")})
     summary = dict(
+        evidence="development data, engineering numbers; validation = the frozen-six run",
         corpus=corpus, sessions=extra["sessions"], ledger=ledger, calls=calls,
         rows=SC.strata(named["producer"], comp, wa)["rows"], forecasts=fsum,
         producer_strata=SC.strata(named["producer"], comp, wa),

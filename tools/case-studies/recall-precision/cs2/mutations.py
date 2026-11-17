@@ -298,6 +298,22 @@ MUTANTS = [
         test="test_state_mapping_matches_the_gold_definitions",
     ),
     dict(
+        id="M31",
+        guard="pass-1 memory search inside a framed film routes work-level",
+        file="cs2/ff_producer.py",
+        edits=[('        if kind in ("work", "memory_search") and top is not None:\n',
+                '        if kind == "work" and top is not None:\n')],
+        test="test_memory_search_in_a_framed_film_is_work_level",
+    ),
+    dict(
+        id="M32",
+        guard="gold alignment refuses non-monotone utterance onsets",
+        file="adapters/filmfestival.py",
+        edits=[("    if any(b < a for a, b in zip(onsets, onsets[1:])):\n",
+                "    if False:\n")],
+        test="test_gold_alignment_refuses_non_monotone_onsets",
+    ),
+    dict(
         id="M16",
         guard="the part marginal places a unit's mass on the unit's own part",
         file="cs2/projections.py",

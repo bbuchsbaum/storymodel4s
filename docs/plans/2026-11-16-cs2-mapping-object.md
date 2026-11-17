@@ -233,8 +233,9 @@ was silent. These are declarations, not owner decisions.
 
 - Memory search inside a framed film is recorded as a work-level reference, which is how the
   gold codes it. The ADR needs a typed *searching within work* state.
-- Non-film states (memory search, gave up, off task, commentary, fragment) are typed
-  destinations inside the simplex. That extends ADR 0031 §3, whose onset-point projection
+- Non-film states (memory search between films, gave up, off task, and commentary with no
+  framed work) are typed destinations inside the simplex. A fragment is a ledger count, not a
+  destination. That extends ADR 0031 §3, whose onset-point projection
   treats not-applicable references as a typed absence ("only not applicable"). The harness has
   no such absence: a bin of not-applicable words alone is a sampled row whose mass sits on
   non-film states. The vocabulary ADR must decide this too.

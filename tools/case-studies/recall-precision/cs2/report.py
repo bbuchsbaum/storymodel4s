@@ -26,6 +26,7 @@ from metrics import cluster_bootstrap, cohen_kappa, icc21  # noqa: E402
 TERMS = ("film_bits", "work_bits", "scene_bits", "total_bits")
 BASES = ("duration", "lopo", "order_oracle", "tfidf")
 SCHEMA = "storymodel4s.case-study-2.corpus-report/v1"
+EVIDENCE = "development data, engineering numbers; validation = the frozen-six run"
 
 
 def _num(x):
@@ -231,17 +232,18 @@ def corpus_report(corpus, producer, dirs, work_applicable):
             if U[0][u]["log10_extent"] is not None
             and U[1][u]["log10_extent"] is not None
         ]
+        either = [u for u in keys if U[0][u]["top_scene"] is not None
+                  or U[1][u]["top_scene"] is not None]
+        agree = sum(U[0][u]["top_scene"] == U[1][u]["top_scene"] for u in both)
         rel = dict(
             units=len(keys),
-            top_scene_agreement=round(
-                float(
-                    np.mean(
-                        [U[0][u]["top_scene"] == U[1][u]["top_scene"] for u in both]
-                    )
-                ),
-                4,
-            ),
-            top_scene_units=len(both),
+            top_scene_agreement_both_located=dict(
+                share=round(agree / len(both), 4), agree=agree, denominator=len(both),
+                rule="units with a top scene in both samples"),
+            top_scene_agreement_either_located=dict(
+                share=round(agree / len(either), 4), agree=agree, denominator=len(either),
+                rule="units with a top scene in at least one sample; one-located units count as "
+                "disagreements"),
             alternatives_kappa=round(
                 cohen_kappa(
                     [int(U[0][u]["alternatives"]) for u in keys],
@@ -260,6 +262,7 @@ def corpus_report(corpus, producer, dirs, work_applicable):
         )
     return dict(
         schema=SCHEMA,
+        evidence=EVIDENCE,
         corpus=corpus,
         producer=producer,
         samples=len(dirs),
@@ -286,6 +289,7 @@ def main(argv):
     out = Path(argv[0])
     rep = dict(
         schema="storymodel4s.case-study-2.summary-both/v1",
+        evidence=EVIDENCE,
         comparability="the corpora use different producers unless both name the same "
         "producer; compare corpora only within one producer",
         corpora=[],

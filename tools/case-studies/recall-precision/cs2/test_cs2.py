@@ -604,9 +604,6 @@ def test_abstain_everything_scores_the_baseline():
     acc, _ = rich_account()
     comp = acc.composition
     words = [(0.2 + i, f"u{i}", Uncovered(f"u{i}")) for i in range(6)]
-    words += [
-        (2.5, "u2", StateSample("u2", "commentary"))
-    ]  # irrelevant: row 2 is non-film
     acc = Account(comp, {}, {("P", "s"): cells(words)})
     gold = [
         _gold("P", "s", 0, "specific", "C", {8}),
@@ -624,7 +621,7 @@ def test_abstain_everything_scores_the_baseline():
     prod = SC.score_rows(gold, SC.producer_forecasts(ld, dur, CFG), comp, valid)
     base = SC.score_rows(gold, [dur] * len(gold), comp, valid)
     for p, b in zip(prod, base):
-        for term in ("work_bits", "scene_bits"):
+        for term in ("film_bits", "work_bits", "scene_bits", "total_bits"):
             x, y = getattr(p, term), getattr(b, term)
             assert (x is None) == (y is None)
             if x is not None:
@@ -892,6 +889,46 @@ def test_state_mapping_matches_the_gold_definitions():
     acc = Account(comp, refs, {("P", "s"): cells})
     row = LocationDistribution.from_words(acc, cells, [Bin(0, 2)]).rows[0]
     assert row.state == "only_uncovered"  # a fragment unit is never non-film mass
+
+
+def test_memory_search_in_a_framed_film_is_work_level():
+    # pass-1 memory search with a frame, and pass-2 metamemory inside its framed film, are
+    # work-level references to that film, never non-film mass
+    P = _producer()
+    from cs2.source import RecallWord
+
+    comp = fixture()
+    words = [RecallWord(i, f"w{i}", float(i)) for i in range(4)]
+    units = [dict(first=0, last=1), dict(first=2, last=3)]
+    frames = [dict(kind="memory_search", frame=[("C", 0.7)], position=None),
+              dict(kind="content", frame=[("B", 1.0)], position=None)]
+    conv = dict(references=0, refused={}, frame_mismatch=0, pass2_missing=0, shapes={},
+                broad_cases={}, positions=dict(resolved=0, unresolved=0), fragment_words=0)
+    refs = {}
+    cells = P.convert_session(("P", "s"), words, units, frames,
+                              {"o1": (dict(talk="metamemory"), {})}, {1: dict(oid="o1")}, comp,
+                              P.conditions(1, "s", 1), refs, conv)
+    for c, work in ((cells[0], "C"), (cells[2], "B")):
+        assert isinstance(c.sample, RefSample), c.sample
+        r = refs[c.sample.ref]
+        assert isinstance(r, WorkReference) and r.work == work
+    acc = Account(comp, refs, {("P", "s"): cells})
+    row = LocationDistribution.from_words(acc, cells, [Bin(0, 9)]).rows[0]
+    assert not any(k[0] == "nonfilm" for k in row.mass), row.mass
+
+
+def test_gold_alignment_refuses_non_monotone_onsets():
+    import adapters.filmfestival as F
+
+    try:
+        F.align_gold([(10.0, 14.0), (9.0, 11.0)], [(10.0, 5.0), (9.0, 3.0)])
+    except SourceError:
+        pass
+    else:
+        raise AssertionError("non-monotone utterance onsets were accepted")
+    spans, rec = F.align_gold([(10.0, 0), (10.0, 0), (12.0, 13.0)],
+                              [(10.0, None), (10.0, None), (12.0, 2.0)])
+    assert spans[0] == (10.0, 10.0) and rec["zero_length_bins"] == 1
 
 
 # ---------------------------------------------------------------- runner

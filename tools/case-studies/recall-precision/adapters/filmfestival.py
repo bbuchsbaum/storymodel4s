@@ -355,6 +355,9 @@ def align_gold(gold, events):
     end_s = start_s + duration - 1.0 s wherever a duration is given. Returns (spans, receipt)."""
     if len(gold) != len(events):
         raise SourceError(f"{len(gold)} gold rows vs {len(events)} utterances")
+    onsets = [e[0] for e in events]
+    if any(b < a for a, b in zip(onsets, onsets[1:])):
+        raise SourceError("utterance onsets are not monotone")
     offs = [g[0] - e[0] for g, e in zip(gold, events)]
     c = sorted(offs)[len(offs) // 2]
     if abs(c) > GOLD_START_OFFSET_MAX_S or any(abs(o - c) > 1e-3 for o in offs):
@@ -366,9 +369,12 @@ def align_gold(gold, events):
         checked += 1
         if abs((ge - gs) - (dur - GOLD_END_SHORTFALL_S)) > 1e-6:
             raise SourceError("a gold end is not its utterance end minus 1.0 s")
-    return utterance_spans(events), dict(
+    spans = utterance_spans(events)
+    return spans, dict(
         rows=len(gold), start_offset_s=round(c, 6), end_shortfall_s=GOLD_END_SHORTFALL_S,
-        ends_checked=checked, rule="bin = source utterance span on the recall-word clock")
+        ends_checked=checked, zero_length_bins=sum(1 for lo, hi in spans if not hi > lo),
+        rule="bin = source utterance span on the recall-word clock; a zero-length bin holds "
+        "no word and is a typed no-sample row")
 
 
 _CLOCK: dict = {}
