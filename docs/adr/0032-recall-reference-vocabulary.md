@@ -131,8 +131,9 @@ unassigned remainder. Topic frames and ledger counts do not add mass.
 
 1. Select the producer condition and apply the timing amendment's run rule. As in ADR 0031
    §3, sample by word onset and named nesting policy. Under innermost nesting, distinct
-   observations tied for the shortest support make the row unavailable. Reply order has no
-   role.
+   observations tied for the fewest covered inventory word cells make the row unavailable.
+   FilmFestival pointing uses that cell count; reply order has no role. This does not change
+   ADR 0031's held-level UTF-16 support policy.
 2. Average distinct reference and state samples, once per sample. A weight-one work reference
    and one state contribute one half each. A state contributes unit mass before averaging.
 3. Under the case-study allocation rule, a single moment spreads uniformly over its units.
@@ -176,8 +177,10 @@ difference for every other row. Aggregate counts are supporting evidence.
   reference keeps a missing weight unavailable. (`H/ff_producer.py:880–889`)
 - **Missing pass-2 replies.** The harness leaves words uncovered. Preserve the processing
   outcome and account for any row absence it causes. (`H/ff_producer.py:982–985`)
-- **Innermost ties.** The first reply wins in the harness. Refuse ambiguous selections and
-  require an explicit pre-freeze disposition. (`H/ff_producer.py:1055–1060`)
+- **Innermost ties.** The corrected converter at `b6a11ebaa` selects the fewest covered
+  inventory word cells and makes equal minima unavailable. The pinned historical replay profile
+  retains first-reply selection; report it as a historical behavior, not the converter's current
+  rule. (`H/ff_producer.py:1055–1060`)
 - **Cross-scene broad mass.** Preserve the current scene-set key and its distinct mass in
   parity. The earlier work-level allocation remains a separate replay rule.
   (`H/projections.py:168–177`)

@@ -84,7 +84,9 @@ value the projection actually receives. This replay needs no Sherlock intake cha
 **V11. Pointing rows and the run rule.** `align`. One condition per series. Test exact keys and
 masses for a single moment across unequal-duration units, a joint moment, a broad moment
 within one scene, a multi-scene set, the work fallback, and a work or position with a state.
-Test distinct-sample averaging, a reply-order-invariant tie, and absent mass on a partial
+Test distinct-sample averaging and synthetic overlapping references with equal covered-cell
+counts but different character lengths in both reply orders: the equal minimum is unavailable;
+a uniquely shorter covered-cell reference is the positive control. Test absent mass on a partial
 assignment. Admit bins containing entire runs or excluding them and refuse a bin boundary
 strictly inside a run that splits its onsets. Refuse undeclared timing and admit the measured
 control. This is an in-memory projection, without wire or scorer work.
