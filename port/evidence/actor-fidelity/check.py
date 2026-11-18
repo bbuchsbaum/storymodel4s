@@ -1,12 +1,28 @@
 """Build the fixed-reference actor contrast and replay a separately recorded machine reading."""
 import argparse
-from collections import Counter
 import json
-from pathlib import Path
 import random
+from collections import Counter
+from pathlib import Path
 
-from storymodel import fidelity_prompt, make_account, prepare_fidelity, resolve_fidelity, verify_fidelity
-from storymodel.model import Binding, Detail, Document, Hypothesis, Inventory, Reference, Span, Support, Unit
+from storymodel import (
+    fidelity_prompt,
+    make_account,
+    prepare_fidelity,
+    resolve_fidelity,
+    verify_fidelity,
+)
+from storymodel.model import (
+    Binding,
+    Detail,
+    Document,
+    Hypothesis,
+    Inventory,
+    Reference,
+    Span,
+    Support,
+    Unit,
+)
 from storymodel.serialization import canonical
 
 HERE = Path(__file__).resolve().parent
@@ -28,18 +44,32 @@ def packet(source_rows, target_index, recall_text):
         return Support(document=doc.id, spans=(Span(start=offset, end=offset + len(text)),))
 
     scene = Unit(kind="scene", support=support(source, 0, source.text))
-    rows = tuple(Unit(kind="row", parent=scene.id, support=support(source, start, text))
-                 for start, text in zip((0, len(source_rows[0]) + 1), source_rows, strict=True))
+    rows = tuple(
+        Unit(kind="row", parent=scene.id, support=support(source, start, text))
+        for start, text in zip((0, len(source_rows[0]) + 1), source_rows, strict=True)
+    )
     unit = Unit(kind="recall", support=support(recall, 0, recall.text))
-    detail = Detail(unit=unit.id, kind="participant", content=recall.text,
-                    support=unit.support, address="target")
+    detail = Detail(
+        unit=unit.id,
+        kind="participant",
+        content=recall.text,
+        support=unit.support,
+        address="target",
+    )
     target = rows[target_index]
-    reference = Reference(status="attempted", outcome="resolved", hypotheses=(
-        Hypothesis(kind="single", targets=(target.id,)),))
-    account = make_account((source, recall), units=(scene, *rows, unit), details=(detail,),
-                           inventories=(Inventory(unit=unit.id, status="completed"),),
-                           bindings=(Binding(detail=detail.id, reference=reference),),
-                           export_permission="allowed")
+    reference = Reference(
+        status="attempted",
+        outcome="resolved",
+        hypotheses=(Hypothesis(kind="single", targets=(target.id,)),),
+    )
+    account = make_account(
+        (source, recall),
+        units=(scene, *rows, unit),
+        details=(detail,),
+        inventories=(Inventory(unit=unit.id, status="completed"),),
+        bindings=(Binding(detail=detail.id, reference=reference),),
+        export_permission="allowed",
+    )
     return prepare_fidelity(account, unit.id), source
 
 
@@ -91,10 +121,16 @@ def score(path):
             assessment["severity"] = r["severity"]
         if r.get("evidence_span") is not None:
             span = Span.model_validate(r["evidence_span"])
-            assessment["evidence"] = [dict(document=document.id, span=span.model_dump(),
-                                           text=span.slice(document.text))]
-        raw = canonical(dict(schema_version="storymodel.fidelity-proposal/v1",
-                             packet_sha256=key, assessments=[assessment]))
+            assessment["evidence"] = [
+                dict(document=document.id, span=span.model_dump(), text=span.slice(document.text))
+            ]
+        raw = canonical(
+            dict(
+                schema_version="storymodel.fidelity-proposal/v1",
+                packet_sha256=key,
+                assessments=[assessment],
+            )
+        )
         replay = resolve_fidelity(request, raw)
         verify_fidelity(request, raw, replay)
         before, after = request.account, replay.account
@@ -108,10 +144,13 @@ def score(path):
         counts[condition][outcome] += 1
         if outcome in GROUPS[condition]:
             recovered[condition].add(event)
-    return dict(outcomes=counts, correct={k: len(v) for k, v in recovered.items()},
-                complete_triplets=len(set.intersection(*recovered.values())),
-                scene_only_always_supported=sum(v[-1] == "stated" for v in trials.values()),
-                total=len(trials))
+    return dict(
+        outcomes=counts,
+        correct={k: len(v) for k, v in recovered.items()},
+        complete_triplets=len(set.intersection(*recovered.values())),
+        scene_only_always_supported=sum(v[-1] == "stated" for v in trials.values()),
+        total=len(trials),
+    )
 
 
 if __name__ == "__main__":
