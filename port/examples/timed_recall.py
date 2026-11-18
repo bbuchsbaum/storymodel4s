@@ -19,8 +19,10 @@ from storymodel.source_grid import (
     LocalScoreGridQuery,
     SourceGridQuery,
     SupportDeclaration,
+    TransportGridQuery,
     project_source_grid,
 )
+from storymodel.transport import TransportSpec
 
 
 def _query(plan: Path) -> RecordingQuery:
@@ -120,7 +122,27 @@ def run(destination: Path) -> None:
             scores = project_source_grid(plan, local_query)
             export_supported_account(destination / "local-source.json", replay.source.account)
             export_supported_account(destination / "local-recall.json", replay.recall.account)
+            # Hold the comparison population fixed at the same six row candidates.
+            transport_spec = TransportSpec(
+                units=tuple(
+                    selected.model_copy(update={"targets": scores.reference.universe})
+                    for selected in reference.evidence.units
+                )
+            )
+            transport_query = TransportGridQuery(
+                transport=transport_spec,
+                selection=local_query.selection,
+                axis=axis,
+                bins=local_query.bins,
+                declarations=local_query.declarations,
+                exposure=exposure_query,
+            )
+            transported = project_source_grid(plan, transport_query)
             for filename, artifact in (
+                ("transport-spec.json", transport_spec),
+                ("transport.json", transported.transport),
+                ("transport-grid-query.json", transport_query),
+                ("transport-grid.json", transported),
                 ("local-reference-spec.json", reference),
                 ("local-reference.json", scores.reference),
                 ("local-score-grid-query.json", local_query),

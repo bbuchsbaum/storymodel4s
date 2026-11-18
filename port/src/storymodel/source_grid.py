@@ -1,9 +1,11 @@
 """Project an account posterior onto declared source-time supports and a recall window."""
 
 from collections import defaultdict
+from collections.abc import Iterable, Iterator
+from dataclasses import dataclass
 from fractions import Fraction
 from pathlib import Path
-from typing import Literal, Self, overload
+from typing import Literal, Self, TypedDict, overload
 
 from pydantic import Field, model_validator
 
@@ -29,6 +31,7 @@ from .serialization import digest
 from .sherlock_composition import _derive, _native_row_supports
 from .sherlock_source import SherlockSource
 from .source_transitions import SourceProjection
+from .transport import TransportAlignment, TransportSpec, align_transport
 
 
 class SupportDeclaration(Model):
@@ -83,6 +86,15 @@ class LocalScoreGridQuery(_GridGeometry):
         return self
 
 
+class TransportGridQuery(_GridGeometry):
+    """Project the achieved source mass of an account transport plan into film coordinates."""
+
+    schema_version: Literal["storymodel.transport-grid-query/v1"] = (
+        "storymodel.transport-grid-query/v1"
+    )
+    transport: TransportSpec
+
+
 class TargetDomain(Model):
     """The actual target geometry and the result of applying its declared allocation."""
 
@@ -127,11 +139,20 @@ class SourceLedger(Model):
     allocated_outside: Fraction
 
 
+type _RowStatus = Literal[
+    "computed",
+    "outside-inference-selection",
+    "local-reference-unavailable",
+    "no-transport-candidates",
+    "transport-iteration-limit",
+]
+
+
 class UnitSourceGrid(Model):
     """Sparse bins; absent bins have zero mass in a computed row."""
 
     unit: Name
-    status: Literal["computed", "outside-inference-selection", "local-reference-unavailable"]
+    status: _RowStatus
     ledger: SourceLedger | None
     cells: dict[int, GridQuantity] | None
     duration_seconds: Fraction | None
@@ -164,6 +185,15 @@ class LocalScoreGrid(_GridReadout):
     reference: LocalReferenceResult
 
 
+class TransportGrid(_GridReadout):
+    """Transported mass and declared budgets with the fitted baseline and optional exposure."""
+
+    schema_version: Literal["storymodel.transport-grid/v1"] = "storymodel.transport-grid/v1"
+    measure: Literal["transport-mass"] = "transport-mass"
+    query: TransportGridQuery
+    transport: TransportAlignment
+
+
 def _source_geometry(
     replay: AnalysisReplay, query: _GridGeometry
 ) -> tuple[MediaSource | PlaybackComposition, dict[str, PlaybackSupport]]:
@@ -189,20 +219,26 @@ def _source_geometry(
 
 
 def _project_mass(
-    weights: tuple[tuple[SequenceState, Fraction], ...],
+    weights: Iterable[tuple[SequenceState | str, Fraction]],
     projected: dict[str, BinProjection],
+    row_budget: Fraction = Fraction(1),
 ) -> tuple[SourceLedger, dict[int, GridQuantity]]:
     """Project each admitted state independently, retaining its original posterior weight."""
-    allocated = unallocated = unresolved = outside = Fraction()
+    supplied = allocated = unallocated = unresolved = outside = Fraction()
     external: dict[str, Fraction] = defaultdict(Fraction)
     amounts: dict[int, Fraction] = defaultdict(Fraction)
     lower: dict[int, Fraction] = defaultdict(Fraction)
     upper: dict[int, Fraction] = defaultdict(Fraction)
     for state, mass in weights:
-        if state.external is not None:
-            external[state.external] += mass
-            continue
-        grid = projected.get(state.anchor) if state.anchor is not None else None
+        supplied += mass
+        if isinstance(state, SequenceState):
+            if state.external is not None:
+                external[state.external] += mass
+                continue
+            target = state.anchor
+        else:
+            target = state
+        grid = projected.get(target) if target is not None else None
         if grid is None:
             unresolved += mass
             continue
@@ -220,8 +256,8 @@ def _project_mass(
             if cell.fraction is not None:
                 amounts[bin_index] += mass * cell.fraction
     ledger = SourceLedger(
-        supplied=sum((w for _, w in weights), Fraction()),
-        row_budget=Fraction(1),
+        supplied=supplied,
+        row_budget=row_budget,
         allocated_source=allocated,
         support_without_allocation=unallocated,
         unavailable_location=unresolved,
@@ -294,62 +330,69 @@ def _target_domains(
     return domains
 
 
-type _Weights = tuple[tuple[SequenceState, Fraction], ...]
+@dataclass(frozen=True)
+class _MeasureRow:
+    unit: str
+    status: _RowStatus
+    weights: Iterable[tuple[SequenceState | str, Fraction]] | None
+    budget: Fraction = Fraction(1)
 
 
-def _posterior_weights(
+def _posterior_rows(
     inference: RefinedAccountInference | AccountInferenceResult,
-) -> dict[str, _Weights | None]:
-    weights: dict[str, _Weights | None] = {}
+) -> Iterator[_MeasureRow]:
     for row, posterior in zip(
         inference.evidence.sequence.request.rows, inference.inference.posterior, strict=True
     ):
         states = {c.state.id: c.state for c in row.costs}
-        weights[row.unit] = tuple(
-            (states[m.state], Fraction(m.probability)) for m in posterior.mass
+        yield _MeasureRow(
+            row.unit,
+            "computed",
+            tuple((states[m.state], Fraction(m.probability)) for m in posterior.mass),
         )
-    return weights
 
 
-def _place_units(
-    units: tuple[str, ...],
-    weights: dict[str, _Weights | None],
-    durations: dict[str, Fraction],
-    domains: dict[str, TargetDomain],
-) -> tuple[UnitSourceGrid, ...]:
-    projected = {t: d.projection for t, d in domains.items() if d.projection is not None}
-    rows = []
-    for unit in (*weights, *(u for u in units if u not in weights)):
-        mass = weights.get(unit)
-        duration = durations.get(unit)
-        if mass is None:
-            rows.append(
-                UnitSourceGrid(
-                    unit=unit,
-                    status="local-reference-unavailable"
-                    if unit in weights
-                    else "outside-inference-selection",
-                    ledger=None,
-                    cells=None,
-                    duration_seconds=duration,
-                    weighted_seconds=None,
-                )
+def _score_rows(reference: LocalReferenceResult) -> Iterator[_MeasureRow]:
+    for row in reference.rows:
+        if row.status == "computed":
+            yield _MeasureRow(
+                row.unit, "computed", tuple((m.state, Fraction(m.weight)) for m in row.mass)
             )
         else:
-            ledger, cells = _project_mass(mass, projected)
-            rows.append(
-                UnitSourceGrid(
-                    unit=unit,
-                    status="computed",
-                    ledger=ledger,
-                    cells=cells,
-                    duration_seconds=duration,
-                    weighted_seconds={i: q.scaled(duration) for i, q in cells.items() if duration}
-                    if duration is not None
-                    else None,
-                )
+            yield _MeasureRow(row.unit, "local-reference-unavailable", None)
+
+
+def _transport_rows(plan: TransportAlignment) -> Iterator[_MeasureRow]:
+    for i, row in enumerate(plan.retrieval):
+        if plan.scaling is None:
+            yield _MeasureRow(row.unit, "no-transport-candidates", None)
+        else:
+            yield _MeasureRow(
+                row.unit,
+                "computed" if plan.scaling.converged else "transport-iteration-limit",
+                ((anchor, Fraction(mass)) for anchor, mass in plan.iter_row(i)),
+                Fraction(plan.row_targets[i]),
             )
-    return tuple(rows)
+
+
+def _include_unselected(
+    measures: Iterable[_MeasureRow], units: Iterable[str]
+) -> Iterator[_MeasureRow]:
+    selected = set()
+    for row in measures:
+        selected.add(row.unit)
+        yield row
+    for unit in units:
+        if unit not in selected:
+            yield _MeasureRow(unit, "outside-inference-selection", None)
+
+
+class _GridFields(TypedDict):
+    analysis_sha256: Digest
+    axis: MediaSource | PlaybackComposition
+    exposure: RecallExposure | None
+    domains: dict[str, TargetDomain]
+    rows: tuple[UnitSourceGrid, ...]
 
 
 @overload
@@ -360,11 +403,17 @@ def project_source_grid(plan_path: Path, query: SourceGridQuery) -> SourceGrid: 
 def project_source_grid(plan_path: Path, query: LocalScoreGridQuery) -> LocalScoreGrid: ...
 
 
+@overload
+def project_source_grid(plan_path: Path, query: TransportGridQuery) -> TransportGrid: ...
+
+
 def project_source_grid(
-    plan_path: Path, query: SourceGridQuery | LocalScoreGridQuery
-) -> SourceGrid | LocalScoreGrid:
-    """Replay both accounts and project the selected measure without changing its denominator."""
-    if isinstance(query, LocalScoreGridQuery):
+    plan_path: Path, query: SourceGridQuery | LocalScoreGridQuery | TransportGridQuery
+) -> SourceGrid | LocalScoreGrid | TransportGrid:
+    """Replay both accounts and project the selected measure with its own mass and budget."""
+    if isinstance(query, TransportGridQuery):
+        query = _validate_instance(TransportGridQuery, query)
+    elif isinstance(query, LocalScoreGridQuery):
         query = _validate_instance(LocalScoreGridQuery, query)
     else:
         query = _validate_instance(SourceGridQuery, query)
@@ -376,52 +425,74 @@ def project_source_grid(
         end=tick(axis.end_tick),
     )
     recall = _recall_before_pairing(replay)
-    reference = None
-    inference = None
-    if isinstance(query, LocalScoreGridQuery):
-        reference = local_reference(replay.source.account, recall, query.reference)
-        weights: dict[str, _Weights | None] = {
-            row.unit: tuple((m.state, Fraction(m.weight)) for m in row.mass)
-            if row.status == "computed"
-            else None
-            for row in reference.rows
-        }
-        projection = reference.projection
-    else:
-        inference = _resolve_account_inference(replay.source.account, recall, query.inference, None)
-        weights = _posterior_weights(inference)
-        projection = inference.evidence.sequence.projection
-
-    targets = {s.anchor for row in weights.values() if row for s, _ in row if s.anchor is not None}
-    domains = _target_domains(projection, targets, query, index, supports)
     exposure = _exposure_from_replay(replay, query.exposure) if query.exposure is not None else None
     durations = (
         {r.inventory.unit: Fraction(r.duration_seconds) for r in exposure.units} if exposure else {}
     )
-    rows = _place_units(
-        tuple(u.id for u in recall.units if u.kind == "recall"), weights, durations, domains
-    )
-    analysis_sha256 = (
-        exposure.analysis_sha256 if exposure else digest(replay.model_dump(mode="json"))
-    )
-    if isinstance(query, LocalScoreGridQuery):
-        assert reference is not None
-        return LocalScoreGrid(
-            query=query,
-            reference=reference,
-            analysis_sha256=analysis_sha256,
+
+    def place(
+        projection: SourceProjection, targets: set[str], measures: Iterable[_MeasureRow]
+    ) -> _GridFields:
+        domains = _target_domains(projection, targets, query, index, supports)
+        projected = {t: d.projection for t, d in domains.items() if d.projection is not None}
+        rows = []
+        for entry in _include_unselected(
+            measures, (u.id for u in recall.units if u.kind == "recall")
+        ):
+            duration = durations.get(entry.unit)
+            ledger, cells = (
+                _project_mass(entry.weights, projected, entry.budget)
+                if entry.weights is not None
+                else (None, None)
+            )
+            rows.append(
+                UnitSourceGrid(
+                    unit=entry.unit,
+                    status=entry.status,
+                    ledger=ledger,
+                    cells=cells,
+                    duration_seconds=duration,
+                    weighted_seconds={i: q.scaled(duration) for i, q in cells.items() if duration}
+                    if duration is not None and cells is not None
+                    else None,
+                )
+            )
+        return _GridFields(
+            analysis_sha256=exposure.analysis_sha256
+            if exposure
+            else digest(replay.model_dump(mode="json")),
             axis=axis,
             exposure=exposure,
             domains=domains,
-            rows=rows,
+            rows=tuple(rows),
         )
-    assert inference is not None
+
+    if isinstance(query, TransportGridQuery):
+        plan = align_transport(replay.source.account, recall, query.transport)
+        return TransportGrid(
+            query=query,
+            transport=plan,
+            **place(plan.projection, set(plan.columns), _transport_rows(plan)),
+        )
+    if isinstance(query, LocalScoreGridQuery):
+        reference = local_reference(replay.source.account, recall, query.reference)
+        targets = {
+            m.state.anchor for row in reference.rows for m in row.mass if m.state.anchor is not None
+        }
+        return LocalScoreGrid(
+            query=query,
+            reference=reference,
+            **place(reference.projection, targets, _score_rows(reference)),
+        )
+    inference = _resolve_account_inference(replay.source.account, recall, query.inference, None)
+    targets = {
+        c.state.anchor
+        for r in inference.evidence.sequence.request.rows
+        for c in r.costs
+        if c.state.anchor is not None
+    }
     return SourceGrid(
         query=query,
         inference=inference,
-        analysis_sha256=analysis_sha256,
-        axis=axis,
-        exposure=exposure,
-        domains=domains,
-        rows=rows,
+        **place(inference.evidence.sequence.projection, targets, _posterior_rows(inference)),
     )

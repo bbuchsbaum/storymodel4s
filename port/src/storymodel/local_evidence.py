@@ -705,18 +705,25 @@ def _content_table(
     return read_unit
 
 
-def _price_account_rows(
+@dataclass(frozen=True)
+class _AccountContent:
+    projection: SourceProjection
+    targets: dict[str, _Content]
+    members: dict[str, tuple[str, ...]]
+    units: dict[str, tuple[_Content, str | None]]
+    table: dict[str, dict[str, SemanticEstimate]]
+
+
+def _prepare_account_content(
     source: SupportedAccount,
     recall: SupportedAccount,
     spec: LocalEvidenceSpec,
     unit_memberships: dict[str, str | None] | None = None,
-    reference: _ReferencePolicy | None = None,
-) -> _PricedRows:
-    """Construct unit content and all admitted state prices before any sequence operations."""
+) -> _AccountContent:
+    """Resolve actual account occurrences and their scoring content before selecting a method."""
     projection, anchor_supports = _project_source_and_supports(source, spec.projection)
     if not recall.documents or any(d.side != "recall" for d in recall.documents):
         raise ValueError("local evidence requires an independent recall-only account")
-    nodes = {n.anchor: n for n in projection.nodes}
     source_situations = {s.id: s for s in source._situations()}
     source_docs = {d.id: d.text for d in source.documents}
     source_labels = {e.id: e.label for e in source.entities}
@@ -757,21 +764,6 @@ def _price_account_rows(
             token for _, names in participants for name in names for token in stem_set(name)
         )
         targets[segment_id] = _Content(None, participants, "narrated", "unknown", "unknown", lemmas)
-    inverted: dict[tuple[int, str, str], list[str]] = defaultdict(list)
-    cut: dict[str, _Content] = {}
-    if reference is None:
-        for anchor, content in targets.items():
-            for key in _query(content):
-                inverted[key].append(anchor)
-    else:
-        cut = {
-            node.anchor: targets[node.anchor]
-            for node in projection.nodes
-            if node.level == reference.level
-        }
-        if not cut:
-            raise ValueError("local reference requires a nonempty source level cut")
-    postings = {key: tuple(sorted(values)) for key, values in inverted.items()}
     recall_units = {u.id: u for u in recall.units if u.kind == "recall"}
     recall_situations = {s.id: s for s in recall._situations()}
     recall_docs = {d.id: d.text for d in recall.documents}
@@ -797,8 +789,6 @@ def _price_account_rows(
         semantic_table[cell_input.unit][cell_input.target] = cell_input.estimate
     if any(c.unit not in selected_units or c.target not in targets for c in spec.semantic_cells):
         raise ValueError("semantic cell is outside selected units or source anchors")
-    retrieval, cells, rows = [], [], []
-    max_level = max((n.level for n in projection.nodes), default=0)
     unit_content: dict[str, tuple[_Content, str | None]] = {}
     for selected in spec.units:
         unit = recall_units.get(selected.unit)
@@ -852,6 +842,41 @@ def _price_account_rows(
         )
         unit_content[unit.id] = content, situation.id if situation else None
 
+    return _AccountContent(projection, targets, leaves, unit_content, semantic_table)
+
+
+def _candidate_postings(
+    targets: dict[str, _Content],
+) -> dict[tuple[int, str, str], tuple[str, ...]]:
+    inverted: dict[tuple[int, str, str], list[str]] = defaultdict(list)
+    for anchor, content in targets.items():
+        for key in _query(content):
+            inverted[key].append(anchor)
+    return {key: tuple(sorted(values)) for key, values in inverted.items()}
+
+
+def _price_account_rows(
+    source: SupportedAccount,
+    recall: SupportedAccount,
+    spec: LocalEvidenceSpec,
+    unit_memberships: dict[str, str | None] | None = None,
+    reference: _ReferencePolicy | None = None,
+) -> _PricedRows:
+    """Construct unit content and all admitted state prices before any sequence operations."""
+    prepared = _prepare_account_content(source, recall, spec, unit_memberships)
+    projection, targets = prepared.projection, prepared.targets
+    unit_content, semantic_table = prepared.units, prepared.table
+    nodes = {n.anchor: n for n in projection.nodes}
+    max_level = max((n.level for n in projection.nodes), default=0)
+    cut: dict[str, _Content] = {}
+    postings = {}
+    if reference is not None:
+        cut = {n.anchor: targets[n.anchor] for n in projection.nodes if n.level == reference.level}
+        if not cut:
+            raise ValueError("local reference requires a nonempty source level cut")
+    elif any(u.targets is None for u in spec.units):
+        postings = _candidate_postings(targets)
+    retrieval, cells, rows = [], [], []
     content_table = None
     if reference is not None and spec.semantic == "table":
         # Scores must depend only on content available to this scorer. Repeated
@@ -860,7 +885,7 @@ def _price_account_rows(
             anchor: (
                 content,
                 nodes[anchor].kind,
-                frozenset(Counter(targets[m] for m in under(anchor)).items())
+                frozenset(Counter(targets[m] for m in prepared.members[anchor]).items())
                 if nodes[anchor].kind == "segment"
                 else frozenset(),
             )
@@ -905,7 +930,7 @@ def _price_account_rows(
                         ),
                         facets=cs,
                     )
-                    for member in under(anchor)
+                    for member in prepared.members[anchor]
                     for cs in [_contradictions(content, targets[member])]
                 )
                 engaged = [gate for gate in gates if gate.engaged]

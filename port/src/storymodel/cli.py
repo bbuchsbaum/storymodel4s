@@ -183,7 +183,12 @@ from .sherlock_recall import (
 )
 from .sherlock_source import SherlockSource, prepare_sherlock_source
 from .source import SourceRow, prepare_source
-from .source_grid import LocalScoreGridQuery, SourceGridQuery, project_source_grid
+from .source_grid import (
+    LocalScoreGridQuery,
+    SourceGridQuery,
+    TransportGridQuery,
+    project_source_grid,
+)
 from .source_transitions import (
     SourceSequenceResult,
     SourceSequenceSpec,
@@ -204,6 +209,7 @@ from .study_workflow import (
     replay_time_study,
     strict_json,
 )
+from .transport import TransportSpec, align_transport, verify_transport
 
 
 def emit(value: Any, output: str | None) -> None:
@@ -397,7 +403,7 @@ def main(argv: list[str] | None = None) -> int:
         ("verify-timed-recall", "recompute a saved timed recall result"),
         (
             "source-time-grid",
-            "project a sequence posterior or independent local scores into source-time bins",
+            "project an account measure into source-time bins",
         ),
         ("verify-source-time-grid", "recompute a saved source-time grid"),
         ("recall-exposure", "measure unit durations from word intervals on a recording"),
@@ -838,6 +844,8 @@ def main(argv: list[str] | None = None) -> int:
         ("derive-local-evidence", "derive account evidence and costs"),
         ("infer-accounts", "run sequence inference on account evidence"),
         ("verify-account-inference", "verify a saved sequence inference result"),
+        ("align-transport", "fit the unbalanced semantic transport baseline"),
+        ("verify-transport", "verify a saved account transport plan"),
         ("local-reference", "normalize independently measured costs on a declared source level"),
         ("verify-local-reference", "verify local score mass against both original accounts"),
     ):
@@ -1029,6 +1037,8 @@ def main(argv: list[str] | None = None) -> int:
             "verify-account-inference",
             "local-reference",
             "verify-local-reference",
+            "align-transport",
+            "verify-transport",
         ):
             local_source = read_supported_account(
                 Path(args.source), expected_sha256=args.source_sha256
@@ -1041,7 +1051,19 @@ def main(argv: list[str] | None = None) -> int:
             )
             if exporting and local_recall.export_permission != "allowed":
                 raise PermissionError("producer denies recall inference export")
-            if args.command in ("local-reference", "verify-local-reference"):
+            if args.command in ("align-transport", "verify-transport"):
+                transport_spec = TransportSpec.model_validate_json(
+                    canonical(strict_json(Path(args.spec).read_bytes()))
+                )
+                if exporting:
+                    fitted = align_transport(local_source, local_recall, transport_spec)
+                    emit(fitted.model_dump(mode="json"), args.output)
+                else:
+                    checked_transport = verify_transport(
+                        local_source, local_recall, transport_spec, Path(args.result).read_bytes()
+                    )
+                    emit({"valid": True, "source_sha256": checked_transport.source_sha256}, None)
+            elif args.command in ("local-reference", "verify-local-reference"):
                 ref_spec = LocalReferenceSpec.model_validate_json(
                     canonical(strict_json(Path(args.spec).read_bytes()))
                 )
@@ -1658,11 +1680,14 @@ def main(argv: list[str] | None = None) -> int:
                 emit(feature_result, args.output)
         elif args.command in ("source-time-grid", "verify-source-time-grid"):
             grid_input = strict_json(Path(args.query).read_bytes())
-            grid_schema = (
-                LocalScoreGridQuery
-                if isinstance(grid_input, dict) and "reference" in grid_input
-                else SourceGridQuery
-            )
+            if isinstance(grid_input, dict) and "transport" in grid_input:
+                grid_schema: type[TransportGridQuery | LocalScoreGridQuery | SourceGridQuery] = (
+                    TransportGridQuery
+                )
+            elif isinstance(grid_input, dict) and "reference" in grid_input:
+                grid_schema = LocalScoreGridQuery
+            else:
+                grid_schema = SourceGridQuery
             grid_result = project_source_grid(
                 Path(args.plan), grid_schema.model_validate_json(canonical(grid_input))
             )
