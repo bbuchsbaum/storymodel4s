@@ -75,12 +75,13 @@ def utf16(text):
     return len(text.encode("utf-16-le")) // 2
 
 
-def normalize(directory):
+def normalize(directory, cases=None, arms=ARMS):
     from storymodel.model import Span
 
-    cases = trials()
+    if cases is None:
+        cases = trials()
     readings = {}
-    for arm in ARMS:
+    for arm in arms:
         answers = json.loads((directory / (arm + "-answers.json")).read_text())
         for answer in answers:
             key, choice, quote = (answer[k] for k in ("id", "choice", "quote"))
