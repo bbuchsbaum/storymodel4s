@@ -901,5 +901,28 @@ This measures the declared workload on one machine.
 Installed API and CLI artifacts matched byte for byte. The CLI exported the original
 base request, and replay verification rejected an edited policy. At commit `14de29ca8`
 all 1,134 Python tests passed in 65.95 seconds. Ruff, mypy and independent code review
-passed. Existing organization and reconstruction commands still consume baseline account
-inference. Passing a verified refined posterior into these readouts is the next step.
+passed.
+
+### Organization and reconstruction consume refined inference
+
+At `5dcff403d` both account commands accept the original or refined inference spec.
+Reconstruction consumes the final unit marginals. Organization consumes final adjacent
+flow and collapses fidelity modes to destinations. The v2 outputs embed all original
+evidence, the refinement policy and the final model. Supplied inference is verified by
+recomputation before either readout. The installed wheel reproduced the API output bytes
+both with and without the saved inference. The ten baseline example artifacts reproduced
+their pre-change bytes. [Example and CLI commands](refinement.md#read-the-refined-alignment)
+
+With a stay weight of 3, the coupled synthetic example gave a forward probability of
+0.0244114. Replacing the adjacent joint with marginal products in a temporary copy
+produced 0.159051. The forward-probability assertion failed and its two siblings passed.
+The full Python suite passed 1,137 tests, and lint and type checking passed. Independent
+review of the implementation commit also checked cross-family substitution, changed
+accounts, and agreement with the baseline at zero passes.
+
+The next temporal workflow is exposure per recall unit in a declared recording window.
+Scala's `TemporalExposure.checked` and `TemporalProjection.exposure` bind a mapping
+to the timing inventory and clock. `TemporalQuerySuite` distinguishes uncovered time,
+within-unit overlap, between-unit sharing, onset-only events and failed processing.
+Python's `timed_recall` and interval allocator already serve detail-level queries.
+A checked mapping-to-unit exposure readout is still owed.
