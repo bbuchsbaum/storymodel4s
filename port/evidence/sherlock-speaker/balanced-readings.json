@@ -1,0 +1,454 @@
+{
+  "01af1dbc7f4f03b1": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 41,
+      "start": 19
+    },
+    "text_sha256": "df4d4eab3da994905364fe6bb163ea995971888471ff4c7bda97c9df5cb90e94"
+  },
+  "08c4a7552c6dece4": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 101,
+      "start": 62
+    },
+    "text_sha256": "b9d755aa56fc484bda37332d859adf574b102e69b4ec942964a6c42a06708bdc"
+  },
+  "0c4da14439aae4d8": {
+    "choice": null,
+    "evidence": null,
+    "text_sha256": "c7016f3f9fed8bb0b5a103bdd303631222d25bc6384da763530b49ab0e72ab58"
+  },
+  "1a8022917f8054d9": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 43,
+      "start": 0
+    },
+    "text_sha256": "59cb9c9c12175dd921334a923b47fcab8072c3d7f35399e71f0fd6c9d2fe27a5"
+  },
+  "1e9b58ac2f6ad344": {
+    "choice": "John",
+    "evidence": {
+      "end": 68,
+      "start": 0
+    },
+    "text_sha256": "b2cbd6614374f8406e8f6bb85baf341caeb89d8ba6cebe1df855ba2279ca44cc"
+  },
+  "231796e95bafe43b": {
+    "choice": "John",
+    "evidence": {
+      "end": 44,
+      "start": 0
+    },
+    "text_sha256": "f29a6b21a83fed4b8a367798b67af9a7bc8950fb7203104a8fd80cb36c8bc6ca"
+  },
+  "25add58afc5eee7f": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 44,
+      "start": 0
+    },
+    "text_sha256": "1194f94164ea146859cf72a1ac82ff2b71c52b499ee7f452de7f17556a4145b7"
+  },
+  "2b979eb9fa80fbce": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 132,
+      "start": 38
+    },
+    "text_sha256": "57b44de9f8fca192ceeb04193e3d4c27b798d23056e114cdfcd4de6769449c56"
+  },
+  "2d5d3532598c2a35": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 108,
+      "start": 68
+    },
+    "text_sha256": "c535ebcd83c299da89c8505f63d387b0f64f6468bf58ca02c0a4c09715800933"
+  },
+  "2e2c046a2b171869": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 206,
+      "start": 149
+    },
+    "text_sha256": "5433c774eb11d7aafd7b1ed3485ce04eb3900ccb9e6f065c9d81defb0e4bb316"
+  },
+  "31d6c507cf6973b7": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 157,
+      "start": 41
+    },
+    "text_sha256": "1607afcd22968422bb455d4ecde5f0e3d7dbdb41fcf9fcc8d83ba72b4c8c40c2"
+  },
+  "32076ea3f6c468ce": {
+    "choice": "John",
+    "evidence": {
+      "end": 155,
+      "start": 110
+    },
+    "text_sha256": "393b7f108c73a1741132529c8b34c7ecc7824bf8d6774c9e6866a4813bfd63eb"
+  },
+  "327f3e006406d3ee": {
+    "choice": "John",
+    "evidence": {
+      "end": 25,
+      "start": 0
+    },
+    "text_sha256": "dd08656f252aa5e26364150ea198536666d0236c2b8a1dee9b321f54e25c1cd2"
+  },
+  "339133e4090146b4": {
+    "choice": "John",
+    "evidence": {
+      "end": 60,
+      "start": 0
+    },
+    "text_sha256": "81a3fbe55735dbd055f9046640c1190ab0493d00a76a806a7c70e6b9a3b4f43c"
+  },
+  "3c701b5482e8f2bf": {
+    "choice": "John",
+    "evidence": {
+      "end": 69,
+      "start": 0
+    },
+    "text_sha256": "c248a6ffccfd0af8ca98f325d099f26e5e1b53693c04e059e33802f2bd64429f"
+  },
+  "3ea936efe56de2ad": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 44,
+      "start": 0
+    },
+    "text_sha256": "77df16c8cdebee9f67aa641aa4a4696b53c07d065d504ef42a383a2b83fb90ba"
+  },
+  "3f6d15b2b0327935": {
+    "choice": "John",
+    "evidence": {
+      "end": 91,
+      "start": 40
+    },
+    "text_sha256": "0b614cd2846c99db3a057c5433897ccbdd62754a52b06cc95e74922996978c9b"
+  },
+  "429bc53b3e4f3e5b": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 127,
+      "start": 49
+    },
+    "text_sha256": "6977d7231a244e57bfe8a95ae2e70968ea3032abeb7ae87e5e01bca3649c18c4"
+  },
+  "4b524df3efb782fd": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 94,
+      "start": 23
+    },
+    "text_sha256": "da272861b54a6870f6911045ce4f5e47b464d55f8993283e5a40aaac8f73c23f"
+  },
+  "539b0fa28acf0939": {
+    "choice": "John",
+    "evidence": {
+      "end": 63,
+      "start": 32
+    },
+    "text_sha256": "7f3c35025b1db47333cab6ba19b66e4dbf2fc0aa2feee2acd07093d0cf345111"
+  },
+  "58da2277685ff06b": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 142,
+      "start": 70
+    },
+    "text_sha256": "2b7bf839cb6b680d6244aed708e7ec95f9e6e051dd1ed4c9404c355bdb309240"
+  },
+  "5ad9db53cd669492": {
+    "choice": "John",
+    "evidence": {
+      "end": 68,
+      "start": 0
+    },
+    "text_sha256": "08131ee6c8a609688d675fe06a723693948ec55b212d2217f3eb9e700ce6d5dc"
+  },
+  "6580587fb77aff23": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 107,
+      "start": 40
+    },
+    "text_sha256": "af09cf089c7e83646d807fe5d6422211c034d373bcdc4783378c37b780884c13"
+  },
+  "69c5cb1fdb19d73b": {
+    "choice": "John",
+    "evidence": {
+      "end": 82,
+      "start": 23
+    },
+    "text_sha256": "726a508a61e4851f5b2ddd6c451f006bff16fb714cd8124d277144704c2aa692"
+  },
+  "69f909c155f151ef": {
+    "choice": "John",
+    "evidence": {
+      "end": 52,
+      "start": 0
+    },
+    "text_sha256": "c28f4fd8c5bcdfe966e54a0285be5ced7aafd0950493f22db6cc0c8ec596439c"
+  },
+  "6b8189956c1cc392": {
+    "choice": "John",
+    "evidence": {
+      "end": 67,
+      "start": 51
+    },
+    "text_sha256": "16e52feef8f89344148ca72d66340de89780144782a2e96f9ae6e92dd5308130"
+  },
+  "6bbed071f49bc60f": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 104,
+      "start": 21
+    },
+    "text_sha256": "c111ea658ab8d854ec1be0cfa5b619e2733819145cc31aee451496c4c7c451c9"
+  },
+  "70fd6ec3a940fab4": {
+    "choice": "John",
+    "evidence": {
+      "end": 119,
+      "start": 54
+    },
+    "text_sha256": "a6227867e3e8cfc278215ded60acf0bfb5ed86b1182636cf13a57b086935d211"
+  },
+  "73e01ce01c4cfb6d": {
+    "choice": "John",
+    "evidence": {
+      "end": 86,
+      "start": 0
+    },
+    "text_sha256": "9716c712f2dfcf8a5b7f6968ad032e92211ab70078d12bafdeb29348274da142"
+  },
+  "74c9fb36cdd41109": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 126,
+      "start": 28
+    },
+    "text_sha256": "6b568fc48a9478a0889e6fe328f7630e0fe1b0d395881d293060c6ecd779ab37"
+  },
+  "841e8dc4d6517152": {
+    "choice": "John",
+    "evidence": {
+      "end": 89,
+      "start": 0
+    },
+    "text_sha256": "bd66b78b921725337938185c6a2d95275576a915a800265e7403b6afa7ba5c4d"
+  },
+  "855ae0fbc39dba4a": {
+    "choice": "John",
+    "evidence": {
+      "end": 68,
+      "start": 0
+    },
+    "text_sha256": "5ca0bb3acb8f8314195ba0ed39526d02eeb29bac908c62eceb540acf3ce1f81f"
+  },
+  "8aaf41ded41af9af": {
+    "choice": "John",
+    "evidence": {
+      "end": 65,
+      "start": 0
+    },
+    "text_sha256": "3c646b9a325b7614c229713cd54676c7b8ff9aa90e1949588cf1aaf541d780dc"
+  },
+  "8b6ba2dac8a91724": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 105,
+      "start": 26
+    },
+    "text_sha256": "14628cd57293bdb8a88d8f91f3dbd8d0e16df7b2d1a742b6fd580b803173bd6d"
+  },
+  "8d402244b12198c0": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 98,
+      "start": 62
+    },
+    "text_sha256": "77821f0357373b109b499eb82dc6db5f1465338493eb8c80f8a847bf1355e7eb"
+  },
+  "9139983303af5902": {
+    "choice": "John",
+    "evidence": {
+      "end": 47,
+      "start": 0
+    },
+    "text_sha256": "ebd3705ff08b93c4311158456fdd9ab494b254bab95572043fe1ff9d4c8324a7"
+  },
+  "917b4fe4195814ca": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 151,
+      "start": 37
+    },
+    "text_sha256": "1836609f2211cbdb07aebd7e8c7fffad479e6f873c4b74e2967ff729334eb621"
+  },
+  "9503c5af87b00d0d": {
+    "choice": "John",
+    "evidence": {
+      "end": 51,
+      "start": 0
+    },
+    "text_sha256": "9571c4a6762e6eaae83024275fb92c87f0538523a1ae6ca9315528f85c5de99e"
+  },
+  "95327ed2a6869ff4": {
+    "choice": null,
+    "evidence": null,
+    "text_sha256": "777b9ddb5337ff36663fb317f80836055fe52dd58e1577d05e684ba5875dc6a8"
+  },
+  "99367e49caa34c37": {
+    "choice": "John",
+    "evidence": {
+      "end": 62,
+      "start": 0
+    },
+    "text_sha256": "33dfd38ea663a27fd07ec794c953510cfe86fdeee3f3021e89f03d53ae5c4982"
+  },
+  "9ac602ca6397a99a": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 134,
+      "start": 49
+    },
+    "text_sha256": "8e324302d87e745593e0929284acaff96b3a8ba1c16ae741c652b2b5751bc0fb"
+  },
+  "a24b0297be0eca09": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 89,
+      "start": 39
+    },
+    "text_sha256": "c778331a86efdfd21e28c3d19ec48f8f538d0f9ba6152a00a33f69a97b9a549d"
+  },
+  "a7d6e790c9b64fe5": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 66,
+      "start": 26
+    },
+    "text_sha256": "ded23f467c228ad8ce0356cd0dabcb514332d417bc834598aae3e049ab2bb544"
+  },
+  "a9c6becd7edd642f": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 47,
+      "start": 0
+    },
+    "text_sha256": "d4666522f1e9b08acd66886d0da0ca212e44f7eeb5a514ced2c6086fef2bec54"
+  },
+  "bcb9c046bdb613f1": {
+    "choice": "John",
+    "evidence": {
+      "end": 39,
+      "start": 0
+    },
+    "text_sha256": "f4256dbff8d5c821f6c685f4fbf95d614dc2a62b59438b373ec836f227947ba4"
+  },
+  "ce462c01a3514784": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 123,
+      "start": 35
+    },
+    "text_sha256": "34672e193cbc2dd1b7ae4b0ea9b08042b9a2dc94e6b81276f87b2ab6cf04c5ed"
+  },
+  "cfe4d746299668f4": {
+    "choice": "John",
+    "evidence": {
+      "end": 21,
+      "start": 0
+    },
+    "text_sha256": "69174d40afb1590d6b9cf8fbeb0eb3f9e1b598e5cdf3126ae1672146b01f67aa"
+  },
+  "d71f8a8b99a60a6b": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 93,
+      "start": 30
+    },
+    "text_sha256": "0eb418b418656bc1f7fd0d0a49ff2626e531584b90ff106b699e5d8f34fc0f33"
+  },
+  "dab121b282d283b9": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 215,
+      "start": 120
+    },
+    "text_sha256": "ca574be8afbff85595f53fb6f43e24341887ba78990dd538a1d2a39f3b65718f"
+  },
+  "de11c8ecb190feaa": {
+    "choice": null,
+    "evidence": null,
+    "text_sha256": "2440e5fc71bcc5897b594b859804bafc5afe2439f6f8d61ccd15f73bead8e172"
+  },
+  "de3020f969459813": {
+    "choice": "John",
+    "evidence": {
+      "end": 31,
+      "start": 0
+    },
+    "text_sha256": "93d816a3bdba494ae654d562023df8a4bde26f8ae67c877d3d8af5e951741c8d"
+  },
+  "ee90e3f7a1312ce5": {
+    "choice": null,
+    "evidence": null,
+    "text_sha256": "7eb90f719340d896f9b215880472dceeed9a9ec437620b74563105e9e230a351"
+  },
+  "eeda7b348cd83d35": {
+    "choice": "John",
+    "evidence": {
+      "end": 77,
+      "start": 0
+    },
+    "text_sha256": "32fde835e256f5262f86a6724c3266db1bc4aeb53119310de0f26d6cdba27af9"
+  },
+  "f0a240cce6d4d3f2": {
+    "choice": "John",
+    "evidence": {
+      "end": 74,
+      "start": 0
+    },
+    "text_sha256": "11e88df442708e461c401a699ade7518e934a3c8807f8c03d8331963aaabe747"
+  },
+  "f2faf2fecf096fed": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 122,
+      "start": 77
+    },
+    "text_sha256": "65d78304de860ac712777d91199c4e40d0bd69f4ec15cf91e31b8215c2ca7532"
+  },
+  "f7ff648a80c18552": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 139,
+      "start": 32
+    },
+    "text_sha256": "2bb1dccd4b10d5e6af28ef6c2b789c10cae2748d842c1e89fa2c46123a948192"
+  },
+  "f9ce74872d66f665": {
+    "choice": "John",
+    "evidence": {
+      "end": 78,
+      "start": 0
+    },
+    "text_sha256": "90e476d47bfbdd9c5251ac8576e8a39425ffe4676927be50e992a3d96da0d2d0"
+  },
+  "fe5dcbd2dfe05795": {
+    "choice": "Sherlock",
+    "evidence": {
+      "end": 112,
+      "start": 47
+    },
+    "text_sha256": "92a23322ee5e97822329638d79991e1d64c6edbb19702e5ae9457802c90ecb38"
+  }
+}

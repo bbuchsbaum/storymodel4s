@@ -26,3 +26,39 @@ It does not estimate natural prevalence, open-ended retrieval or participant acc
 Replay two candidate assessments per segment through the existing Python fidelity
 resolver. These are deterministic translations of the single reading.
 Frozen packet file SHA-256: `ac4597c4ed61d0793dabb7aec5abe7967a2bca92ca34f8525e6d33fa50ac1248`.
+
+## Result
+
+One fresh Codex reader received the frozen packet file from commit `1345b8dff`.
+Its first submitted response passed the ID, coverage and exact quotation checks.
+The selected rows span 18 scenes. Nineteen of the 29 pairs share a scene.
+
+| Speaker credited | Correct | Wrong | Abstained |
+|---|---:|---:|---:|
+| First distinct name | 26 | 0 | 3 |
+| Second distinct name | 28 | 0 | 1 |
+| All 58 segments | 54 | 0 | 4 |
+| First-name rule on all segments | 29 | 29 | 0 |
+
+Coverage was 54/58 (93.1%) and agreement among answered rows was 54/54.
+The reader recovered both speakers in 25 of the 29 matched pairs. Its 54
+correct answers exceed the first-name rule by 25 on these selected rows.
+A descriptive inspection of the four abstentions found two descriptions of
+reactions without stated speech, one with a speaker introduced by a pronoun,
+and one assigning dialogue to both candidates despite the single credit.
+All four retain their original abstention score.
+
+Deterministic library replay admitted 54 supported and 62 unverifiable
+candidate assessments with fixed source references. The reader made 58 decisions.
+The result supports description-based speaker attribution at a supplied segment
+in this episode. Whether this information improves retrieval from recall is open.
+
+## Reproduce
+
+From the evidence branch root, use the port environment, the pinned local source
+TSV, and `PYTHONPATH=port/src`. To replay the recorded reading, run
+`python port/evidence/sherlock-speaker/balanced.py score port/evidence/sherlock-speaker/balanced-readings.json`.
+To repeat the blind reading, use the same script's `prepare PRIVATE_DIR` command.
+Give the reader only the generated `description.json`, save the response as
+`description-answers.json`, then run `normalize PRIVATE_DIR`. Keep raw packets
+and quotations in the private directory. A fresh reading may differ.
