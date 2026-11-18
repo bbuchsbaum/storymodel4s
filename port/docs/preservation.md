@@ -956,3 +956,38 @@ The next numerical consumer is a conditional grid over source playback regions a
 Scala's `TemporalQuery`, `TemporalGrid` and `TemporalProjection` distinguish the source
 measure, external mass, unavailable support and the optional recall exposure window.
 The Python exposure result supplies the recall side of that calculation.
+
+### Source-time grids from a replayed posterior
+
+At `f2576c502`, [source-time-grid](recall-clock.md#which-film-regions-does-a-recall-unit-refer-to)
+projects a baseline or refined model posterior onto bins in a Sherlock film part or its
+complete ordered presentation. The grid conserves supplied mass across placed, unavailable,
+support-only and external alternatives. Cropping preserves the outside quantity. A separate
+optional exposure query supplies the measured recall duration by constructed unit ID.
+Declaring an extracted situation as a descendant of a timed row withholds placement of the
+parent if that situation lacks timing. Probabilities, bounds and durations remain inspectable.
+
+The [JVM witness](../evidence/source-grid/README.md) at Scala revision `a311f9b50`
+reproduced byte-for-byte in two executions. Python matched all 13 computable rows starting
+from the same resolved components of Scala's normalized-score measure. These cases cover
+disjoint intervals, explicit point mass, incompatible allocation, clipped occurrences as
+already unresolved inputs, and an integer tick beyond binary64's exact range. The fourteenth
+row records failed processing. The synthetic Python workflow independently exercises source
+and recall construction, inference, coordinate selection, hierarchy, cropping and duration.
+It does not establish Scala parity for those upstream operations.
+
+The installed wheel reproduced the API grid bytes, verified the saved result and reproduced
+the preceding wheel's exposure bytes. Dropping allocated outside mass in a temporary copy
+failed the crop assertion while both containment controls passed. A local CPython 3.12
+probe built an index of 100,000 disjoint bins in 0.79 s with 55.76 MiB peak traced
+allocation after creating the input intervals. On that index 100 projections of 50 short
+intervals and 50 points took 0.26 s with 0.18 MiB peak additional traced allocation.
+The full Python suite passed 1,181 tests in 47.16 s. Ruff and strict mypy passed.
+Independent review compared the sparse kernel with an exhaustive calculation on 1,000
+deterministic randomized inputs. These controls concern computation on synthetic data.
+
+The next connected producer is Scala's `LocalReference`: normalize measured local costs
+over their declared population and preserve excluded or unmeasured rows. `MappingPipeline`
+already feeds its supplied-destination measure to `TemporalProjection.compile`. A measure
+conditional on source targets has a different denominator. Transport row budgets, native
+account geometry, occurrence-specific cropping, and remaining P2–P6 work also stay open.
