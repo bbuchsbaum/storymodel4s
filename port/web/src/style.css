@@ -1,0 +1,10 @@
+:root { font: 100%/1.5 system-ui,sans-serif; color:#232e31; background:#f8faf8 }
+main { max-width:78rem; margin:4vh auto; padding:1.5rem }
+h1,h2 { font-family:Georgia,serif; font-weight:500 }
+label { display:block; margin:1rem 0 }
+input,select { font:inherit; margin-inline-start:.5rem }
+.scroll { overflow-x:auto }
+table { border-collapse:collapse; background:white; width:100%; font-variant-numeric:tabular-nums }
+caption { text-align:left; font-weight:600; padding:.65rem 0 }
+th,td { text-align:left; vertical-align:top; padding:.65rem; border-bottom:1px solid #cfdad4; overflow-wrap:anywhere }
+th { background:#e7eeea }

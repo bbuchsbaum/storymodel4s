@@ -10,7 +10,7 @@ from pydantic import Field, field_validator, model_validator
 from ._base import Digest, Model, Name, _validate_instance
 from ._coordinates import exact, tick
 from .analysis import CorrespondenceRow, RecallRow
-from .analysis_workflow import replay_analysis_file
+from .analysis_workflow import AnalysisReplay, replay_analysis_file
 from .playback import MediaSource, TickInterval
 from .prepared_construction import PreparedConstruction, PreparedConstructionResult
 from .serialization import digest
@@ -138,7 +138,11 @@ def _bind_onsets(
 def timed_recall(plan_path: Path, query: RecordingQuery) -> TimedRecall:
     """Replay the granted analysis, bind exact recording ticks and locate its mapped details."""
     query = _validate_instance(RecordingQuery, query)
-    replay = replay_analysis_file(plan_path)
+    return _timed_replay(replay_analysis_file(plan_path), query)
+
+
+def _timed_replay(replay: AnalysisReplay, query: RecordingQuery) -> TimedRecall:
+    """Project a freshly replayed analysis using an already checked declaration."""
     request = replay.recall.request
     if not isinstance(request, PreparedConstruction) or not isinstance(
         request.intake, SherlockRecall
@@ -157,9 +161,7 @@ def timed_recall(plan_path: Path, query: RecordingQuery) -> TimedRecall:
         row.key: occurrence.u
         for row, occurrence in zip(request.request.rows, intake.prepared.units, strict=True)
     }
-    ordinals = {
-        row.unit: ordinal_by_row[row.row] for row in construction.construction.resolutions
-    }
+    ordinals = {row.unit: ordinal_by_row[row.row] for row in construction.construction.resolutions}
     if ordinals.keys() != {u.id for u in replay.account.units if u.kind == "recall"}:
         raise ValueError("analysis recall units differ from the construction receipt")
     references: dict[str, list[CorrespondenceRow]] = defaultdict(list)

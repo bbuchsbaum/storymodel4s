@@ -343,6 +343,14 @@ def main(argv: list[str] | None = None) -> int:
     sherlock_timing.add_argument("request")
     sherlock_timing.add_argument("--clock", required=True, choices=("princeton", "openneuro"))
     sherlock_timing.add_argument("--output")
+    for name in ("feature-windows", "verify-feature-windows"):
+        features = commands.add_parser(name, help="measure lexical features in recording windows")
+        features.add_argument("plan")
+        features.add_argument("query")
+        features.add_argument("lexicon")
+        if name.startswith("verify-"):
+            features.add_argument("result")
+        features.add_argument("--output")
     for command in ("timed-recall", "verify-timed-recall"):
         timed = commands.add_parser(
             command,
@@ -1518,6 +1526,29 @@ def main(argv: list[str] | None = None) -> int:
                 raise ValueError("Sherlock recall timing requires a Sherlock recall intake")
             timing = sherlock_recall_timing(sherlock_prepared.intake, args.clock)
             emit(timing.model_dump(mode="json"), args.output)
+        elif args.command in ("feature-windows", "verify-feature-windows"):
+            from .feature_windows import Lexicon, feature_windows
+
+            feature_query = RecordingQuery.model_validate_json(
+                canonical(strict_json(Path(args.query).read_bytes()))
+            )
+            lexicon = Lexicon.model_validate_json(
+                canonical(strict_json(Path(args.lexicon).read_bytes()))
+            )
+            feature_result = feature_windows(Path(args.plan), feature_query, lexicon).model_dump(
+                mode="json"
+            )
+            if args.command == "verify-feature-windows":
+                if canonical(strict_json(Path(args.result).read_bytes())) != canonical(
+                    feature_result
+                ):
+                    raise ValueError("feature windows differ from the replayed measurements")
+                emit(
+                    {"verified": True, "analysis_sha256": feature_result["analysis_sha256"]},
+                    args.output,
+                )
+            else:
+                emit(feature_result, args.output)
         elif args.command in ("timed-recall", "verify-timed-recall"):
             timed_query = RecordingQuery.model_validate_json(
                 canonical(strict_json(Path(args.query).read_bytes()))
