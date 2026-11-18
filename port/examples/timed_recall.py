@@ -9,9 +9,12 @@ from sherlock_workflow import run as run_sherlock
 from storymodel.analysis_workflow import replay_analysis_file
 from storymodel.artifacts import publish_json
 from storymodel.exposure import ExposureQuery, WordIntervals, recall_exposure
+from storymodel.local_evidence import LocalEvidenceSpec, RecallSelection
 from storymodel.playback import MediaSource, TickInterval
 from storymodel.recall_clock import RecordingQuery, UnitInterval, timed_recall
+from storymodel.sherlock_composition import compose_sherlock_source
 from storymodel.sherlock_recall import sherlock_recall_timing
+from storymodel.source_grid import SourceGridQuery, SupportDeclaration, project_source_grid
 
 
 def _query(plan: Path) -> RecordingQuery:
@@ -72,6 +75,32 @@ def run(destination: Path) -> None:
                 destination / "exposure-query.json", exposure_query.model_dump(mode="json")
             )
             publish_json(destination / "exposure.json", exposure.model_dump(mode="json"))
+            replay = replay_analysis_file(plan)
+            source = compose_sherlock_source(replay.source.request.intake)
+            # The receipt identifies the graph row that owns this measured interval.
+            first = replay.source.construction.construction.resolutions[0]
+            axis = next(r for r in source.rows if r.key == first.row).anchors[0].native.source
+            grid_query = SourceGridQuery(
+                inference=LocalEvidenceSpec(
+                    units=tuple(RecallSelection(unit=r.inventory.unit) for r in exposure.units)
+                ),
+                selection="part",
+                axis=axis,
+                bins=(
+                    TickInterval(start="0", end="10000"),
+                    TickInterval(start="10000", end="20000"),
+                ),
+                declarations={
+                    first.unit: SupportDeclaration(
+                        assumption="supplied-support-contains-referent",
+                        allocation="uniform-intervals",
+                    )
+                },
+                exposure=exposure_query,
+            )
+            grid = project_source_grid(plan, grid_query)
+            publish_json(destination / "source-grid-query.json", grid_query.model_dump(mode="json"))
+            publish_json(destination / "source-grid.json", grid.model_dump(mode="json"))
 
 
 if __name__ == "__main__":

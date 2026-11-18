@@ -12,7 +12,7 @@ from pydantic import Field, model_validator
 from ._base import Digest, Model, Name, _validate_instance
 from ._coordinates import exact, tick
 from ._exposure import integrate_exposure
-from .analysis_workflow import replay_analysis_file
+from .analysis_workflow import AnalysisReplay, replay_analysis_file
 from .direct_mapping import Interpretation, MappingDecision, MappingInput, MappingOutput
 from .model import Inventory
 from .playback import TickInterval
@@ -132,7 +132,11 @@ def _measure_word_timing(
 def recall_exposure(plan_path: Path, query: ExposureQuery) -> RecallExposure:
     """Replay both accounts and the named mapping stage before measuring word intervals."""
     query = _validate_instance(ExposureQuery, query)
-    replay = replay_analysis_file(plan_path)
+    return _exposure_from_replay(replay_analysis_file(plan_path), query)
+
+
+def _exposure_from_replay(replay: AnalysisReplay, query: ExposureQuery) -> RecallExposure:
+    """Measure a checked query using the same verified replay as its downstream consumer."""
     intake, ordinals = _recall_population(replay)
     terminal = next((s for s in replay.stages if s.name == query.mapping_stage), None)
     if (

@@ -182,6 +182,7 @@ from .sherlock_recall import (
 )
 from .sherlock_source import SherlockSource, prepare_sherlock_source
 from .source import SourceRow, prepare_source
+from .source_grid import SourceGridQuery, project_source_grid
 from .source_transitions import (
     SourceSequenceResult,
     SourceSequenceSpec,
@@ -393,6 +394,8 @@ def main(argv: list[str] | None = None) -> int:
     for command, help_text in (
         ("timed-recall", "measure mapped recall details on a declared recording clock"),
         ("verify-timed-recall", "recompute a saved timed recall result"),
+        ("source-time-grid", "project an account posterior into declared source-time bins"),
+        ("verify-source-time-grid", "recompute a saved source-time grid"),
         ("recall-exposure", "measure unit durations from word intervals on a recording"),
         ("verify-recall-exposure", "recompute a saved recording-window exposure"),
     ):
@@ -1624,6 +1627,22 @@ def main(argv: list[str] | None = None) -> int:
                 )
             else:
                 emit(feature_result, args.output)
+        elif args.command in ("source-time-grid", "verify-source-time-grid"):
+            grid_query = SourceGridQuery.model_validate_json(
+                canonical(strict_json(Path(args.query).read_bytes()))
+            )
+            grid_result = project_source_grid(Path(args.plan), grid_query)
+            grid_payload = grid_result.model_dump(mode="json")
+            if args.command.startswith("verify-"):
+                if canonical(strict_json(Path(args.result).read_bytes())) != canonical(
+                    grid_payload
+                ):
+                    raise ValueError("source grid differs from exact plan and query")
+                emit(
+                    {"verified": True, "analysis_sha256": grid_result.analysis_sha256}, args.output
+                )
+            else:
+                emit(grid_payload, args.output)
         elif args.command in (
             "timed-recall",
             "verify-timed-recall",

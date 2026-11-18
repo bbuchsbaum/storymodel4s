@@ -101,3 +101,42 @@ The result distinguishes completed empty inventories, failed or partial processi
 and details outside the replayed requests. `seconds_without_complete_mapping` sums the
 measured durations of units lacking complete coverage. Uncovered recording time is
 reported separately.
+
+## Which film regions does a recall unit refer to?
+
+Run these commands in the synthetic example output directory. In Python, use
+`storymodel.source_grid.project_source_grid(plan_path, query)`.
+
+```sh
+storymodel source-time-grid analysis-1.json source-grid-query.json --output grid.json
+storymodel verify-source-time-grid analysis-1.json source-grid-query.json grid.json
+```
+
+Select a Sherlock film part or the complete ordered presentation by its exact axis
+ID. Supply disjoint half-open bins in ticks. The query names the inference recipe,
+the source targets whose support contains their referents, and how to distribute
+mass within each support. An interval can use uniform duration, points can use
+equal weights, and a mixture specifies the fraction assigned to intervals. Choose
+`support-only` when containment is the only defensible assumption.
+
+For each recall unit, the grid shows how much model posterior falls in each bin.
+Its lower bound counts targets whose entire support fits the bin. Its upper bound
+counts all targets whose support intersects it. These bounds are conditional on
+the declared support. Overlapping upper bounds across bins cannot be added as
+independent probability. The ledger distinguishes allocated mass outside the bins,
+targets with usable support but no allocation, targets without usable locations,
+and each external destination. An extracted situation needs its own timing. A
+sentence that mentions it can have measured film time while the situation remains
+unplaced.
+
+In the example, one target occupies ticks 0–25,000. It receives about 0.15135 of
+the recall unit's posterior. The two bins each cover 10,000 ticks, so each receives
+about 0.06054. The remaining 0.03027 is outside both. A second target and five
+external destinations account for the rest of the model posterior. With 3/4 second
+of measured recall exposure, each bin receives approximately 0.04540 model-weighted
+seconds. These are allocated quantities under the declared model. The exposure
+receipt separately records the actual timing and replayed mapping decisions.
+
+Omit `exposure` to compute a source grid without a recording window. A selected
+unit with zero measured duration has an empty weighted grid. A unit excluded from
+inference has no computed grid. Within a computed row, omitted bin keys mean zero.
