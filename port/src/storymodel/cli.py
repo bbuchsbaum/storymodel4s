@@ -93,9 +93,13 @@ from .intake_workflow import prepare_time_study_files
 from .local_evidence import (
     AccountInferenceResult,
     LocalEvidenceSpec,
+    RefinedAccountInference,
+    RefinedInferenceSpec,
     derive_local_evidence,
     infer_accounts,
+    infer_refined_accounts,
     verify_account_inference,
+    verify_refined_accounts,
 )
 from .model import Account, canonical
 from .organization import (
@@ -1001,8 +1005,17 @@ def main(argv: list[str] | None = None) -> int:
             )
             if exporting and local_recall.export_permission != "allowed":
                 raise PermissionError("producer denies recall inference export")
-            local_spec = LocalEvidenceSpec.model_validate_json(
-                canonical(strict_json(Path(args.spec).read_bytes()))
+            spec_payload = strict_json(Path(args.spec).read_bytes())
+            refined_spec = (
+                RefinedInferenceSpec.model_validate_json(canonical(spec_payload))
+                if isinstance(spec_payload, dict)
+                and spec_payload.get("schema_version") == "storymodel.refined-inference-spec/v1"
+                else None
+            )
+            local_spec = (
+                refined_spec.local
+                if refined_spec
+                else LocalEvidenceSpec.model_validate_json(canonical(spec_payload))
             )
             if args.command == "derive-local-evidence":
                 local_result = derive_local_evidence(local_source, local_recall, local_spec)
@@ -1012,6 +1025,18 @@ def main(argv: list[str] | None = None) -> int:
                     ).model_dump(mode="json"),
                     args.output,
                 )
+            elif refined_spec is not None:
+                if args.command == "infer-accounts":
+                    refined = infer_refined_accounts(local_source, local_recall, refined_spec)
+                    emit(refined.model_dump(mode="json"), args.output)
+                else:
+                    saved_refined = RefinedAccountInference.model_validate_json(
+                        canonical(strict_json(Path(args.result).read_bytes()))
+                    )
+                    verified_refined = verify_refined_accounts(
+                        local_source, local_recall, refined_spec, saved_refined
+                    )
+                    emit({"valid": True, "spec_sha256": verified_refined.spec_sha256}, None)
             elif args.command == "infer-accounts":
                 emit(
                     infer_accounts(local_source, local_recall, local_spec).model_dump(mode="json"),

@@ -120,10 +120,14 @@ from .identity import identity_role_table, resolve_text_identity, verify_identit
 from .local_evidence import (
     LocalEvidenceSpec,
     RecallSelection,
+    RefinedAccountInference,
+    RefinedInferenceSpec,
     derive_local_evidence,
     infer_accounts,
+    infer_refined_accounts,
     verify_account_inference,
     verify_local_evidence,
+    verify_refined_accounts,
 )
 from .model import Account, account_digest, validate_account
 from .organization import (
@@ -176,6 +180,7 @@ from .reconstruction import (
     verify_account_reconstruction,
     verify_reconstruction,
 )
+from .refinement import RefinementPolicy
 from .relations import admit_relations, relation_table, verify_relations
 from .rich_account import (
     RichAccount,
@@ -383,10 +388,15 @@ __all__ = [
     "MappingRecording",
     "LocalEvidenceSpec",
     "RecallSelection",
+    "RefinedAccountInference",
+    "RefinedInferenceSpec",
+    "RefinementPolicy",
     "derive_local_evidence",
     "infer_accounts",
+    "infer_refined_accounts",
     "verify_account_inference",
     "verify_local_evidence",
+    "verify_refined_accounts",
     "RichAccount",
     "RichRecording",
     "SequenceRequest",

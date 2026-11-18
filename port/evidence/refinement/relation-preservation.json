@@ -1,0 +1,77 @@
+{
+  "schema": "relation-preservation/v1",
+  "reference": {
+    "implementation": "storymodel4s Scala RelationPreservation.diagnostic and reweight",
+    "scala_source_revision": "a927afb6755c",
+    "command": "cp port/evidence/refinement/RelationPreservationParityProbe.scala align/src/test/scala/storymodel4s/align/ && sbt -batch 'alignJVM/testOnly storymodel4s.align.RelationPreservationParityProbe'"
+  },
+  "request": {
+    "rows": {
+      "u3": {
+        "source": [
+          { "node": "e2-hear", "mode": "faithful", "mass": 0.2 },
+          { "node": "e3-search", "mode": "distorted:Polarity", "mass": 0.3 }
+        ],
+        "external": [{ "state": "Association", "mass": 0.5 }]
+      },
+      "u2": {
+        "source": [
+          { "node": "e5-find", "mode": "faithful", "mass": 0.4 },
+          { "node": "e1-arrive", "mode": "faithful", "mass": 0.2 }
+        ],
+        "external": [{ "state": "Intrusion", "mass": 0.4 }]
+      }
+    },
+    "projection": {
+      "nodes": ["e1-arrive", "e2-hear", "e3-search", "e4-enter", "e5-find"],
+      "edges": {
+        "world-time": [
+          ["e1-arrive", "e2-hear"],
+          ["e2-hear", "e3-search"],
+          ["e3-search", "e4-enter"],
+          ["e4-enter", "e5-find"]
+        ],
+        "causal": [
+          ["e2-hear", "e3-search"],
+          ["e2-hear", "e4-enter"],
+          ["e4-enter", "e5-find"]
+        ]
+      }
+    },
+    "relations": [
+      { "claim": "temporal", "relation": "before", "from_unit": "u3", "to_unit": "u2" },
+      { "claim": "causal", "relation": "causes", "from_unit": "u3", "to_unit": "u2" }
+    ],
+    "base_costs": {
+      "u3": {
+        "e2-hear:faithful": 10.0,
+        "e3-search:distorted:Polarity": 20.0,
+        "external:Association": 30.0
+      },
+      "u2": {
+        "e5-find:faithful": 40.0,
+        "e1-arrive:faithful": 50.0,
+        "external:Intrusion": 60.0
+      }
+    },
+    "policy": { "passes": 1, "weight": 0.5 }
+  },
+  "expected": {
+    "preservation": {
+      "world-time": { "stated": 1, "evaluated": 1, "mean": 0.6666666666666666 },
+      "causal": { "stated": 1, "evaluated": 1, "mean": 0.26666666666666666 }
+    },
+    "final_costs": {
+      "u3": {
+        "e2-hear:faithful": 9.6,
+        "e3-search:distorted:Polarity": 19.8,
+        "external:Association": 30.0
+      },
+      "u2": {
+        "e5-find:faithful": 39.65,
+        "e1-arrive:faithful": 50.0,
+        "external:Intrusion": 60.0
+      }
+    }
+  }
+}

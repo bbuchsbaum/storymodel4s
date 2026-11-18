@@ -574,10 +574,11 @@ with a broken old implementation needs repair or replacement, not silent deletio
   scores in recording windows, supplied unit intervals and source annotation scenes. Caption
   scoring accepts both target-keyed text and exact native intervals on Sherlock annotation
   rows. The synthetic Friends example exercises a second study through the saved analysis
-  inspector. The next inference workflow is graph-HSMM relation refinement. The Scala
-  implementation recomputes each pass from the base emission costs and prior posterior
-  using directed temporal and causal edges. Its diagnostic reports how many stated edges
-  had evaluable endpoints. Preserve both the direction and the denominator through replay.
+  inspector. [Relation-aware refinement](refinement.md) uses stated recall edges and
+  reachable source events to update the candidate costs, and reports which relations had
+  evaluable endpoints. Continue the numerical methods inventory from the actual inference
+  and readout callers. Duration, multiscale alignment and remaining temporal analyses
+  still require their own behavioral comparisons.
   Review evolving Scala case-study results at computational milestones for confirmed fixes or
   settled changes to shared contracts. General clock maps, additional study adapters and the
   remaining graph, inference and inspection work stay on the phase plan.

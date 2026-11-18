@@ -29,7 +29,8 @@ from .model import (
     text_evidence,
     text_support,
 )
-from .rich_account import SupportedAccount, require_text_account
+from .refinement import RefinementPolicy, RefinementResult, UnitRelation, refine_sequence
+from .rich_account import RichAccount, SupportedAccount, require_text_account
 from .sequence import (
     External,
     Facet,
@@ -285,6 +286,39 @@ class AccountInferenceResult(Model):
     schema_version: Literal["storymodel.account-inference/v1"] = "storymodel.account-inference/v1"
     evidence: LocalEvidenceResult
     inference: SequenceResult
+
+
+class RefinedInferenceSpec(Model):
+    """A second inference stage consumes the same local evidence and source transition policy."""
+
+    schema_version: Literal["storymodel.refined-inference-spec/v1"] = (
+        "storymodel.refined-inference-spec/v1"
+    )
+    local: LocalEvidenceSpec
+    policy: RefinementPolicy
+
+
+ClaimExclusion = Literal[
+    "attributed-context",
+    "not-stated",
+    "unsupported-temporal-relation",
+    "outside-selected-units",
+    "ambiguous-unit-membership",
+    "within-one-unit",
+    "duplicate-unit-edge",
+]
+
+
+class RefinedAccountInference(Model):
+    """Keep base retrieval and costs inspectable alongside the relation-aware solution."""
+
+    schema_version: Literal["storymodel.refined-account-inference/v1"] = (
+        "storymodel.refined-account-inference/v1"
+    )
+    spec_sha256: Digest
+    evidence: LocalEvidenceResult
+    refinement: RefinementResult
+    excluded_claims: dict[str, ClaimExclusion]
 
 
 @dataclass(frozen=True)
@@ -576,8 +610,20 @@ def derive_local_evidence(
     source: SupportedAccount, recall: SupportedAccount, spec: LocalEvidenceSpec
 ) -> LocalEvidenceResult:
     """Generate local evidence from independent accounts; never alter reference or fidelity."""
-    source, recall = require_text_account(source), require_text_account(recall)
-    spec = _validate_instance(LocalEvidenceSpec, spec)
+    return _derive_local_evidence(
+        require_text_account(source),
+        require_text_account(recall),
+        _validate_instance(LocalEvidenceSpec, spec),
+    )
+
+
+def _derive_local_evidence(
+    source: SupportedAccount,
+    recall: SupportedAccount,
+    spec: LocalEvidenceSpec,
+    unit_memberships: dict[str, str | None] | None = None,
+) -> LocalEvidenceResult:
+    """Price checked inputs; optionally retain the unique covering unit for each situation."""
     projection, anchor_supports = _project_source_and_supports(source, spec.projection)
     if not recall.documents or any(d.side != "recall" for d in recall.documents):
         raise ValueError("local evidence requires an independent recall-only account")
@@ -656,14 +702,10 @@ def derive_local_evidence(
         unit = recall_units.get(selected.unit)
         if unit is None:
             raise ValueError("selected unit is outside the recall account")
-        situation = None
-        if selected.situation is not None:
-            situation = recall_situations.get(selected.situation)
-            if situation is None or not all(
-                contained_in(s, (unit.support,)) for s in situation.evidence
-            ):
-                raise ValueError("selected situation must have all evidence within its recall unit")
-        elif selected.content == "auto":
+        available = []
+        if unit_memberships is not None or (
+            selected.situation is None and selected.content == "auto"
+        ):
             support = text_support(unit.support)
             entries = by_document.get(support.document, [])
             first = bisect_left(entries, (support.spans[0].start, ""))
@@ -673,6 +715,17 @@ def derive_local_evidence(
                 for _, key in entries[first:last]
                 if all(contained_in(e, (unit.support,)) for e in recall_situations[key].evidence)
             ]
+            if unit_memberships is not None:
+                for member in available:
+                    unit_memberships[member.id] = None if member.id in unit_memberships else unit.id
+        situation = None
+        if selected.situation is not None:
+            situation = recall_situations.get(selected.situation)
+            if situation is None or not all(
+                contained_in(s, (unit.support,)) for s in situation.evidence
+            ):
+                raise ValueError("selected situation must have all evidence within its recall unit")
+        elif selected.content == "auto":
             if len(available) > 1:
                 raise ValueError(
                     "several situations fit recall unit; select one or use text-only content"
@@ -836,4 +889,85 @@ def verify_account_inference(
     expected = infer_accounts(source, recall, spec)
     if checked != expected:
         raise ValueError("account inference differs from original inputs")
+    return expected
+
+
+def infer_refined_accounts(
+    source: SupportedAccount, recall: SupportedAccount, spec: RefinedInferenceSpec
+) -> RefinedAccountInference:
+    """Project stated recall relations to distinct units, then refine the existing sequence."""
+    spec = _validate_instance(RefinedInferenceSpec, spec)
+    source, recall = require_text_account(source), require_text_account(recall)
+    units = {u.id: text_support(u.support) for u in recall.units if u.kind == "recall"}
+    documents = {units[s.unit].document for s in spec.local.units if s.unit in units}
+    if len(documents) > 1:
+        raise ValueError("refinement requires one recall document per sequence")
+    owners: dict[str, str | None] = {}
+    evidence = _derive_local_evidence(source, recall, spec.local, owners)
+    root = {c.id for c in recall.contexts if c.kind == "narrated"}
+    excluded: dict[str, ClaimExclusion] = {}
+    claims: list[tuple[str, str, str, Literal["before", "causes", "simultaneous"]]] = []
+    for r in recall.relations:
+        if r.kind in ("before", "causes"):
+            if r.context not in root:
+                excluded[r.id] = "attributed-context"
+            else:
+                claims.append((r.id, r.source, r.target, r.kind))
+    if isinstance(recall, RichAccount):
+        for c in recall.temporal_relations:
+            if c.context not in root:
+                excluded[c.id] = "attributed-context"
+            elif c.status != "surface-explicit":
+                excluded[c.id] = "not-stated"
+            elif c.relation in ("before", "equal"):
+                kind: Literal["before", "simultaneous"] = (
+                    "before" if c.relation == "before" else "simultaneous"
+                )
+                claims.append((c.id, c.source, c.target, kind))
+            else:
+                excluded[c.id] = "unsupported-temporal-relation"
+
+    relations = []
+    seen = set()
+    for claim, left, right, relation in sorted(claims):
+        a, b = owners.get(left), owners.get(right)
+        if left not in owners or right not in owners:
+            excluded[claim] = "outside-selected-units"
+        elif a is None or b is None:
+            excluded[claim] = "ambiguous-unit-membership"
+        elif a == b:
+            excluded[claim] = "within-one-unit"
+        else:
+            if relation == "simultaneous" and b < a:
+                a, b = b, a
+            key = (a, b, relation)
+            if key in seen:
+                excluded[claim] = "duplicate-unit-edge"
+            else:
+                seen.add(key)
+                relations.append(
+                    UnitRelation(claim=claim, from_unit=a, to_unit=b, relation=relation)
+                )
+    refinement = refine_sequence(
+        evidence.sequence.request, evidence.sequence.projection, tuple(relations), spec.policy
+    )
+    return RefinedAccountInference(
+        spec_sha256=digest(spec.model_dump(mode="json")),
+        evidence=evidence,
+        refinement=refinement,
+        excluded_claims=excluded,
+    )
+
+
+def verify_refined_accounts(
+    source: SupportedAccount,
+    recall: SupportedAccount,
+    spec: RefinedInferenceSpec,
+    result: RefinedAccountInference,
+) -> RefinedAccountInference:
+    """Replay the original accounts and compare the full claim selection, costs and inference."""
+    checked = _validate_instance(RefinedAccountInference, result)
+    expected = infer_refined_accounts(source, recall, spec)
+    if checked != expected:
+        raise ValueError("refined inference differs from original inputs")
     return expected
