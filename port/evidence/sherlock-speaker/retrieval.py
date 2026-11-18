@@ -49,6 +49,19 @@ def normalized(weights):
     return [v / z for v in weights]
 
 
+def baseline_units(name):
+    units = c.units(name)
+    saved = json.loads((c.OUT / RUN / (name + ".json")).read_text())
+    assert saved["participant"] == name and not saved["missing"]
+    seen = set()
+    for u, record in zip(units, saved["units"], strict=True):
+        assert (u.id, u.index) == (record["id"], record["index"])
+        assert u.id not in seen
+        seen.add(u.id)
+        base = normalized([math.exp(x) for x in emissions(record, DEFAULT[4])])
+        yield u, base
+
+
 def forecasts():
     # No gold or evaluation-support loader is called during prediction.
     rows = c.film_rows()
@@ -57,14 +70,8 @@ def forecasts():
     sessions = {}
     for name in c.development():
         c.guard(name)
-        units = c.units(name)
-        saved = json.loads((c.OUT / RUN / (name + ".json")).read_text())
-        assert saved["participant"] == name and not saved["missing"]
         predictions = {}
-        for u, record in zip(units, saved["units"], strict=True):
-            assert (u.id, u.index) == (record["id"], record["index"])
-            assert u.id not in predictions
-            base = normalized([math.exp(x) for x in emissions(record, DEFAULT[4])])
+        for u, base in baseline_units(name):
             actor = speaker(u.text)
             arms = dict.fromkeys(ARMS, base)
             if actor is not None:
@@ -82,7 +89,7 @@ def forecasts():
     return sessions
 
 
-def evaluate(sessions):
+def evaluate(sessions, *, arm_names=ARMS, baseline="off"):
     support = json.loads((c.RUN / "support.json").read_text())["rows"]
     expected = {(r["participant"], r["id"]) for r in support}
     assert len(expected) == len(support)
@@ -112,11 +119,11 @@ def evaluate(sessions):
     for bucket in ("all", "cued"):
         per = []
         for serial, name in enumerate(sorted(sessions), 1):
-            raw = scores.get((name, bucket, "off"))
+            raw = scores.get((name, bucket, baseline))
             if not raw:
                 continue
             rec = {"session": serial, "units": len(raw)}
-            for arm in ARMS:
+            for arm in arm_names:
                 measurements = scores[name, bucket, arm]
                 rec[arm] = dict(
                     zip(
@@ -126,8 +133,10 @@ def evaluate(sessions):
                     )
                 )
             per.append(rec)
-        macro = {a: {m: statistics.mean(r[a][m] for r in per) for m in per[0][a]} for a in ARMS}
-        gains = [r["off"]["loss_bits"] - r["speaker"]["loss_bits"] for r in per]
+        macro = {
+            a: {m: statistics.mean(r[a][m] for r in per) for m in per[0][a]} for a in arm_names
+        }
+        gains = [r[baseline]["loss_bits"] - r["speaker"]["loss_bits"] for r in per]
         result[bucket] = dict(
             per_session=per,
             participants=len(per),
