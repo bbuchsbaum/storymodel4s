@@ -36,6 +36,7 @@ from cs2.account import (  # noqa: E402
     RefSample,
     Shape,
     StateSample,
+    Unavailable,
     Uncovered,
     WordCell,
     WorkReference,
@@ -1191,6 +1192,59 @@ def test_span_anchors_convert_to_word_cells():
     assert kinds == ["Uncovered", "RefSample", "RefSample", "Uncovered"], kinds
     assert conv["refused"] == {"span-invalid": 1}
     assert P.numbered("he ran home") == "[0]he [1]ran [2]home"
+
+
+def _innermost_session(refs, rule="unavailable"):
+    P = _producer()
+    from cs2.source import RecallWord
+
+    comp = fixture()
+    words = [RecallWord(i, f"w{i}", float(i)) for i in range(2)]
+    frames = [dict(kind="content", frame=[("B", 1.0)], position=None)]
+    answers = {"o0": (dict(talk="episodic", refs=refs), {1: "b2", 2: "b3"})}
+    out, conv = {}, P.new_conv()
+    cells = P.convert_session(
+        ("P", "s"), words, [dict(first=0, last=1)], frames, answers,
+        {0: dict(oid="o0")}, comp, P.conditions(1, "s", 1), out, conv,
+        dict(talk="orthogonal", innermost_tie=rule),
+    )
+    return comp, cells, out, conv
+
+
+def test_equal_innermost_tie_is_unavailable_and_order_invariant():
+    # The two references cover the same one word but point to different source units. Their
+    # response order must not decide which source survives, nor may a row retain other mass.
+    a = dict(span=[0, 0], alts=[{"w": 1.0, "iv": [[1, 1]]}])
+    b = dict(span=[0, 0], alts=[{"w": 1.0, "iv": [[2, 2]]}])
+    observed = []
+    for refs in ([a, b], [b, a]):
+        comp, cells, stored, conv = _innermost_session(refs)
+        assert isinstance(cells[0].sample, Unavailable)
+        assert cells[0].sample.reason == "equal-innermost-tie"
+        assert conv["innermost_tie_words"] == 1
+        acc = Account(comp, stored, {("P", "s"): cells})
+        ld = LocationDistribution.from_words(acc, cells, [Bin(0, 2)])
+        row = ld.rows[0]
+        assert row.state == "unavailable" and row.mass == {} and row.samples == ()
+        assert CoverageMeasure.from_words(acc, cells, [Bin(0, 2)]).rows[0].state == "unavailable"
+        forecast = SC.producer_forecasts(ld, B.duration_prior(comp, CFG), CFG)[0]
+        assert forecast.no_sample and forecast.empty == "unavailable" and forecast.abstain == 1.0
+        observed.append((row.state, word_ledger(cells, [Bin(0, 2)])["unavailable_words"]))
+    assert observed == [("unavailable", 1), ("unavailable", 1)]
+    # The historical rule is explicit and replays the original first-reference selection.
+    _, old_cells, old_refs, _ = _innermost_session([a, b], rule="first")
+    assert old_refs[old_cells[0].sample.ref].members[0].target.support == frozenset({"b2"})
+
+
+def test_short_unique_innermost_reference_is_retained():
+    # A strict shorter span remains informative in either response order; only equal spans abstain.
+    long = dict(span=[0, 1], alts=[{"w": 1.0, "iv": [[2, 2]]}])
+    short = dict(span=[0, 0], alts=[{"w": 1.0, "iv": [[1, 1]]}])
+    for refs in ([long, short], [short, long]):
+        _, cells, stored, conv = _innermost_session(refs)
+        assert isinstance(cells[0].sample, RefSample)
+        assert stored[cells[0].sample.ref].members[0].target.support == frozenset({"b2"})
+        assert conv["innermost_tie_words"] == 0
 
 
 def _v2_session(replies, answers=None, items=None, rules=None):

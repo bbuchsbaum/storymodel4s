@@ -58,6 +58,7 @@ from .account import (
     Shape,
     StateSample,
     TalkSample,
+    Unavailable,
     Uncovered,
     WorkReference,
 )
@@ -243,6 +244,10 @@ def bin_samples(cells, b: Bin):
     """The words in a bin and its distinct samples: references and typed states
     (not-applicable included). Uncovered words are in `inside` but are never samples."""
     inside = [c for c in cells if b.contains(c.onset)]
+    # An unavailable word invalidates the whole bin: retaining its other samples would report
+    # a partly known row as though the missing address had no bearing on the distribution.
+    if any(isinstance(c.sample, Unavailable) for c in inside):
+        return inside, []
     samples = {c.sample for c in inside if not isinstance(c.sample, (Uncovered, TalkSample))}
     return inside, sorted(samples, key=_sample_key)
 
@@ -261,6 +266,8 @@ def bin_ledger(inside) -> dict:
 def empty_state(inside) -> str:
     if not inside:
         return "no_sample"
+    if any(isinstance(c.sample, Unavailable) for c in inside):
+        return "unavailable"
     if any(isinstance(c.sample, TalkSample) for c in inside):
         return "only_non_addressed"
     return "only_uncovered"
@@ -366,7 +373,7 @@ def _coarsener(comp, src, dst):
 
 
 def _check_row(r: Row):
-    if r.state in ("no_sample", "only_uncovered", "only_non_addressed"):
+    if r.state in ("no_sample", "only_uncovered", "only_non_addressed", "unavailable"):
         if r.mass:
             raise ProjectionError("empty-state-has-mass", r.state)
         return
@@ -537,8 +544,10 @@ def word_ledger(cells, bins):
         words_in_bins=n,
         reference_words=kinds["RefSample"],
         not_applicable_words=kinds["StateSample"],
+        unavailable_words=kinds["Unavailable"],
         uncovered_words=kinds["Uncovered"],
         non_addressed_words=kinds["TalkSample"],
         uncovered_share=kinds["Uncovered"] / n if n else float("nan"),
         not_applicable_share=kinds["StateSample"] / n if n else float("nan"),
+        unavailable_share=kinds["Unavailable"] / n if n else float("nan"),
     )

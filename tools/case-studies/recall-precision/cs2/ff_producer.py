@@ -78,6 +78,7 @@ from cs2.account import (  # noqa: E402
     Shape,
     StateSample,
     TalkSample,
+    Unavailable,
     Uncovered,
     WordCell,
     WorkReference,
@@ -644,13 +645,16 @@ def prefetch(pairs, jobs):
     _PREFETCHED_FRESH.update(k for k, _, _ in todo)
 
 
-def logged_call(prompt, system, log, label, condition):
+def logged_call(prompt, system, log, label, condition, *, fresh_model=None):
     key = sha(json.dumps([MODEL, system, prompt]))
     cached = (CACHE / f"{key}.json").exists() and key not in _PREFETCHED_FRESH
     if CACHE_ONLY and not (CACHE / f"{key}.json").exists():
         raise RuntimeError(f"cache miss in a cache-only run: {label}")
     t0 = time.time()
-    text = call(prompt, system, model=MODEL)
+    if fresh_model is not None and CACHE_ONLY:
+        raise ValueError("fresh-only and cache-only are incompatible")
+    text = (call(prompt, system, model=MODEL, fresh_model=fresh_model) if fresh_model
+            else call(prompt, system, model=MODEL))
     rec = json.loads((CACHE / f"{key}.json").read_text())
     log.append(
         dict(
@@ -671,10 +675,10 @@ def logged_call(prompt, system, log, label, condition):
     return text
 
 
-def parse_with_retry(prompt, system, log, label, key, condition):
+def parse_with_retry(prompt, system, log, label, key, condition, *, fresh_model=None):
     for attempt in range(3):
         sfx = "" if attempt == 0 else RETRY.format(attempt=attempt)
-        text = logged_call(prompt + sfx, system, log, f"{label}#{attempt}", condition)
+        text = logged_call(prompt + sfx, system, log, f"{label}#{attempt}", condition, fresh_model=fresh_model)
         try:
             return parse_json(text)[key], attempt
         except (ValueError, KeyError, TypeError):
@@ -841,7 +845,7 @@ def new_conv():
     return dict(references=0, refused={}, frame_mismatch=0, pass2_missing=0, shapes={},
                 broad_cases={}, positions=dict(resolved=0, unresolved=0), fragment_words=0,
                 non_addressed_words={}, anchored_non_narration_units=0, modes={},
-                position_readings=[], mismatch_words=0)
+                position_readings=[], mismatch_words=0, innermost_tie_words=0)
 
 
 def convert_session(
@@ -861,6 +865,9 @@ def convert_session(
     rules = rules or dict(talk="orthogonal", talk_work_variant="identifying")
     talk_rule = rules.get("talk", "orthogonal")
     variant = rules.get("talk_work_variant", "identifying")
+    tie_rule = rules.get("innermost_tie", "unavailable")
+    if tie_rule not in ("unavailable", "first"):
+        raise ValueError(f"unknown-innermost-tie-rule: {tie_rule}")
     framing = {} if framing is None else framing
     unit_talk = {} if unit_talk is None else unit_talk
     p, s = key
@@ -1054,10 +1061,19 @@ def convert_session(
                             continue
                         conv["references"] += 1
                         for w in covered_w:
-                            if w not in best or len(covered_w) < best[w][0]:  # innermost wins
-                                best[w] = (len(covered_w), rid)
+                            candidate = (len(covered_w), rid)
+                            if w not in best or candidate[0] < best[w][0]:  # innermost wins
+                                best[w] = candidate
+                            elif candidate[0] == best[w][0] and tie_rule == "unavailable":
+                                # Equal innermost spans do not establish an address. Do not let
+                                # response order select one and make the other disappear.
+                                best[w] = (candidate[0], None)
                     for w, (_, rid) in best.items():
-                        sample_of[w] = RefSample(rid)
+                        if rid is None:
+                            sample_of[w] = Unavailable("equal-innermost-tie")
+                            conv["innermost_tie_words"] += 1
+                        else:
+                            sample_of[w] = RefSample(rid)
         unit_talk[(p, s, uid)] = talk
         if top is not None:
             current = top[0]
@@ -1102,6 +1118,7 @@ def run(
     films: list | None = None,
     control: str | None = None,
     reuse_pass2_from: Path | None = None,
+    fresh_model: str | None = None,
 ):
     """Both passes over `sessions` (development only), pass 2 pooled across them.
 
@@ -1190,7 +1207,9 @@ def run(
                     p1=json.loads((Path(pass1_from) / "pass1.json").read_text()),
                     conds=json.loads((Path(pass1_from) / "conditions.json").read_text()))
         conds["pass1"] = dict(src1["conds"]["pass1"], reused_from=str(pass1_from))
-    if not dry and src1 is None:
+    if fresh_model and reuse_pass2_from is not None:
+        raise ValueError("fresh-only runs cannot replay pass 2")
+    if not dry and src1 is None and not fresh_model:
         s1 = sys1_full if layout == "prefix" else sys1
         prefetch([(d["prompt1"], s1) for d in data.values()], jobs)
     for (p, s), d in data.items():
@@ -1215,7 +1234,7 @@ def run(
                 log,
                 f"pass1:{p}:{s}",
                 "units",
-                conds["pass1"]["id"],
+                conds["pass1"]["id"], fresh_model=fresh_model,
             )
             if p1 is None:
                 raise SystemExit(f"pass 1 returned no parseable JSON for {p} {s}")
@@ -1286,7 +1305,7 @@ def run(
                 comp, texts, bworks, rng, f"{salt}:{sample}:{tag}call{bi}", True, outline_order, extras
             )
             rendered.append((pass2_prompt(batch, outline2, cast_line), rowmap, order2, sys2))
-        if not dry:
+        if not dry and not fresh_model:
             prefetch([(r[0], r[3]) for r in rendered], jobs)
         for bi, (batch, (prompt2, rowmap, order2, sysb)) in enumerate(zip(batches, rendered)):
             rec = dict(
@@ -1306,7 +1325,7 @@ def run(
                     log_,
                     f"pass2:{tag}call{bi}",
                     "items",
-                    conds["pass2"]["id"],
+                    conds["pass2"]["id"], fresh_model=fresh_model,
                 )
                 rec.update(retries=retries, returned=len(got or []))
                 for x in got or []:

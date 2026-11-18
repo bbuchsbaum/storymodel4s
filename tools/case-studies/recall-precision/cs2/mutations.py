@@ -506,6 +506,14 @@ MUTANTS = [
         test="test_order_fallback_null_producer_equals_order_prior_only",
     ),
     dict(
+        id="M66",
+        guard="equal-length innermost spans are unavailable rather than response-order selected",
+        file="cs2/ff_producer.py",
+        edits=[('                            elif candidate[0] == best[w][0] and tie_rule == "unavailable":\n',
+                '                            elif False:\n')],
+        test="test_equal_innermost_tie_is_unavailable_and_order_invariant",
+    ),
+    dict(
         id="M59",
         guard="the order fallback leaves the producer's located mass unchanged",
         file="cs2/decoder.py",

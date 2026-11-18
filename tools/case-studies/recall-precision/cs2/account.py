@@ -224,12 +224,19 @@ class Uncovered:
     unit: str
 
 
+@dataclass(frozen=True, order=True)
+class Unavailable:
+    """A word whose address cannot be determined under a declared conversion rule."""
+
+    reason: str
+
+
 @dataclass(frozen=True)
 class WordCell:
     index: int
     onset: float | None
     unit: str  # recall unit id, '' when outside every unit
-    sample: RefSample | StateSample | Uncovered | TalkSample
+    sample: RefSample | StateSample | Uncovered | TalkSample | Unavailable
 
 
 @dataclass

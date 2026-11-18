@@ -1,6 +1,6 @@
-# Case study 2: pre-registration of the sealed-six run (DRAFT)
+# Case study 2: pre-registration of the sealed-six run (approved endpoint amendment)
 
-**Status: DRAFT, awaiting the owner's approval.** Nothing in this document has been run on the
+**The owner approved the amended endpoint on 2026-11-17 and authorized one run after the preflight checks pass. The executable freeze is pending.** Nothing in this document has been run on the
 sealed participants. No sealed recall, gold row or prompt has been opened, rendered or cached.
 Design: [the mapping-object plan](2026-11-16-cs2-mapping-object.md). Bead
 `bd-01M7JRB11CHP7EPC35QQ12DT41`.
@@ -17,9 +17,13 @@ The frozen values were computed without sealed data. They are recorded in
 
 **Code and configuration**
 
-- **Harness commit:** `8101acc15e1a76e7a0345e6f84a4ade64e120f7c`.
-- **`scorer-config.json` SHA-256:**
+- **Original development harness commit:** `8101acc15e1a76e7a0345e6f84a4ade64e120f7c`.
+- **Original development `scorer-config.json` SHA-256:**
   `e6c28ab7162ff27ba59aafc57ad0921bf2f239e1fba48d22fbe6e5bc3d836343`.
+- **Executable scorer after the tie correction.** SHA-256
+  `59f3b1708fedd6a7cfa48aec784a5fea65f82e03502057698c8987ed2c72af08`.
+  Equal innermost reference spans leave the address unavailable. The corresponding forecast
+  row abstains and uses the declared fallback. Round-5 replay retains its original tie rule.
 - **Rules:**
   - `fallback: frame-film`;
   - `talk: orthogonal`, with `talk_work_variant: identifying`;
@@ -73,8 +77,7 @@ development data.
     dominance, not a fitted lever; for each conditional term it held empirically, not by proof.
     The gain is smaller than the pooled sample band (scene ±0.041), so it is not claimed as an
     improvement; it is adopted because it cannot do worse on the total.
-  - **Open item.** The frozen harness (8101acc15) has no two-sample combining entry point yet;
-    one must be added and its digest recorded before the freeze.
+  - The executable scores the ensemble separately on the author rows and the 7 s windows.
 
 **Frozen baselines**, fitted on the ten coded development participants only:
 
@@ -107,8 +110,7 @@ With five scorable participants, a 5/5 win gives exactly p = 1/32.
 **Required co-condition.** The same comparison on gold-blind 7 s windows (`--windows 7`) must
 win for at least n − 1 of the n scorable participants: at least 4 of 5.
 
-**For the owner.** The draft request said "6/6 wins" and "≥ 5/6 windows". sub-06 cannot be
-scored, so this draft uses all-of-n and n − 1 of n. The owner must confirm or amend this.
+**Owner decision, 2026-11-17.** Map all six sessions. Score the five participants with gold. Require five primary wins, a mean gain of at least 0.5 bits, and at least four wins on 7 s windows. A further missing participant leaves this test unevaluable.
 
 **Development reference** (not a test; development data with revised rules):
 
@@ -181,7 +183,7 @@ differences, ±2 SE.
 1. **Adapter refusal.** `test_frozen_participants_refused` passes at the frozen commit, and
    reading a sealed participant without `allow_frozen=True` raises `FrozenParticipant`.
 2. **Zero cache hits.** Before each sealed call, the run asserts that the prompt's cache key
-   is absent from the cache (a `--require-fresh` guard, to be added). Any hit stops the run.
+   is absent from the cache (the fresh-only transport). Any hit stops the run.
 3. **Digests reproduce.** A dry run on development data at the frozen commit (layout `prefix`,
    pass 1 `v1`) reproduces the frozen system, template and renderer digests and the
    scorer-config SHA.

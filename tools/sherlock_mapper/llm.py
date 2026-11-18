@@ -16,10 +16,20 @@ from common import OUT, sha
 CACHE = OUT / "cache"
 
 
-def call(prompt, system, model="opus", timeout=1800, retries=2):
+def call(prompt, system, model="opus", timeout=1800, retries=2, *, fresh_model=None):
     key = sha(json.dumps([model, system, prompt]))
     path = CACHE / f"{key}.json"
+    if fresh_model is not None:
+        # A failed or interrupted sealed call is a deviation. Leave its reservation in place.
+        CACHE.mkdir(parents=True, exist_ok=True)
+        if path.exists():
+            raise RuntimeError(f"fresh call refused an existing cache entry: {key}")
+        with (CACHE / f"{key}.attempt").open("x") as marker:
+            marker.write(fresh_model)
+        retries = 0
     if path.exists():
+        if fresh_model is not None:
+            raise RuntimeError(f"fresh call refused an existing cache entry: {key}")
         return json.loads(path.read_text())["result"]
     CACHE.mkdir(parents=True, exist_ok=True)
     env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
@@ -71,6 +81,8 @@ def call(prompt, system, model="opus", timeout=1800, retries=2):
             modelUsage=list((d.get("modelUsage") or {}).keys()),
             result=d["result"],
         )
+        if fresh_model is not None and rec["modelUsage"] != [fresh_model]:
+            raise RuntimeError(f"sealed call returned an unexpected model for {key}")
         path.write_text(json.dumps(rec))
         return d["result"]
     raise RuntimeError(last)

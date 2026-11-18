@@ -134,7 +134,7 @@ class ProducerForecast:
 
 def producer_forecast(row, comp, fallback, eps) -> ProducerForecast:
     """From one scene-grain LocationDistribution row."""
-    if row.state in ("no_sample", "only_uncovered", "only_non_addressed"):
+    if row.state in ("no_sample", "only_uncovered", "only_non_addressed", "unavailable"):
         return ProducerForecast(
             {}, {}, {}, 0.0, 1.0, fallback, eps, comp, no_sample=True, empty=row.state
         )
@@ -534,7 +534,7 @@ def strata(scores, comp, work_applicable=True):
     if em:
         out["typed_absence"] = {
             k: dict(n=sum(1 for e in em if e == k), share=sum(1 for e in em if e == k) / len(em))
-            for k in ("no_sample", "only_uncovered", "only_non_addressed")
+            for k in ("no_sample", "only_uncovered", "only_non_addressed", "unavailable")
         }
         sampled = [s.abstain for s in scores if s.empty == ""]
         out["fallback_mass_sampled_rows"] = dict(
