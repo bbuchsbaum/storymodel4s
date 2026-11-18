@@ -175,18 +175,28 @@ def memorization(gold, comp, valid):
             "rows",
             "cs2-memorization-probe",
             fresh_model=MODEL,
+            expected_ids=set(ids),
         )
         for answer in got or []:
-            if isinstance(answer, dict) and answer.get("id") in ids:
+            if (
+                isinstance(answer, dict)
+                and answer.get("id") in ids
+                and type(answer.get("movie")) is int
+                and 1 <= answer["movie"] <= 10
+                and type(answer.get("scene")) is int
+                and 1 <= answer["scene"] <= 216
+            ):
                 answers[answer["id"]] = answer
     n = len(rows)
 
     def measure(hits, chance):
         rate = hits / n
         return dict(
-            accuracy=rate,
+            accuracy=rate if len(answers) == n else None,
             chance=chance,
-            passed=rate <= chance + 2 * math.sqrt(chance * (1 - chance) / n),
+            passed=rate <= chance + 2 * math.sqrt(chance * (1 - chance) / n)
+            if len(answers) == n
+            else None,
         )
 
     movie = sum(

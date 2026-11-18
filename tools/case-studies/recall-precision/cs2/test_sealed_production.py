@@ -52,16 +52,64 @@ class FreshCallsTest(unittest.TestCase):
                 returncode=0,
                 stdout=json.dumps(dict(modelUsage={"pinned": {}}, result=answer)),
             )
-            for answer in ("bad", '{"items": [3]}')
+            for answer in ('{"items":[3]}', '{"items":[{"id":"a"}]}')
         ]
         with patch.object(llm, "CACHE", tmp_path), patch.object(
             ff_producer, "CACHE", tmp_path
         ), patch.object(llm.subprocess, "run", side_effect=replies) as run:
             log = []
             values, attempt = ff_producer.parse_with_retry(
-                "one", "two", log, "label", "items", "example", fresh_model="pinned"
+                "one",
+                "two",
+                log,
+                "label",
+                "items",
+                "example",
+                fresh_model="pinned",
+                expected_ids={"a"},
             )
-            assert (values, attempt) == ([3], 1)
+            assert (values, attempt) == ([{"id": "a"}], 1)
             assert run.call_count == 2
             assert all(c["fresh"] for c in log)
             assert log[0]["key"] != log[1]["key"]
+
+    def test_memo_control_cannot_pass_without_eighty_valid_answers(self):
+        from cs2 import sealed_production as run
+        from cs2.source import GoldRow
+
+        gold = {
+            "synthetic": [
+                GoldRow(
+                    "synthetic",
+                    "s",
+                    i,
+                    i,
+                    i + 1,
+                    False,
+                    "specific",
+                    "work",
+                    frozenset({1}),
+                    None,
+                )
+                for i in range(80)
+            ]
+        }
+
+        def fake(*args, **kwargs):
+            return [
+                {"id": k, "movie": 100, "scene": 0} for k in kwargs["expected_ids"]
+            ], 0
+
+        with patch.object(
+            run.filmfestival, "_work_codes", return_value={1: "work"}
+        ), patch.object(run.ff_producer, "parse_with_retry", side_effect=fake):
+            result = run.memorization(gold, None, {"work": [1, 2]})
+        assert not result["complete"] and result["answered"] == 0
+        assert result["movie"]["passed"] is None and result["scene"]["passed"] is None
+
+    def test_malformed_nested_pass1_frame_is_counted(self):
+        comp = SimpleNamespace(works=[])
+        frames, bad = ff_producer.parse_frames(
+            [{"id": "U1", "kind": "content", "frame": [0]}], [{}], comp
+        )
+        assert bad == 1 and frames[0]["kind"] is None

@@ -23,6 +23,14 @@ def test_primary_rule_uses_five_coded_participants_and_all_three_gates():
     assert not sealed.primary_decision(gains, windows)["passed"]
 
 
+def test_reported_p_value_can_block_a_numerically_tied_fifth_win():
+    gains = dict.fromkeys(sealed.SCORABLE_PARTICIPANTS, 1.0)
+    gains["sub-20"] = 1e-14
+    result = sealed.primary_decision(gains, dict.fromkeys(gains, 1.0))
+    assert result["one_sided_exact_sign_flip_p"] > 1 / 32
+    assert not result["passed"]
+
+
 def test_primary_rule_refuses_to_score_unscorable_sixth_participant():
     gains = dict.fromkeys(sealed.SCORABLE_PARTICIPANTS, 1.0)
     gains["sub-06"] = 1.0

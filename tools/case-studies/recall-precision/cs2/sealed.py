@@ -301,6 +301,7 @@ def primary_decision(gains: dict, window_gains: dict) -> dict:
         sum(x > 0 for x in windows.values()),
     )
     mean = math.fsum(primary.values()) / n
+    p_value = sign_flip_p(list(primary.values()), "greater")
     return dict(
         schema="storymodel4s.case-study-2.sealed-primary/v1",
         n_sealed_sessions=len(SEALED_SESSIONS),
@@ -309,9 +310,12 @@ def primary_decision(gains: dict, window_gains: dict) -> dict:
         fixed_window_gains_bits=windows,
         primary_wins=wins,
         mean_gain_bits=mean,
-        one_sided_exact_sign_flip_p=sign_flip_p(list(primary.values()), "greater"),
+        one_sided_exact_sign_flip_p=p_value,
         fixed_window_wins=window_wins,
-        passed=wins == n and mean >= MEAN_GAIN_BITS and window_wins >= n - 1,
+        passed=wins == n
+        and p_value <= 1 / 32
+        and mean >= MEAN_GAIN_BITS
+        and window_wins >= n - 1,
         rule="5/5 primary wins, mean gain >= 0.5 bits, and >=4/5 fixed-window wins",
     )
 

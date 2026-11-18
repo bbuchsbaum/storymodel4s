@@ -1094,7 +1094,9 @@ identical recorded replies.
   The strict import keeps its weight unavailable.
 - The harness resolves equal-length innermost ties by reply order
   (`cs2/ff_producer.py:1055–1060`). Before freeze, make these unavailable as in ADR 0031 and
-  rerun affected development rows.
+  rerun affected development rows. The corrected converter found zero tied words in both
+  full FilmFestival samples, Sherlock V1, and the archived five-participant prefix run. All four
+  row files matched byte for byte across the two tie rules; all 48 prefix prompt hashes matched.
 - The default broad allocation retains a multi-scene set within one work
   (`cs2/projections.py:124–140, 168–178`). Preserve the set through projection and replay.
 

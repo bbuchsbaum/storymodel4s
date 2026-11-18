@@ -396,7 +396,7 @@ def parse_frames_v2(p1, units, comp):
             w = label_to_work.get(str(f.get("film")))
             try:
                 wt = float(f.get("w"))
-            except (TypeError, ValueError):
+            except (TypeError, ValueError, OverflowError):
                 wt = None
             if w is not None and wt and wt > 0:
                 fr.append((w, min(wt, 1.0)))
@@ -675,12 +675,29 @@ def logged_call(prompt, system, log, label, condition, *, fresh_model=None):
     return text
 
 
-def parse_with_retry(prompt, system, log, label, key, condition, *, fresh_model=None):
+def registered_rows(payload, key, expected_ids):
+    rows = payload[key]
+    if not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
+        raise ValueError("expected an array of reply records")
+    seen = set()
+    for row in rows:
+        ident = row.get("id")
+        if not isinstance(ident, str) or ident not in expected_ids or ident in seen:
+            raise ValueError("invalid or repeated reply identifier")
+        seen.add(ident)
+    return rows
+
+
+def parse_with_retry(prompt, system, log, label, key, condition, *, fresh_model=None,
+                     expected_ids=None):
     for attempt in range(3):
         sfx = "" if attempt == 0 else RETRY.format(attempt=attempt)
         text = logged_call(prompt + sfx, system, log, f"{label}#{attempt}", condition, fresh_model=fresh_model)
         try:
-            return parse_json(text)[key], attempt
+            payload = parse_json(text)
+            if fresh_model is not None:
+                return registered_rows(payload, key, expected_ids), attempt
+            return payload[key], attempt
         except (ValueError, KeyError, TypeError):
             continue
     return None, 3
@@ -770,18 +787,25 @@ def members(r, rowmap, frame_work, frame_w, comp, refuse, conv):
     """Members of one pass-2 reference, or None (refused, counted in conv['refused'])."""
     occ, extent, mode = r.get("occurrence"), r.get("extent"), r.get("mode")
     out = []
-    for a in r.get("alts") or []:
+    alternatives = r.get("alts") or []
+    if not isinstance(alternatives, list):
+        refuse("alts-invalid")
+        return None
+    for a in alternatives:
         try:
             w = float(a["w"])
             ivs = [tuple(sorted((int(x), int(y)))) for x, y in a["iv"]]
-        except (KeyError, TypeError, ValueError):
+        except (KeyError, TypeError, ValueError, OverflowError):
             refuse("alts-invalid")
             return None
-        if not (w > 0) or not ivs:
+        if not (math.isfinite(w) and w > 0) or not ivs:
             refuse("alts-empty")
             return None
         rows = []
         for lo, hi in ivs:
+            if lo not in rowmap or hi not in rowmap or hi - lo >= len(rowmap):
+                refuse("unknown-row")
+                return None
             ids = [rowmap.get(n) for n in range(lo, hi + 1)]
             if any(x is None for x in ids):
                 refuse("unknown-row")
@@ -818,7 +842,10 @@ def parse_frames(p1, units, comp):
     frames, bad = [], 0
     for i in range(len(units)):
         x = by_id.get(f"U{i + 1}")
-        if x is None or x.get("kind") not in KINDS:
+        if (x is None or x.get("kind") not in KINDS
+                or not isinstance(x.get("position", "") or "", str)
+                or not isinstance(x.get("frame") or [], list)
+                or any(not isinstance(f, dict) for f in x.get("frame") or [])):
             bad += 1
             frames.append(dict(kind=None, frame=[], position=None))
             continue
@@ -827,7 +854,7 @@ def parse_frames(p1, units, comp):
             w = label_to_work.get(str(f.get("film")))
             try:
                 wt = float(f.get("w"))
-            except (TypeError, ValueError):
+            except (TypeError, ValueError, OverflowError):
                 wt = None
             if w is not None and wt and wt > 0:
                 fr.append((w, min(wt, 1.0)))
@@ -1027,11 +1054,19 @@ def convert_session(
                     pairs = [(w, t) for w in wids for t in toks(words[w].text)]
                     utoks = [t for _, t in pairs]
                     best = {}
-                    for ri, r in enumerate(x.get("refs") or []):
+                    references = x.get("refs") or []
+                    if not isinstance(references, list):
+                        refuse("refs-invalid")
+                        references = []
+                    for ri, r in enumerate(references):
+                        if (not isinstance(r, dict) or not isinstance(r.get("words") or "", str)
+                                or not isinstance(r.get("mode") or "", str)):
+                            refuse("ref-invalid")
+                            continue
                         if "span" in r:  # layout 'prefix': word numbers of the TARGET
                             try:
                                 a_, b_ = (int(v) for v in r["span"])
-                            except (TypeError, ValueError):
+                            except (TypeError, ValueError, OverflowError):
                                 refuse("span-invalid")
                                 continue
                             if not (0 <= a_ <= b_ < len(wids)) and rules.get(
@@ -1235,6 +1270,7 @@ def run(
                 f"pass1:{p}:{s}",
                 "units",
                 conds["pass1"]["id"], fresh_model=fresh_model,
+                expected_ids={f"U{i+1}" for i in range(len(units))},
             )
             if p1 is None:
                 raise SystemExit(f"pass 1 returned no parseable JSON for {p} {s}")
@@ -1326,6 +1362,7 @@ def run(
                     f"pass2:{tag}call{bi}",
                     "items",
                     conds["pass2"]["id"], fresh_model=fresh_model,
+                    expected_ids={item["oid"] for item in batch},
                 )
                 rec.update(retries=retries, returned=len(got or []))
                 for x in got or []:

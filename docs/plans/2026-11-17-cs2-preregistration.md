@@ -205,3 +205,9 @@ items per session.
 
 At the measured development rates (about $0.20 per pass-2 call and about $0.25 per pass-1 call)
 that is roughly $33 notional. The calls run on the subscription.
+
+The primary baseline is chosen once per participant after averaging each baseline's losses.
+The registered one-sided p-value must also meet its threshold at floating-point precision.
+For the identifier-only memorization control, an incomplete set of valid guesses leaves the
+control unevaluable. Parse retries use the registered suffix. The run reserves every fresh
+call before transport. A transport failure or a different model records an interruption.
