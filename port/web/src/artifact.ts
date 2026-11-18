@@ -55,6 +55,26 @@ export function inspectArtifact(value: unknown): Inspection {
         }))},
     ]};
   }
+  if (data.schema_version === "storymodel.friends-prepared/v1") {
+    const crosswalk = record(data.crosswalk);
+    const rows = array(crosswalk.entries).map(raw => {
+      const item = record(raw);
+      const candidates = array(item.tolerance_candidates).map(candidate => {
+        const match = record(candidate);
+        return String(number(match.event)) + " (" + String(number(match.delta_seconds)) + " s)";
+      });
+      return [
+        String(number(item.more_ems_event)), String(number(item.presentation_seconds)),
+        text(item.kind), item.target_event === null ? "—" : String(number(item.target_event)),
+        candidates.join(", ")
+      ];
+    });
+    return {title: "Friends storyboard", sections: [{
+      label: "Event crosswalk",
+      columns: ["MoreEMs event", "Presentation seconds", "Match", "NarrComb event", "Candidates (difference)"],
+      rows
+    }]};
+  }
   if (data.schema_version === "storymodel.analysis-replay/v1" || data.schema_version === "storymodel.analysis-replay/v2") {
     const views=record(data.views);
     return {title:"Saved recall analysis", sections:[
@@ -66,5 +86,5 @@ export function inspectArtifact(value: unknown): Inspection {
       })},
     ]};
   }
-  throw Error("Choose a feature-window or saved analysis replay JSON file.");
+  throw Error("Choose a feature-window, Friends preparation, or analysis replay JSON file.");
 }

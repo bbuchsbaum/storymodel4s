@@ -137,3 +137,13 @@ def test_repeated_astral_words_have_distinct_spans_and_half_open_membership(
     assert (a.span.start, a.span.end, b.span.start, b.span.end) == (0, 3, 4, 7)
     assert [w.words.occurrences for w in r.windows] == [(), (a.occurrence,)]
     assert r.outside_windows == (b.occurrence,) and r.windows[1].words.lexicon.mean == 4
+
+
+@pytest.mark.parametrize(
+    ("form", "eligible"),
+    [("_", False), ("\u0301", False), ("23-4", False), ("٢,١", True), ("_1", True), ("X-1", True)],
+)
+def test_measure_eligibility_matches_surface_class_instead_of_token_start(form, eligible):
+    from storymodel.feature_windows import _eligible
+
+    assert _eligible(form) is eligible

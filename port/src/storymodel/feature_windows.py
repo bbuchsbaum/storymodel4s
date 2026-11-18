@@ -14,7 +14,7 @@ from .model import Span
 from .playback import TickInterval
 from .prepared_construction import PreparedConstruction
 from .recall_clock import RecordingQuery, TimedDetail, _timed_replay
-from .recall_intake import _token_spans, _word_code_point
+from .recall_intake import _token_spans
 from .sherlock_recall import SherlockRecall
 from .sherlock_source import SherlockSource
 
@@ -84,10 +84,27 @@ class FeatureWindows(Model):
     source_words: tuple[WordSample, ...]
     details: tuple[TimedDetail, ...]
     windows: tuple[Window, ...]
+    ineligible_recall: dict[str, Span]
     missing_onset: tuple[str, ...]
     outside_windows: tuple[str, ...]
     unit_intervals: dict[int, Summary]
     source_scenes: dict[str, Summary]
+
+
+def _eligible(form: str) -> bool:
+    """Apply the Scala surface word/number test to a complete token."""
+    if any(ch.isalpha() for ch in form):
+        return True
+    if not any(ch.isdecimal() for ch in form):
+        return False
+    for i, ch in enumerate(form):
+        if ch.isdecimal() or ch == "_":
+            continue
+        if ch not in ".," or i == 0 or i + 1 == len(form):
+            return False
+        if not (form[i - 1].isdecimal() and form[i + 1].isdecimal()):
+            return False
+    return True
 
 
 def _sample(
@@ -137,7 +154,7 @@ def _scene_features(
             for ch in text:
                 offsets.append(offsets[-1] + (2 if ord(ch) > 0xFFFF else 1))
             for begin, end in _token_spans(text, (0, len(text))):
-                if _word_code_point(text[begin]):
+                if _eligible(text[begin:end]):
                     span = Span(start=offsets[begin], end=offsets[end])
                     scene_words.append(
                         _sample(
@@ -169,11 +186,15 @@ def feature_windows(plan: Path, query: RecordingQuery, lexicon: Lexicon) -> Feat
     starts = [int(b.start) for b in query.bins]
     groups: list[list[WordSample]] = [[] for _ in starts]
     samples = []
+    ineligible = {}
     missing, outside = [], []
     intervals: dict[int, list[WordSample]] = {i.unit: [] for i in query.intervals}
     for word in recall.words:
         span = word.span
         form = encoded[2 * span.start : 2 * span.end].decode("utf-16-le")
+        if not _eligible(form):
+            ineligible[word.id] = span
+            continue
         onset = timed.word_onsets[word.id]
         sample = _sample(word.id, span, form, onset, lexicon)
         samples.append(sample)
@@ -217,6 +238,7 @@ def feature_windows(plan: Path, query: RecordingQuery, lexicon: Lexicon) -> Feat
         source_words=tuple(source_words),
         details=timed.entries,
         windows=windows,
+        ineligible_recall=ineligible,
         missing_onset=tuple(missing),
         outside_windows=tuple(outside),
         unit_intervals={u: _summarize(words) for u, words in intervals.items()},

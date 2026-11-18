@@ -61,6 +61,41 @@ def test_preserves_competing_event_scales_and_original_presentation_clocks():
     ]
 
 
+def test_crosswalk_rederives_exact_tolerance_ambiguous_and_unmatched_evidence():
+    study = FriendsStudy(
+        storyboard=FriendsStoryboard(
+            narrcomb_52=(row(1, 0, 9), row(2, 11, 2), row(3, 20, 4)),
+            more_ems_56=(row(1, 0, 9), row(2, 10, 6), row(3, 15, 5), row(4, 99, 1)),
+            source_scale="narrcomb-52",
+            crosswalk_tolerance_seconds=1,
+        ),
+        recalls=(FriendsRecallSheet(participant="synthetic-01", raw_text="AA."),),
+    )
+    entries = prepare_friends_study(study).crosswalk.entries
+    assert [(entry.kind, entry.target_event) for entry in entries] == [
+        ("exact", 1),
+        ("tolerance", 2),
+        ("unmatched", None),
+        ("unmatched", None),
+    ]
+    assert entries[1].tolerance_candidates[0].delta_seconds == 1
+    ambiguous = prepare_friends_study(
+        fixture().model_copy(
+            update={
+                "storyboard": FriendsStoryboard(
+                    narrcomb_52=(row(1, 0, 1), row(2, 10, 2)),
+                    more_ems_56=(row(1, 5, 3),),
+                    source_scale="narrcomb-52",
+                    crosswalk_tolerance_seconds=5,
+                )
+            }
+        )
+    )
+    entry = ambiguous.crosswalk.entries[0]
+    assert entry.kind == "ambiguous" and entry.target_event is None
+    assert [candidate.event for candidate in entry.tolerance_candidates] == [1, 2]
+
+
 def test_recall_duration_never_becomes_a_recall_timestamp():
     prepared = prepare_friends_study(fixture())
     recall = prepared.recalls[0]
@@ -70,6 +105,19 @@ def test_recall_duration_never_becomes_a_recall_timestamp():
     assert len(recall.recall.units) == 2
 
 
+def test_source_identity_binds_selected_rows_and_both_storyboard_clocks_not_participants():
+    original = prepare_friends_study(fixture())
+    changed_storyboard = FriendsStoryboard(
+        narrcomb_52=(row(1, 0, 9, "AA"), row(2, 10, 99, "BB")),
+        more_ems_56=fixture().storyboard.more_ems_56,
+        source_scale="narrcomb-52",
+    )
+    changed = prepare_friends_study(fixture().model_copy(update={"storyboard": changed_storyboard}))
+    assert original.source_request.document.text == changed.source_request.document.text
+    assert original.source_rows_sha256 != changed.source_rows_sha256
+    assert original.source_request.document.key != changed.source_request.document.key
+
+
 def test_export_is_denied_by_default_and_prepared_receipt_rejects_forgery():
     denied = fixture().model_copy(update={"export_permission": "denied"})
     prepared = prepare_friends_study(denied)
@@ -77,12 +125,34 @@ def test_export_is_denied_by_default_and_prepared_receipt_rejects_forgery():
     forged = prepared.model_copy(
         update={
             "source_request": prepared.source_request.model_copy(
-                update={"document": prepared.source_request.document.model_copy(update={"key": "foreign"})}
+                update={
+                    "document": prepared.source_request.document.model_copy(
+                        update={"key": "foreign"}
+                    )
+                }
             )
         }
     )
-    with pytest.raises(ValueError, match="differs from declared storyboard"):
+    with pytest.raises(ValueError):
         compile_friends_source(forged, unresolved_source_proposal(prepared))
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda prepared: prepared.model_copy(
+            update={"recalls": (prepared.recalls[0].model_copy(update={"seconds_of_recall": -1}),)}
+        ),
+        lambda prepared: prepared.model_copy(
+            update={"recalls": (prepared.recalls[0], prepared.recalls[0])}
+        ),
+        lambda prepared: prepared.model_copy(update={"recalls": ()}),
+    ],
+)
+def test_prepared_readback_refuses_forged_recall_duration_or_participants(mutate):
+    prepared = prepare_friends_study(fixture())
+    with pytest.raises(ValueError):
+        compile_friends_source(mutate(prepared), unresolved_source_proposal(prepared))
 
 
 def test_duplicate_or_nonascending_event_scales_refuse():

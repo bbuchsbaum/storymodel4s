@@ -9,12 +9,12 @@ from __future__ import annotations
 
 from hashlib import sha256
 from pathlib import Path
-from typing import Self
+from typing import Literal, Self
 
 from pydantic import model_validator
 
 from ._lexical import stem_set
-from .analysis_workflow import AnalysisPlan, replay_analysis
+from .analysis_workflow import AnalysisPlan, AnalysisReplay, replay_analysis
 from .local_evidence import (
     AccountInferenceResult,
     LocalCell,
@@ -26,7 +26,8 @@ from .local_evidence import (
     derive_local_evidence,
     infer_accounts,
 )
-from .model import Digest, Model, _validate_instance, text_evidence, text_support
+from .model import Digest, Model, _validate_instance, text_support
+from .rich_account import SupportedAccount
 from .sequence import SequenceResult
 from .serialization import canonical, digest, strict_json
 
@@ -63,7 +64,10 @@ class CaptionLexicalScore(Model):
 class AlignmentMethodResult(Model):
     """One plan-bound lexical run, with each inferential stage left inspectable."""
 
-    schema_version: str = "storymodel.alignment-method/v1"
+    schema_version: Literal["storymodel.alignment-method/v1"] = "storymodel.alignment-method/v1"
+    blend: float
+    max_candidates: int
+    max_postings: int
     plan_sha256: Digest
     source_sha256: Digest
     recall_sha256: Digest
@@ -74,26 +78,33 @@ class AlignmentMethodResult(Model):
     decoding: SequenceResult
 
 
-def _recall_before_pairing(replay):
+def _recall_before_pairing(replay: AnalysisReplay) -> SupportedAccount:
     """Use the recall branch after its saved detail stages, before source pairing."""
-    return replay.recall_details[-1].result.account if replay.recall_details else replay.recall.account
-
-
-def _support_text(supports, documents: dict[str, str]) -> str:
-    return " ".join(
-        span.slice(documents[support.document]) for support in supports for span in support.spans
+    return (
+        replay.recall_details[-1].result.account if replay.recall_details else replay.recall.account
     )
 
 
-def _ordered_selections(recall) -> tuple[RecallSelection, ...]:
+def _ordered_selections(recall: SupportedAccount) -> tuple[RecallSelection, ...]:
     """Use occurrence order, never account serialization order, for decoder rows."""
-    def occurrence(unit) -> tuple[str, int, str]:
-        support = text_support(unit.support)
-        return support.document, support.spans[0].start, unit.id
 
+    ordered: list[tuple[int, str]] = []
+    documents = set()
+    starts = set()
+    for unit in recall.units:
+        if unit.kind != "recall":
+            continue
+        support = text_support(unit.support)
+        documents.add(support.document)
+        if len(documents) > 1:
+            raise ValueError("caption decoding requires one recall document")
+        start = support.spans[0].start
+        if start in starts:
+            raise ValueError("tied recall starts require an explicit sequence order")
+        starts.add(start)
+        ordered.append((start, unit.id))
     return tuple(
-        RecallSelection(unit=unit.id, content="text-only")
-        for unit in sorted((u for u in recall.units if u.kind == "recall"), key=occurrence)
+        RecallSelection(unit=unit_id, content="text-only") for _, unit_id in sorted(ordered)
     )
 
 
@@ -135,27 +146,27 @@ def run_alignment_method(
     )
     candidates = derive_local_evidence(replay.source.account, recall, baseline_spec)
     recall_docs = {document.id: document.text for document in recall.documents}
-    source_supports = {
-        **{unit.id: (text_support(unit.support),) for unit in replay.source.account.units},
-        **{
-            situation.id: text_evidence(situation.evidence)
-            for situation in replay.source.account._situations()
-        },
-    }
-    unknown = set(captions.captions) - set(source_supports)
+    known_targets = {node.anchor for node in candidates.sequence.projection.nodes}
+    unknown = captions.captions.keys() - known_targets
     if unknown:
         raise ValueError("caption evidence names a target outside the checked source")
-    unit_by_id = {unit.id: unit for unit in recall.units}
+    recall_terms = {}
+    for unit in recall.units:
+        support = text_support(unit.support)
+        surface = " ".join(span.slice(recall_docs[support.document]) for span in support.spans)
+        recall_terms[unit.id] = stem_set(surface)
     scores = []
     semantic_cells = []
     for cell in candidates.cells:
-        unit_terms = stem_set(
-            _support_text((text_support(unit_by_id[cell.unit].support),), recall_docs)
-        )
+        unit_terms = recall_terms[cell.unit]
         caption = captions.captions.get(cell.target, "")
         lexical = cell.terms["semantic"]
         caption_distance = _distance(unit_terms, stem_set(caption)) if caption.strip() else None
-        blended = (1 - blend) * lexical + blend * caption_distance if caption_distance is not None else None
+        blended = (
+            (1 - blend) * lexical + blend * caption_distance
+            if caption_distance is not None
+            else None
+        )
         scores.append(
             CaptionLexicalScore(
                 unit=cell.unit,
@@ -203,6 +214,9 @@ def run_alignment_method(
         )
     )
     return AlignmentMethodResult(
+        blend=blend,
+        max_candidates=max_candidates,
+        max_postings=max_postings,
         plan_sha256=sha256(raw_plan).hexdigest(),
         source_sha256=source_sha256,
         recall_sha256=digest(recall.model_dump(mode="json")),

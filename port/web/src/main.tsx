@@ -30,7 +30,7 @@ function Workbench() {
     <main>
       <h1>StoryModel workbench</h1>
       <label>
-        Open a saved analysis or feature table
+        Open a saved StoryModel artifact
         <input type="file" accept=".json,application/json"
           onChange={event => void open(event.target.files?.[0])} />
       </label>

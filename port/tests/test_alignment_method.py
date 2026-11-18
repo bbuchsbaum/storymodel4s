@@ -49,7 +49,9 @@ def _write_plan(root: Path) -> tuple[Path, RichAccount]:
     return path, source
 
 
-def test_saved_plan_keeps_caption_lexical_stages_separate_and_changes_decoding(tmp_path: Path) -> None:
+def test_saved_plan_keeps_caption_lexical_stages_separate_and_changes_decoding(
+    tmp_path: Path,
+) -> None:
     plan, source = _write_plan(tmp_path)
     target = source.states[0].id
     source_sha256 = digest(source.model_dump(mode="json"))
@@ -79,3 +81,48 @@ def test_saved_plan_keeps_caption_lexical_stages_separate_and_changes_decoding(t
     forged = matching.model_copy(update={"source_sha256": "0" * 64})
     with pytest.raises(ValueError, match="different source"):
         run_alignment_method(plan, forged)
+
+
+def test_caption_decoder_requires_single_recall_document(tmp_path):
+    plan, source = _write_plan(tmp_path)
+    path = tmp_path / "recall.json"
+    recall = RichAccount.model_validate_json(path.read_bytes())
+    other = Document.create("other-recording", "recall", "visit")
+    other_unit = Unit(
+        kind="recall", support=Support(document=other.id, spans=({"start": 0, "end": 5},))
+    )
+    expanded = validate_rich_account(
+        recall.model_copy(
+            update={"documents": (*recall.documents, other), "units": (*recall.units, other_unit)}
+        )
+    )
+    path.write_text(expanded.model_dump_json())
+    captions = CaptionEvidence(
+        source_sha256=digest(source.model_dump(mode="json")),
+        captions={source.states[0].id: "visit"},
+    )
+    with pytest.raises(ValueError, match="one recall document"):
+        run_alignment_method(plan, captions)
+
+
+def test_sequence_orders_units_by_text_onset(tmp_path):
+    plan, source = _write_plan(tmp_path)
+    recall = _account("recall", "visit visit")
+    # Store the late occurrence first.
+    doc = recall.documents[0]
+
+    def word(lo, hi):
+        return Unit(
+            kind="recall", support=Support(document=doc.id, spans=({"start": lo, "end": hi},))
+        )
+
+    early, late = word(0, 5), word(6, 11)
+    ordered = validate_rich_account(recall.model_copy(update={"units": (late, early)}))
+    (tmp_path / "recall.json").write_text(ordered.model_dump_json())
+    sidecar = CaptionEvidence(
+        source_sha256=digest(source.model_dump(mode="json")),
+        captions={source.states[0].id: "visit"},
+    )
+    readout = run_alignment_method(plan, sidecar)
+    assert [row.unit for row in readout.retrieval] == [early.id, late.id]
+    assert [row.unit for row in readout.decoding.posterior] == [early.id, late.id]
