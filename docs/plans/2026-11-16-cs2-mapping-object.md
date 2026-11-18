@@ -1131,3 +1131,41 @@ works, ending recall and off-task speech contribute the three non-work states.
 4. FilmFestival two-level producer runs (two samples), then the yardstick and controls.
 5. Progress page and critique round, including visualization.
 6. Library gaps through an ADR, then slices.
+
+### Round 6 development screen for adjacent scenes
+
+Before scoring, fix the flag from the content producer alone. Take its unique top work and
+its two highest scenes in that work. Require a unique first and unambiguous second,
+adjacency in the valid scene order, a conditional probability margin of at most 0.20,
+and a cited unit in the leading scene within five seconds of the other scene on a single
+showing clock. Apply the flag to all rows, including rows without a scene score.
+
+Compare against round 5's order fallback on all scene-scored rows, averaging first within
+participant. As a ceiling, move all the pair's existing mass to a gold member whenever
+exactly one is gold. Measure false alerts, misses caught, and how often the pair includes
+a gold answer. If even a perfect choice falls below the round-5 FilmFestival scene noise
+band in both samples, stop before commissioning an adjudicator. Use Sherlock as a separate
+development check. Preserve the primary account and keep both sealed sets closed.
+
+The pair ceiling cleared 0.041 bits in both FilmFestival samples. For a local content-only
+check, compare each flagged row's recall words with the two scene descriptions by TF-IDF
+cosine. Give the normalized two cosines half the weight and the existing pair odds half.
+Leave zero-overlap pairs alone. Fix this rule before scoring it. Report scene bits, film-time
+error and out-of-order top-scene accuracy on all their eligible rows.
+
+| Development result | FilmFestival 1 | FilmFestival 2 | Sherlock |
+|---|---:|---:|---:|
+| Flagged rows with scene gold | 269/1975 | 264/1975 | 27/385 |
+| Already correct among flagged | 206 | 192 | 17 |
+| Misses flagged / all round-5 misses | 63/310 | 72/314 | 10/53 |
+| Gold candidate present among flagged misses | 48/63 | 58/72 | 9/10 |
+| Perfect choice, maximum improvement in scene bits | 0.064 | 0.064 | 0.058 |
+| Round 5 → lexical choice, scene bits | 0.7977 → 0.8039 | 0.7678 → 0.7721 | 0.7482 → 0.7545 |
+| Film-time error, seconds | 6.393 → 6.403 | 6.321 → 6.325 | 38.042 → 38.039 |
+| Out-of-order top-scene accuracy | .770 → .805 | .777 → .800 | .669 → .662 |
+
+The two FilmFestival draws use the same ten development participants. The screen ran on
+all 2,282 rows per draw. One extra flag per draw lacked scene gold. The lexical rule raised
+the registered loss in every replay. Retain round 5. The perfect-choice ceiling includes
+confidence gains on already-correct rows. It does not estimate an attainable improvement.
+Reproduce on the recorded replies with `python -m cs2.round6` from the case-study directory.
