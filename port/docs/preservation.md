@@ -874,3 +874,32 @@ forms and their 18 length, frequency and lexicon outcomes. The JVM probes ran on
 reference `3171f5b07`. The Python suite passed 1,120 tests in 40.12 seconds. Ruff,
 mypy and independent review passed. Media acquisition, cross-edition correspondence,
 general feature tracks and relation-aware refinement remain on the roadmap.
+
+## Directed relation refinement in account inference
+
+[Run the account example](refinement.md) or call `infer_refined_accounts`. The base
+local evidence, admitted recall claims, reasons for exclusions, final costs, posterior,
+adjacent flow and best path can all be inspected from the same saved result.
+Scala's references are `GraphHsmm` and `RelationPreservation` in `align/hsmm.scala`
+and the positive-edge traversal in `align/source.scala`.
+The Python kernel queries one candidate anchor at a time to bound traversal memory.
+
+On the [Scala/JVM reference fixture](../evidence/refinement/README.md), both implementations
+returned world-time agreement of 2/3, causal agreement of 4/15, and the same six corrected
+costs. A two-unit test independently enumerates all 49 paths, including external alternatives.
+Accumulating adjustments across passes in a temporary copy broke all 49 path probabilities
+while both control tests passed. The Python diagnostic also conditions each endpoint
+individually so that small positive source masses survive a product that would underflow.
+
+A local installed-wheel run used a 48-situation source chain and 24 recall units, each
+with two nominated source candidates. At weight 2, two refinement passes evaluated 23
+causal claims. The tractable input had 96 projected nodes, 545 layer edges, 168 admitted
+states across rows and 1,127 adjacent transitions. One full API call took 0.68 seconds
+with 5.56 MiB peak Python allocations under tracemalloc, excluding fixture construction.
+This measures the declared workload on one machine.
+
+Installed API and CLI artifacts matched byte for byte. The CLI exported the original
+base request, and replay verification rejected an edited policy. At commit `14de29ca8`
+all 1,134 Python tests passed in 65.95 seconds. Ruff, mypy and independent code review
+passed. Existing organization and reconstruction commands still consume baseline account
+inference. Passing a verified refined posterior into these readouts is the next step.
