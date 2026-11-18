@@ -8,6 +8,12 @@ from sherlock_workflow import run as run_sherlock
 
 from storymodel.analysis_workflow import replay_analysis_file
 from storymodel.artifacts import export_supported_account, publish_json
+from storymodel.concentration import (
+    ConcentrationQuery,
+    CoverageTarget,
+    ShortestWindow,
+    source_concentration,
+)
 from storymodel.exposure import ExposureQuery, WordIntervals, recall_exposure
 from storymodel.local_evidence import LocalEvidenceSpec, RecallSelection
 from storymodel.local_reference import LocalReferenceSpec
@@ -138,7 +144,17 @@ def run(destination: Path) -> None:
                 exposure=exposure_query,
             )
             transported = project_source_grid(plan, transport_query)
+            concentration_query = ConcentrationQuery(
+                grid=transport_query,
+                unit=transport_spec.units[0].unit,
+                operation=ShortestWindow(
+                    target=CoverageTarget(basis="share-of-allocated-source", value="1/2")
+                ),
+            )
+            concentration = source_concentration(plan, concentration_query)
             for filename, artifact in (
+                ("concentration-query.json", concentration_query),
+                ("concentration.json", concentration),
                 ("transport-spec.json", transport_spec),
                 ("transport.json", transported.transport),
                 ("transport-grid-query.json", transport_query),

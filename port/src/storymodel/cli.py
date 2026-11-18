@@ -36,6 +36,7 @@ from .claim_assessment import (
     validate_claim_plan,
     verify_claim_assessment,
 )
+from .concentration import ConcentrationQuery, source_concentration
 from .construction_links import (
     ConnectedConstructionResult,
     connect_rich_construction,
@@ -406,6 +407,8 @@ def main(argv: list[str] | None = None) -> int:
             "project an account measure into source-time bins",
         ),
         ("verify-source-time-grid", "recompute a saved source-time grid"),
+        ("source-concentration", "locate a recall unit's measure on the source timeline"),
+        ("verify-source-concentration", "recompute a saved concentration result"),
         ("recall-exposure", "measure unit durations from word intervals on a recording"),
         ("verify-recall-exposure", "recompute a saved recording-window exposure"),
     ):
@@ -1678,6 +1681,25 @@ def main(argv: list[str] | None = None) -> int:
                 )
             else:
                 emit(feature_result, args.output)
+        elif args.command in ("source-concentration", "verify-source-concentration"):
+            concentration_query = ConcentrationQuery.model_validate_json(
+                canonical(strict_json(Path(args.query).read_bytes()))
+            )
+            concentration = source_concentration(Path(args.plan), concentration_query)
+            concentration_payload = concentration.model_dump(mode="json")
+            if args.command == "verify-source-concentration":
+                if canonical(strict_json(Path(args.result).read_bytes())) != canonical(
+                    concentration_payload
+                ):
+                    raise ValueError(
+                        "source concentration differs from the replayed plan and query"
+                    )
+                emit(
+                    {"verified": True, "analysis_sha256": concentration.analysis_sha256},
+                    args.output,
+                )
+            else:
+                emit(concentration_payload, args.output)
         elif args.command in ("source-time-grid", "verify-source-time-grid"):
             grid_input = strict_json(Path(args.query).read_bytes())
             if isinstance(grid_input, dict) and "transport" in grid_input:
