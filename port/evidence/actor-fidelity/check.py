@@ -97,21 +97,31 @@ def cases():
     return result
 
 
-def write_packets(path):
-    prompts = [v[0] for v in cases().values()]
+def write_packets(path, trials):
+    prompts = [v[0] for v in trials.values()]
     random.Random(20261117).shuffle(prompts)
     with path.open("x") as out:
         json.dump(prompts, out)
 
 
-def score(path):
-    trials = cases()
+def subject_lookup(prompt):
+    """Post hoc comparator for this fixture's single-clause, subject-first grammar."""
+    question = prompt["questions"][0]
+    (target_id,) = question["hypothesis"]["targets"]
+    target = next(t for t in prompt["source_targets"] if t["id"] == target_id)
+    (span,) = target["support"]["spans"]
+    (source,) = prompt["source_documents"]
+    words = source["text"][span["start"] : span["end"]].split()
+    if words[0] == "Someone":
+        return "unverifiable"
+    return "supported" if words[1] == prompt["recall"]["text"].split()[1] else "contradicted"
+
+
+def replay_grades(path, trials):
     records = json.loads(path.read_text())
     by_key = {r["packet_sha256"]: r for r in records}
     if len(records) != len(by_key) or set(by_key) != set(trials):
         raise ValueError("duplicate, missing, or unregistered packet")
-    counts = {k: Counter() for k in GROUPS}
-    recovered = {k: set() for k in GROUPS}
     for key, (_, request, document, event, condition) in trials.items():
         r = by_key[key]
         assessment = dict(hypothesis="a0", status=r["status"], reason=r["reason"])
@@ -141,6 +151,14 @@ def score(path):
             outcome = grade.grade if grade.status == "completed" else grade.status
         else:
             outcome = "rejected"
+        yield event, condition, outcome
+
+
+def score(path):
+    trials = cases()
+    counts = {k: Counter() for k in GROUPS}
+    recovered = {k: set() for k in GROUPS}
+    for event, condition, outcome in replay_grades(path, trials):
         counts[condition][outcome] += 1
         if outcome in GROUPS[condition]:
             recovered[condition].add(event)
@@ -149,6 +167,7 @@ def score(path):
         correct={k: len(v) for k, v in recovered.items()},
         complete_triplets=len(set.intersection(*recovered.values())),
         scene_only_always_supported=sum(v[-1] == "stated" for v in trials.values()),
+        subject_lookup_correct=sum(subject_lookup(v[0]) in GROUPS[v[-1]] for v in trials.values()),
         total=len(trials),
     )
 
@@ -160,6 +179,6 @@ if __name__ == "__main__":
     sub.add_parser("score").add_argument("responses", type=Path)
     args = parser.parse_args()
     if args.mode == "prepare":
-        write_packets(args.output)
+        write_packets(args.output, cases())
     else:
         print(json.dumps(score(args.responses), indent=2))

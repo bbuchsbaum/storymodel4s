@@ -15,6 +15,11 @@ The library admitted all 24 assessments with source spans and preserved every su
 reference. Scoring an event match as evidence for every recalled detail would label all
 24 supported and recover 8. All eight events met all three conditions.
 
+A post hoc word lookup also scored 24/24. It compares the subject noun in the supplied
+source row with the subject noun in recall, and abstains on an anonymous subject.
+This makes the exercise a check on how grades travel through the library. The sentences
+are too regular to distinguish semantic understanding from subject-word matching.
+
 ## Reproduction
 
 From a checkout with the port installed in the active Python environment, run
