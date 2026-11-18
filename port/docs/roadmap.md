@@ -572,10 +572,12 @@ with a broken old implementation needs repair or replacement, not silent deletio
   supplied unit intervals and saved detail/reference mappings to window-level measurements.
   The [lexical feature workflow](feature-workflow.md) now measures token length and lexicon
   scores in recording windows, supplied unit intervals and source annotation scenes. Caption
-  scoring adds an explicit sidecar to sparse decoding, and the synthetic Friends example
-  exercises a second study through the saved analysis inspector. Next, use a matched Scala
-  fixture to broaden caption correspondence and feature eligibility, then take the next
-  retained inference method with stable inputs.
+  scoring accepts both target-keyed text and exact native intervals on Sherlock annotation
+  rows. The synthetic Friends example exercises a second study through the saved analysis
+  inspector. The next inference workflow is graph-HSMM relation refinement. The Scala
+  implementation recomputes each pass from the base emission costs and prior posterior
+  using directed temporal and causal edges. Its diagnostic reports how many stated edges
+  had evaluable endpoints. Preserve both the direction and the denominator through replay.
   Review evolving Scala case-study results at computational milestones for confirmed fixes or
   settled changes to shared contracts. General clock maps, additional study adapters and the
   remaining graph, inference and inspection work stay on the phase plan.

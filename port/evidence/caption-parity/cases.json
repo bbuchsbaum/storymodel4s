@@ -1,0 +1,82 @@
+{
+  "schema": "storymodel.caption-exact-parity/v1",
+  "coordinate": {
+    "unit": "native-tick",
+    "interval": "half-open [start,end)",
+    "identity": ["physical_source", "start", "end"]
+  },
+  "parts": [
+    {"id": "part-a", "physical_source": "synthetic-edition-a", "start": "0", "end": "1000"},
+    {"id": "part-b", "physical_source": "synthetic-edition-b", "start": "0", "end": "1000"}
+  ],
+  "captions": [
+    {"id": "cap-a-100-200", "part": "part-a", "start": "100", "end": "200", "text": "AA"},
+    {"id": "cap-a-100-200-replayed", "part": "part-a", "start": "100", "end": "200", "text": "AA2"},
+    {"id": "cap-b-100-200", "part": "part-b", "start": "100", "end": "200", "text": "BB"}
+  ],
+  "cases": [
+    {
+      "id": "exact",
+      "targets": [{"id": "target-a", "part": "part-a", "intervals": [["100", "200"]], "points": []}],
+      "caption_ids": ["cap-a-100-200"],
+      "expect": {"outcome": "matched", "matches": [{"target": "target-a", "caption": "cap-a-100-200"}]}
+    },
+    {
+      "id": "partial",
+      "targets": [{"id": "target-a", "part": "part-a", "intervals": [["120", "180"]], "points": []}],
+      "caption_ids": ["cap-a-100-200"],
+      "expect": {"outcome": "refused", "reason": "caption-has-no-unique-exact-target"}
+    },
+    {
+      "id": "ambiguous-reused-caption",
+      "targets": [{"id": "target-a", "part": "part-a", "intervals": [["100", "200"]], "points": []}],
+      "caption_ids": ["cap-a-100-200", "cap-a-100-200-replayed"],
+      "expect": {"outcome": "refused", "reason": "ambiguous-caption-support"}
+    },
+    {
+      "id": "different-part-same-native-interval",
+      "targets": [{"id": "target-b", "part": "part-b", "intervals": [["100", "200"]], "points": []}],
+      "caption_ids": ["cap-a-100-200"],
+      "expect": {"outcome": "refused", "reason": "caption-has-no-unique-exact-target"}
+    },
+    {
+      "id": "touching-intervals-canonicalize-to-exact",
+      "targets": [{"id": "target-a", "part": "part-a", "intervals": [["100", "150"], ["150", "200"]], "points": []}],
+      "caption_ids": ["cap-a-100-200"],
+      "expect": {"outcome": "matched", "matches": [{"target": "target-a", "caption": "cap-a-100-200"}]}
+    },
+    {
+      "id": "disjoint-intervals",
+      "targets": [{"id": "target-a", "part": "part-a", "intervals": [["100", "150"], ["160", "200"]], "points": []}],
+      "caption_ids": ["cap-a-100-200"],
+      "expect": {"outcome": "refused", "reason": "caption-has-no-unique-exact-target"}
+    },
+    {
+      "id": "point-plus-exact-interval",
+      "targets": [{"id": "target-a", "part": "part-a", "intervals": [["100", "200"]], "points": ["150"]}],
+      "caption_ids": ["cap-a-100-200"],
+      "expect": {"outcome": "refused", "reason": "caption-has-no-unique-exact-target"}
+    },
+    {
+      "id": "duplicate-target-interval",
+      "targets": [
+        {"id": "target-a-1", "part": "part-a", "intervals": [["100", "200"]], "points": []},
+        {"id": "target-a-2", "part": "part-a", "intervals": [["100", "200"]], "points": []}
+      ],
+      "caption_ids": ["cap-a-100-200"],
+      "expect": {"outcome": "refused", "reason": "caption-has-no-unique-exact-target"}
+    },
+    {
+      "id": "two-parts-swapped-input-equal-native-ticks",
+      "targets": [
+        {"id": "target-b", "part": "part-b", "intervals": [["100", "200"]], "points": []},
+        {"id": "target-a", "part": "part-a", "intervals": [["100", "200"]], "points": []}
+      ],
+      "caption_ids": ["cap-a-100-200", "cap-b-100-200"],
+      "expect": {"outcome": "matched", "matches": [
+        {"target": "target-b", "caption": "cap-b-100-200"},
+        {"target": "target-a", "caption": "cap-a-100-200"}
+      ]}
+    }
+  ]
+}

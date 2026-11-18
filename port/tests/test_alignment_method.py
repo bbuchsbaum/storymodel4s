@@ -2,16 +2,95 @@
 
 from __future__ import annotations
 
+import json
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 
 from storymodel.accounts import make_account
-from storymodel.alignment_method import CaptionEvidence, run_alignment_method
+from storymodel.alignment_method import (
+    CaptionEvidence,
+    NativeCaption,
+    NativeCaptionEvidence,
+    _match_native_captions,
+    run_alignment_method,
+)
 from storymodel.analysis_workflow import AnalysisAccountInput, AnalysisFile, AnalysisPlan
 from storymodel.model import Context, Document, State, Support, Unit
+from storymodel.playback import PlaybackSupport, TickInterval
 from storymodel.rich_account import RichAccount, validate_rich_account
 from storymodel.serialization import canonical, digest
+
+_PARITY_DIR = Path(__file__).resolve().parents[1] / "evidence/caption-parity"
+_CAPTION_FIXTURE = json.loads((_PARITY_DIR / "cases.json").read_bytes())
+
+
+@pytest.mark.parametrize("case", _CAPTION_FIXTURE["cases"], ids=lambda case: case["id"])
+def test_native_caption_parity_cases(case):
+    data = _CAPTION_FIXTURE
+    parts = {part["id"]: part["physical_source"] for part in data["parts"]}
+    captions = {
+        c["id"]: NativeCaption(
+            source=parts[c["part"]],
+            interval=TickInterval(start=c["start"], end=c["end"]),
+            text=c["text"],
+        )
+        for c in data["captions"]
+    }
+    rows = {
+        target["id"]: PlaybackSupport(
+            source=parts[target["part"]],
+            intervals=tuple(TickInterval(start=a, end=b) for a, b in target["intervals"]),
+            points=tuple(target["points"]),
+        )
+        for target in case["targets"]
+    }
+    ids = case["caption_ids"]
+    try:
+        matched = _match_native_captions(rows, tuple(captions[key] for key in ids))
+    except ValueError as exc:
+        actual = {"outcome": "refused", "reason": str(exc).replace(" ", "-")}
+    else:
+        caption_by_row = dict(zip(matched, ids, strict=True))
+        actual = {
+            "outcome": "matched",
+            "matches": [
+                {"target": row, "caption": caption_by_row[row]}
+                for row in rows
+                if row in caption_by_row
+            ],
+        }
+    assert actual == case["expect"], case["id"]
+
+
+def test_native_caption_alignment_replays_to_actual_source_rows(tmp_path):
+    root = tmp_path / "example"
+    script = Path(__file__).resolve().parents[1] / "examples/feature_windows.py"
+    subprocess.run([sys.executable, str(script), str(root)], check=True)
+    plan = root / "analysis-1.json"
+    native = NativeCaptionEvidence.model_validate_json((root / "native-captions.json").read_bytes())
+    readout = run_alignment_method(plan, native, blend=1)
+    receipt = json.loads((root / "source/construction.json").read_bytes())
+    rows = {r["row"]: r["unit"] for r in receipt["construction"]["resolutions"]}
+    assert readout.native_caption_targets == (rows["sherlock:row:0001"], rows["sherlock:row:0005"])
+    assert readout.caption_evidence_sha256 == digest(native.model_dump(mode="json"))
+    assert any(
+        s.target == rows["sherlock:row:0001"] and s.caption_distance == 0.5
+        for s in readout.caption_scores
+    )
+    assert all(
+        s.caption_distance is None
+        for s in readout.caption_scores
+        if s.target not in readout.native_caption_targets
+    )
+    with pytest.raises(ValueError, match="no unique exact target"):
+        wrong = native.captions[0].model_copy(update={"source": native.captions[1].source})
+        run_alignment_method(plan, native.model_copy(update={"captions": (wrong,)}))
+    explicit = json.loads((root / "caption-alignment.json").read_bytes())
+    assert explicit["schema_version"] == "storymodel.alignment-method/v1"
+    assert "native_caption_targets" not in explicit
 
 
 def _account(side: str, text: str) -> RichAccount:

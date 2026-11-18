@@ -46,6 +46,14 @@ The Scala behavioral references are `features/measure.scala` (TokenLength and Le
 eligible population. Nonlexical punctuation is outside that population. Additional feature
 spaces, smoothing kernels, derivation tracking and the full eligibility ledger remain open.
 
+For a supplied sequence of surface forms, `LexicalLedger` also computes whole-sequence
+type frequency. Use `LexicalLedger.from_text(text)` to tokenize a string, or pass observed
+forms directly. For example, `LexicalLedger(("AA", "aa", "_", "BB"))` gives frequencies
+`[2, 2, None, 1]` when queried by occurrence index. The underscore is ineligible. With
+a lexicon containing only `aa: 0`, both occurrences of AA have a measured value of zero
+and BB is an eligible word with a missing norm. The input sequence defines the population
+for the frequency count. [Scala measurement fixture](../evidence/lexical-parity/README.md)
+
 ## Caption evidence and alignment
 
 The same synthetic example saves a separate `captions.json` and a decoded alignment.
@@ -60,9 +68,28 @@ budget from a retrieved target that scored poorly.
 A decode covers one recall document. Units are sorted by their start in that transcript.
 Selecting units from multiple documents or with tied starts raises a validation error.
 
-The Scala reference is `align/.../captionscoring.scala`. The Python adapter accepts an
-explicit target-to-caption declaration. Scala's media, clock and multi-part correspondence
-checks would be needed to derive that declaration automatically from physical caption files.
+### Captions on the film clock
+
+The Sherlock example also writes `native-captions.json`. Each observation names a physical
+stream, a half-open interval in native ticks and its caption text. The two observations in the
+example both start at zero. The first runs to tick 25000 in part one, the second to tick 12500
+in part two. Run the same command with the timed declarations:
+
+```sh
+storymodel caption-alignment analysis-1.json native-captions.json --output localized.json
+```
+
+The decoder replays the source intake, projects each annotation row through its recorded
+clock repair, and resolves its account ID through the construction receipt. A caption must
+have exactly one row with the same physical stream and interval. It can be absent from a row.
+Partial overlaps, duplicate assignments, and targets containing explicit points cannot
+establish a match. A state mentioned somewhere in the row has no separate timing from this
+procedure. The v2 result lists the matched row IDs in caption input order, including those
+outside the retrieved candidates. Existing target-keyed declarations still produce v1 results.
+
+The Scala reference is `CaptionScoring.Session.of`. This path accepts decoded native timing
+on a prepared Sherlock source. Raw frame/package verification, decoding subtitle files and
+cross-edition synchronization remain open. [Shared coordinate cases](../evidence/caption-parity/cases.json)
 
 ## A second study
 

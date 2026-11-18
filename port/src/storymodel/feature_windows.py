@@ -67,12 +67,18 @@ class LexicalLedger:
     __slots__ = ("_frequencies", "_tokens")
 
     def __init__(self, forms: list[str] | tuple[str, ...]) -> None:
+        if not isinstance(forms, (tuple, list)) or not all(isinstance(f, str) for f in forms):
+            raise TypeError(
+                "supply a list or tuple of surface forms, or use from_text for a string"
+            )
         self._tokens = tuple(_classify(form) for form in forms)
         self._frequencies: dict[str, int] | None = None
 
     @classmethod
     def from_text(cls, text: str) -> "LexicalLedger":
         """Classify the port's ordinary transcript tokens in their source order."""
+        if not isinstance(text, str):
+            raise TypeError("from_text requires a transcript string")
         spans = _token_spans(text, (0, len(text)))
         return cls([text[start:end] for start, end in spans])
 

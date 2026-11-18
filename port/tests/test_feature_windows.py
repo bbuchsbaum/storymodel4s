@@ -161,6 +161,14 @@ def test_lexical_ledger_preserves_occurrences_and_matches_scala_normalization():
     assert [ledger.type_frequency(i) for i in range(len(ledger.tokens))] == [2, 2, 1, None, None, 1]
 
 
+def test_transcript_cannot_accidentally_be_counted_as_individual_characters():
+    from storymodel.feature_windows import LexicalLedger
+
+    with pytest.raises(TypeError, match="from_text"):
+        LexicalLedger("AA AA")
+    assert LexicalLedger.from_text("AA AA").type_frequency(0) == 2
+
+
 def test_lexical_ledger_matches_scala_token_tracks_witness():
     from storymodel.feature_windows import LexicalLedger, _sample
 
