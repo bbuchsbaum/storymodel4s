@@ -45,3 +45,31 @@ events share four two-event scenes, and all use simple, closely matched wording.
 spontaneous recall, automatic event selection, pronoun resolution, and the relative performance
 of other assessors remain open. The reader is a Codex agent; the FilmFestival subscription
 mapper was not evaluated in this exercise.
+
+## Reciprocal transfers
+
+The second control uses the same eight synthetic occupations in four two-person scenes.
+Each scene depicts two transfers of the same object. The giver in one transfer is the
+recipient in the other. The assessor receives a specific transfer as the proposed reference.
+The identical recall can therefore be faithful under one reference and reverse the roles
+under the other. A changed-actor verdict describes the claim under the supplied reference.
+
+For each transfer we render active and passive recall, and preserve or reverse the giver.
+This gives 32 packets. Within each of 16 pairs, the source, reference, and recall word
+counts are identical, while word order changes the answer. A deterministic assessor with
+only those inputs and no recall word order can recover at most 16/32. The named-first
+subject lookup is evaluated on the same packets.
+
+The source occupations and objects come from the admitted miniatures. All transfers and
+recall wordings in this control are original synthetic template transformations to exercise
+grammatical roles. They use no participant material. Commit `41d973117` fixes the generator,
+wordings, comparison rules and score before the second machine reading. The full shuffled
+packet file hashes to `33e546c982403fa35fec321c8bdc5fd51bd1ae5b4dfd14376178e542f9db568b`.
+
+A second fresh machine reader recovered 8/8 active and 8/8 passive role-preserving claims
+as supported. It marked all 16 reversals as major gist-detail errors. All 32 citations were
+admitted. The first-subject lookup recovered 16/32. Detection of the role change was the
+declared endpoint; the severity or preferred wording of a grade needs separate evidence.
+The four constructed scenes do not supply 32 independent observations about people.
+
+Replay with `python port/evidence/actor-fidelity/role_order.py score port/evidence/actor-fidelity/transfer-reading.json`.
