@@ -991,3 +991,45 @@ over their declared population and preserve excluded or unmeasured rows. `Mappin
 already feeds its supplied-destination measure to `TemporalProjection.compile`. A measure
 conditional on source targets has a different denominator. Transport row budgets, native
 account geometry, occurrence-specific cropping, and remaining P2–P6 work also stay open.
+
+### Independent local reference scores and their film grid
+
+At `2fd5c9a96`, [local-reference and its grid](recall-clock.md#where-does-local-evidence-place-a-recall-unit)
+compute an independent per-unit distribution before sequence inference. Both consumers
+use the same account content, gates and measured local prices. The score producer chooses
+one complete level, completes ties, records missing and ineligible evidence, and checks
+the candidate union budget. It keeps raw prices for all admitted states. An unavailable
+unit retains its measured recall duration with an explicit reason for the absent grid.
+Target-conditional comparisons require comparable measured semantic costs and assign a
+single prior share per target. The temporal grid accepts the supplied-destination population.
+
+The [Scala JVM oracle](../evidence/local-reference/README.md) at `ea146bbb7` ran twice
+with identical output. Two independent synthetic accounts reproduced the seven-state
+prices and weights for supplied destinations, including a polarity-distorted state.
+The target-conditional case reproduced the 2/3 and 1/3 weights with external cost 100.
+Three additional cases reproduced the Scala row refusals. The source and recall IDs,
+table representation and full provider provenance differ between implementations. Python
+uses the supported content sketch for equal-content comparisons, preserves occurrence
+identity and rejects conflicting equal-content measurements.
+
+In a two-unit control, the target sets, local prices and external alternatives matched.
+The second unit had external weight 0.568671 from local scores and 0.999999807 from sequence
+inference with a deliberately strong external transition. Permuting the input units
+preserved their local distributions. A mutation assigning the full target share to each
+of its equal-cost modes failed the split-share assertion while two controls passed.
+
+The installed wheel reproduced API bytes for both score and grid commands, verified
+both results and preserved the preceding wheel's posterior grid and exposure bytes.
+The full Python suite passed 1,198 tests in 45.14 seconds. A subsequent regression test
+confirmed that opposite-polarity members distinguish two same-text row segments. Independent
+review also matched the previous producer's complete sequence-evidence outputs across 48
+input variations. Ruff and strict mypy passed.
+A local CPython 3.12 sparse-table probe processed 24 recall units against 240 targets
+with five observations per unit in 0.101 s and 1.85 MiB peak traced allocation after input
+construction. It priced the best three candidates per unit, 72 in total.
+
+The next independent alignment method is Scala's `UnbalancedSinkhorn.solve` and its
+account alignment adapter in `align/.../sinkhorn.scala`. Its row and column marginal
+penalties, forbidden edges, and convergence status require their own checks. It has a
+distinct mass budget. Source-time concentration, richer semantic representations and
+the remaining P2–P6 capabilities also stay open.

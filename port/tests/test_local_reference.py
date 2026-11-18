@@ -415,3 +415,52 @@ def test_conditional_prior_splits_a_target_share_between_equal_cost_modes():
     )
     row = _score_row(prices, receipt, cells, spec)
     assert {m.state: m.weight for m in row.mass} == {faithful: 0.5, other: 0.25, distorted: 0.25}
+
+
+def test_equal_segment_words_retain_distinct_member_polarity_in_score_table():
+    from test_local_evidence import rich
+
+    from storymodel.source_transitions import SourceProjectionPolicy
+
+    source = rich(
+        "source",
+        "AA AA",
+        (("row", 0, 2, None), ("row", 3, 5, None)),
+        (("act", 0, 2, "positive", "asserted", ()), ("act", 3, 5, "negative", "asserted", ())),
+    )
+    recall = rich(
+        "recall", "AA", (("recall", 0, 2, None),), (("act", 0, 2, "positive", "asserted", ()),)
+    )
+    rows = sorted(source.units, key=lambda r: r.support.spans[0].start)
+    situations = sorted(source.states, key=lambda s: s.polarity != "positive")
+    policy = SourceProjectionPolicy(
+        memberships={s.id: r.id for s, r in zip(situations, rows, strict=True)}
+    )
+    evidence = LocalEvidenceSpec(
+        units=(RecallSelection(unit=recall.units[0].id),),
+        costs=_measured_policy(),
+        projection=policy,
+        semantic="table",
+        semantic_cells=tuple(
+            SemanticCell(
+                unit=recall.units[0].id,
+                target=r.id,
+                estimate=SemanticEstimate(status="observed", value=distance),
+            )
+            for r, distance in zip(rows, (0.0, 1.0), strict=True)
+        ),
+    )
+    result = local_reference(
+        source,
+        recall,
+        LocalReferenceSpec(
+            evidence=evidence,
+            level=1,
+            population="admitted-source-targets",
+            pricing="measured-semantic",
+        ),
+    )
+    assert {c.target: (c.total, c.state.kind) for c in result.cells} == {
+        rows[0].id: (0.0, "source"),
+        rows[1].id: (1.0, "distorted"),
+    }
