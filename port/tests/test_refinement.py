@@ -90,6 +90,13 @@ def projection(*edges: tuple[str, str, str], nodes: tuple[str, ...] = ()) -> Sou
     )
 
 
+def test_zero_weight_has_one_serialized_identity():
+    assert (
+        RefinementPolicy(weight=-0.0).model_dump_json()
+        == RefinementPolicy(weight=0.0).model_dump_json()
+    )
+
+
 def test_diagnostic_uses_directed_positive_transitive_paths_and_source_conditional_denominator():
     a, b = source("a"), distorted("b")
     left, right = row("left", a, external()), row("right", b, external())

@@ -12,7 +12,7 @@ from collections import defaultdict, deque
 from collections.abc import Iterator
 from typing import Annotated, Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from .model import Model, Name, _validate_instance
 from .sequence import (
@@ -49,6 +49,11 @@ class RefinementPolicy(Model):
 
     passes: Annotated[int, Field(ge=0)] = 0
     weight: Annotated[Finite, Field(ge=0)] = 0.3
+
+    @field_validator("weight")
+    @classmethod
+    def canonical_zero(cls, weight: float) -> float:
+        return 0.0 if weight == 0.0 else weight
 
 
 class LayerPreservation(Model):
