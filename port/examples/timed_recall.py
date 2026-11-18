@@ -8,6 +8,7 @@ from sherlock_workflow import run as run_sherlock
 
 from storymodel.analysis_workflow import replay_analysis_file
 from storymodel.artifacts import publish_json
+from storymodel.exposure import ExposureQuery, WordIntervals, recall_exposure
 from storymodel.playback import MediaSource, TickInterval
 from storymodel.recall_clock import RecordingQuery, UnitInterval, timed_recall
 from storymodel.sherlock_recall import sherlock_recall_timing
@@ -52,6 +53,25 @@ def run(destination: Path) -> None:
             destination / f"timed-recall-{number}-query.json", query.model_dump(mode="json")
         )
         publish_json(destination / f"timed-recall-{number}.json", result.model_dump(mode="json"))
+        # The first example has two lexical observations. Supply an independently
+        # declared end for the first, leaving the second as an onset-only event.
+        if number == 1:
+            first_word = next(iter(result.word_onsets))
+            exposure_query = ExposureQuery(
+                **query.model_dump(exclude={"schema_version", "bins", "intervals"}),
+                mapping_stage="mapping",
+                window=TickInterval(start="100", end="116"),
+                word_intervals=WordIntervals(
+                    recording_id=query.recording.id,
+                    provenance="synthetic-word-interval/v1",
+                    by_word={first_word: TickInterval(start="105", end="108")},
+                ),
+            )
+            exposure = recall_exposure(plan, exposure_query)
+            publish_json(
+                destination / "exposure-query.json", exposure_query.model_dump(mode="json")
+            )
+            publish_json(destination / "exposure.json", exposure.model_dump(mode="json"))
 
 
 if __name__ == "__main__":

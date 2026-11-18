@@ -60,6 +60,7 @@ from .direct_workflow import (
 )
 from .embedding import EmbeddingCache, EmbeddingPair
 from .execution import RecordedExecutionError
+from .exposure import ExposureQuery, RecallExposure, recall_exposure
 from .extraction import prepare_extraction
 from .extraction_workflow import (
     ExtractionRecording,
@@ -136,7 +137,7 @@ from .prepared_construction import (
     replay_prepared_construction,
     verify_prepared_construction,
 )
-from .recall_clock import RecordingQuery, timed_recall
+from .recall_clock import RecordingQuery, TimedRecall, timed_recall
 from .reconstruction import (
     AccountReconstructionResult,
     ReconstructionSpec,
@@ -389,18 +390,16 @@ def main(argv: list[str] | None = None) -> int:
         if name.startswith("verify-"):
             features.add_argument("result")
         features.add_argument("--output")
-    for command in ("timed-recall", "verify-timed-recall"):
-        timed = commands.add_parser(
-            command,
-            help=(
-                "measure mapped recall details on a declared recording clock"
-                if command == "timed-recall"
-                else "recompute and verify a saved timed-recall readout"
-            ),
-        )
+    for command, help_text in (
+        ("timed-recall", "measure mapped recall details on a declared recording clock"),
+        ("verify-timed-recall", "recompute a saved timed recall result"),
+        ("recall-exposure", "measure unit durations from word intervals on a recording"),
+        ("verify-recall-exposure", "recompute a saved recording-window exposure"),
+    ):
+        timed = commands.add_parser(command, help=help_text)
         timed.add_argument("plan")
         timed.add_argument("query")
-        if command == "verify-timed-recall":
+        if command.startswith("verify-"):
             timed.add_argument("result")
         timed.add_argument("--output")
     sherlock_compose = commands.add_parser(
@@ -1625,24 +1624,33 @@ def main(argv: list[str] | None = None) -> int:
                 )
             else:
                 emit(feature_result, args.output)
-        elif args.command in ("timed-recall", "verify-timed-recall"):
-            timed_query = RecordingQuery.model_validate_json(
-                canonical(strict_json(Path(args.query).read_bytes()))
-            )
-            timed_result = timed_recall(Path(args.plan), timed_query)
-            if args.command == "timed-recall":
-                emit(timed_result.model_dump(mode="json"), args.output)
-            else:
-                # Pydantic would normalize JSON object keys such as "01" and "1"
-                # to the same strict integer dict key. Compare the parsed JSON shape
-                # exactly so aliases, omitted default fields, and extra structure fail.
-                timed_saved = strict_json(Path(args.result).read_bytes())
-                if canonical(timed_saved) != canonical(timed_result.model_dump(mode="json")):
-                    raise ValueError("timed recall differs from exact plan and recording query")
-                emit(
-                    {"verified": True, "analysis_sha256": timed_result.analysis_sha256},
-                    args.output,
+        elif args.command in (
+            "timed-recall",
+            "verify-timed-recall",
+            "recall-exposure",
+            "verify-recall-exposure",
+        ):
+            query_json = canonical(strict_json(Path(args.query).read_bytes()))
+            timed_result: RecallExposure | TimedRecall
+            if args.command.endswith("recall-exposure"):
+                timed_result = recall_exposure(
+                    Path(args.plan), ExposureQuery.model_validate_json(query_json)
                 )
+                label = "recall exposure"
+            else:
+                timed_result = timed_recall(
+                    Path(args.plan), RecordingQuery.model_validate_json(query_json)
+                )
+                label = "timed recall"
+            if args.command.startswith("verify-"):
+                saved_timing = strict_json(Path(args.result).read_bytes())
+                if canonical(saved_timing) != canonical(timed_result.model_dump(mode="json")):
+                    raise ValueError(f"{label} differs from exact plan and recording query")
+                emit(
+                    {"verified": True, "analysis_sha256": timed_result.analysis_sha256}, args.output
+                )
+            else:
+                emit(timed_result.model_dump(mode="json"), args.output)
         elif args.command in (
             "prepared-construction-prompt",
             "import-prepared-construction",

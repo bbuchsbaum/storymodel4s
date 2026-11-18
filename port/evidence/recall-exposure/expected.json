@@ -1,0 +1,52 @@
+{
+  "schema": "storymodel4s.recall-exposure-oracle/v1",
+  "reference": {
+    "sha": "cdb432cf9241fb70a8a7c812d90e01d9b139b3b2",
+    "implementation": "storymodel4s.align.TemporalExposure",
+    "suite": "storymodel4s.align.TemporalQuerySuite"
+  },
+  "encoding": {
+    "rational": "[numerator, denominator]",
+    "interval": "[startNumerator, startDenominator, endNumerator, endDenominator]",
+    "onset": "[numerator, denominator]",
+    "units": "abstract fixture units, stable only within this oracle"
+  },
+  "cases": [
+    {
+      "id": "separated_intervals_onset",
+      "query": [[0, 1], [14, 1]],
+      "input": {"units": {"u0": {"intervals": [[0, 1, 2, 1], [8, 1, 10, 1]], "onset_only": [[12, 1]], "missing_count": 5}, "u1": {"intervals": [], "onset_only": [], "missing_count": 9}, "u2": {"intervals": [], "onset_only": [], "missing_count": 5}, "u3": {"intervals": [], "onset_only": [], "missing_count": 10}}},
+      "expected": {"units": {"u0": {"duration": [4, 1], "onsets": [[12, 1]], "missing_count": 5, "processing": "complete"}, "u1": {"duration": [0, 1], "onsets": [], "missing_count": 9, "processing": "complete"}, "u2": {"duration": [0, 1], "onsets": [], "missing_count": 5, "processing": "complete"}, "u3": {"duration": [0, 1], "onsets": [], "missing_count": 10, "processing": "complete"}}, "uncovered": [10, 1]}
+    },
+    {
+      "id": "gap_between_intervals",
+      "query": [[2, 1], [8, 1]],
+      "input": {"units": {"u0": {"intervals": [[0, 1, 2, 1], [8, 1, 10, 1]], "onset_only": [[12, 1]], "missing_count": 5}, "u1": {"intervals": [], "onset_only": [], "missing_count": 9}, "u2": {"intervals": [], "onset_only": [], "missing_count": 5}, "u3": {"intervals": [], "onset_only": [], "missing_count": 10}}},
+      "expected": {"units": {"u0": {"duration": [0, 1], "onsets": [], "missing_count": 5, "processing": "complete"}, "u1": {"duration": [0, 1], "onsets": [], "missing_count": 9, "processing": "complete"}, "u2": {"duration": [0, 1], "onsets": [], "missing_count": 5, "processing": "complete"}, "u3": {"duration": [0, 1], "onsets": [], "missing_count": 10, "processing": "complete"}}, "uncovered": [6, 1]}
+    },
+    {
+      "id": "within_unit_duplicate_intervals",
+      "query": [[0, 1], [4, 1]],
+      "input": {"units": {"u0": {"intervals": [[0, 1, 4, 1], [0, 1, 4, 1]], "onset_only": [], "missing_count": 6}, "u1": {"intervals": [], "onset_only": [], "missing_count": 9}, "u2": {"intervals": [], "onset_only": [], "missing_count": 5}, "u3": {"intervals": [], "onset_only": [], "missing_count": 10}}},
+      "expected": {"units": {"u0": {"duration": [4, 1], "onsets": [], "missing_count": 6, "processing": "complete"}, "u1": {"duration": [0, 1], "onsets": [], "missing_count": 9, "processing": "complete"}, "u2": {"duration": [0, 1], "onsets": [], "missing_count": 5, "processing": "complete"}, "u3": {"duration": [0, 1], "onsets": [], "missing_count": 10, "processing": "complete"}}, "uncovered": [0, 1]}
+    },
+    {
+      "id": "cross_unit_equal_share",
+      "query": [[0, 1], [8, 1]],
+      "input": {"units": {"u0": {"intervals": [[0, 1, 4, 1], [0, 1, 4, 1]], "onset_only": [], "missing_count": 6}, "u1": {"intervals": [[2, 1, 6, 1]], "onset_only": [], "missing_count": 8}, "u2": {"intervals": [], "onset_only": [], "missing_count": 5}, "u3": {"intervals": [], "onset_only": [], "missing_count": 10}}},
+      "expected": {"units": {"u0": {"duration": [3, 1], "onsets": [], "missing_count": 6, "processing": "complete"}, "u1": {"duration": [3, 1], "onsets": [], "missing_count": 8, "processing": "complete"}, "u2": {"duration": [0, 1], "onsets": [], "missing_count": 5, "processing": "complete"}, "u3": {"duration": [0, 1], "onsets": [], "missing_count": 10, "processing": "complete"}}, "uncovered": [2, 1]}
+    },
+    {
+      "id": "processing_and_missingness",
+      "query": [[0, 1], [8, 1]],
+      "input": {"units": {"u0": {"intervals": [[0, 1, 4, 1], [0, 1, 4, 1]], "onset_only": [], "missing_count": 6}, "u1": {"intervals": [[2, 1, 6, 1]], "onset_only": [], "missing_count": 8}, "u2": {"intervals": [], "onset_only": [], "missing_count": 5}, "u3": {"intervals": [], "onset_only": [], "missing_count": 10}}},
+      "expected": {"units": {"u0": {"duration": [3, 1], "onsets": [], "missing_count": 6, "processing": "failed:provider:synthetic"}, "u1": {"duration": [3, 1], "onsets": [], "missing_count": 8, "processing": "failed:provider:synthetic"}, "u2": {"duration": [0, 1], "onsets": [], "missing_count": 5, "processing": "failed:provider:synthetic"}, "u3": {"duration": [0, 1], "onsets": [], "missing_count": 10, "processing": "failed:provider:synthetic"}}, "uncovered": [2, 1]}
+    },
+    {
+      "id": "overlap_refusal",
+      "query": [[0, 1], [8, 1]],
+      "input": {"units": {"u0": {"intervals": [[0, 1, 4, 1], [0, 1, 4, 1]], "onset_only": [], "missing_count": 6}, "u1": {"intervals": [[2, 1, 6, 1]], "onset_only": [], "missing_count": 8}, "u2": {"intervals": [], "onset_only": [], "missing_count": 5}, "u3": {"intervals": [], "onset_only": [], "missing_count": 10}}},
+      "expected": {"refusal": "OverlappingUnits"}
+    }
+  ]
+}

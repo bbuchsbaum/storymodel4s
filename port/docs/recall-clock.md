@@ -60,3 +60,44 @@ Synthetic joint and alternative mapping probes each retained two targets and cou
 detail. The Scala reference for timing declarations is
 `recall/src/main/scala/storymodel4s/recall/timing.scala`. These checks exercised the Python
 workflow with synthetic inputs.
+
+## Time attributed to each recall unit
+
+A measured word interval contributes its duration to its containing recall unit.
+An onset-only observation contributes an event at one tick. A missing observation
+increments the unit's missing-word count for the whole inventory, since its position
+in the recording is unknown. Unassigned words retain their IDs and contribute no unit
+duration.
+
+The synthetic example above also writes an exposure query for the first recording.
+From the example output directory:
+
+```sh
+storymodel recall-exposure analysis-1.json exposure-query.json --output measured.json
+storymodel verify-recall-exposure analysis-1.json exposure-query.json measured.json
+```
+
+In Python, call `storymodel.exposure.recall_exposure(plan_path, query)`. An
+`ExposureQuery` identifies the prepared Sherlock intake, timing column, recording,
+tick origin, half-open window and terminal mapping stage. Its optional `WordIntervals`
+table gives each measured word's extent, the recording ID and the measurement
+provenance. An interval with a known lexical onset must begin at that tick. Each
+interval replaces the corresponding onset-only or missing observation. The example
+uses a four-second window. The first word occupies 3/4 second, the second has only an
+onset at tick 110, and 13/4 seconds are uncovered.
+
+Overlaps among words of a single unit count once. The default `refuse` policy rejects
+overlaps between units anywhere in the recording. With `equal-share`, each active
+unit receives an equal fraction of the overlapping time. Summing unit durations and
+uncovered time gives the exact window duration. All durations use rational seconds.
+
+The result includes every constructed recall unit, its extraction inventory and the
+mapping decisions replayed through the named stage for the same interpretation.
+Earlier stages can map other units. Decisions from a different interpretation remain
+separate, and later decisions cannot fill gaps in an earlier stage. A unit has complete
+mapping coverage when its extraction completed, it contains details, and every detail
+has an admitted decision. An admitted attempt can have an unresolved reference.
+The result distinguishes completed empty inventories, failed or partial processing,
+and details outside the replayed requests. `seconds_without_complete_mapping` sums the
+measured durations of units lacking complete coverage. Uncovered recording time is
+reported separately.

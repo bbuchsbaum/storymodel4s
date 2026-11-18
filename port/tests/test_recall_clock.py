@@ -14,8 +14,7 @@ from storymodel.playback import TickInterval
 from storymodel.recall_clock import RecordingQuery, TimedRecall, UnitInterval, timed_recall
 
 
-@pytest.fixture(scope="module")
-def artifacts(tmp_path_factory: pytest.TempPathFactory) -> Path:
+def build_clock_example(tmp_path_factory: pytest.TempPathFactory) -> Path:
     root = tmp_path_factory.mktemp("timed-recall") / "example"
     script = Path(__file__).resolve().parents[1] / "examples/timed_recall.py"
     process = subprocess.run(
@@ -23,6 +22,9 @@ def artifacts(tmp_path_factory: pytest.TempPathFactory) -> Path:
     )
     assert process.returncode == 0, process.stdout + process.stderr
     return root
+
+
+artifacts = pytest.fixture(scope="module")(build_clock_example)
 
 
 def query(artifacts: Path, number: int = 1) -> RecordingQuery:
@@ -172,9 +174,7 @@ def test_timed_recall_cli_matches_api_and_verifier_refuses_changed_readout(
     assert "differs from exact plan" in capsys.readouterr().err
 
 
-def test_two_recall_units_use_construction_identities_across_separators(
-    artifacts, tmp_path, monkeypatch
-):
+def two_unit_recording(artifacts, tmp_path, monkeypatch):
     from hashlib import sha256
 
     from storymodel.detail_admission import detail_request_digest, prepare_details
@@ -270,6 +270,13 @@ def test_two_recall_units_use_construction_identities_across_separators(
     declaration = query(root).model_copy(
         update={"intake_sha256": digest(intake.model_dump(mode="json")), "intervals": ()}
     )
+    return root, declaration, ordered
+
+
+def test_two_recall_units_use_construction_identities_across_separators(
+    artifacts, tmp_path, monkeypatch
+):
+    root, declaration, ordered = two_unit_recording(artifacts, tmp_path, monkeypatch)
     result = timed_recall(root / "multi.json", declaration)
     assert result.unit_onsets == {1: "105", 2: "113"}
     assert {e.recall.unit: e.onset_tick for e in result.entries} == {

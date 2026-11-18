@@ -25,17 +25,15 @@ class UnitInterval(Model):
     native: TickInterval
 
 
-class RecordingQuery(Model):
-    """A producer declares the relation between a specific intake column and audio stream."""
+class _RecordingBinding(Model):
+    """A producer relates an intake timing column to one fingerprinted recording."""
 
-    schema_version: Literal["storymodel.recording-query/v1"] = "storymodel.recording-query/v1"
+    schema_version: str
     intake_sha256: Digest
     clock: Literal["princeton", "openneuro"]
     recording: MediaSource
     zero_tick: str
     provenance: Name
-    bins: tuple[TickInterval, ...] = Field(min_length=1)
-    intervals: tuple[UnitInterval, ...] = ()
 
     @field_validator("zero_tick")
     @classmethod
@@ -43,7 +41,7 @@ class RecordingQuery(Model):
         return str(tick(value))
 
     @model_validator(mode="after")
-    def geometry(self) -> Self:
+    def recall_recording(self) -> Self:
         media = self.recording
         if (media.side, media.stream_kind, media.axis_kind) != (
             "recall",
@@ -51,6 +49,19 @@ class RecordingQuery(Model):
             "edition-playback",
         ):
             raise ValueError("timing requires recall audio on a playback axis")
+        return self
+
+
+class RecordingQuery(_RecordingBinding):
+    """Declare the bins and optional unit intervals used for detail-level allocation."""
+
+    schema_version: Literal["storymodel.recording-query/v1"] = "storymodel.recording-query/v1"
+    bins: tuple[TickInterval, ...] = Field(min_length=1)
+    intervals: tuple[UnitInterval, ...] = ()
+
+    @model_validator(mode="after")
+    def geometry(self) -> Self:
+        media = self.recording
         lower, upper = tick(media.start_tick), tick(media.end_tick)
         previous = lower
         for item in self.bins:
@@ -93,7 +104,7 @@ class TimedRecall(Model):
 
 
 def _bind_onsets(
-    intake: SherlockRecall, query: RecordingQuery, intervals: dict[int, TickInterval]
+    intake: SherlockRecall, query: _RecordingBinding, intervals: dict[int, TickInterval]
 ) -> tuple[dict[str, str | None], dict[int, str | None]]:
     """Convert lexical observations once and check their declared unit extents."""
     timing = sherlock_recall_timing(intake, query.clock)
@@ -141,17 +152,14 @@ def timed_recall(plan_path: Path, query: RecordingQuery) -> TimedRecall:
     return _timed_replay(replay_analysis_file(plan_path), query)
 
 
-def _timed_replay(replay: AnalysisReplay, query: RecordingQuery) -> TimedRecall:
-    """Project a freshly replayed analysis using an already checked declaration."""
+def _recall_population(replay: AnalysisReplay) -> tuple[SherlockRecall, dict[str, int]]:
+    """Bind graph unit IDs to the original lexical inventory via construction rows."""
     request = replay.recall.request
     if not isinstance(request, PreparedConstruction) or not isinstance(
         request.intake, SherlockRecall
     ):
         raise ValueError("timed recall requires prepared Sherlock recall construction")
     intake = request.intake
-    media = query.recording
-    intervals = {item.unit: item.native for item in query.intervals}
-    word_onsets, onsets = _bind_onsets(intake, query, intervals)
     construction = replay.recall.construction
     if not isinstance(construction, PreparedConstructionResult):
         raise ValueError("missing prepared recall construction receipt")
@@ -164,6 +172,15 @@ def _timed_replay(replay: AnalysisReplay, query: RecordingQuery) -> TimedRecall:
     ordinals = {row.unit: ordinal_by_row[row.row] for row in construction.construction.resolutions}
     if ordinals.keys() != {u.id for u in replay.account.units if u.kind == "recall"}:
         raise ValueError("analysis recall units differ from the construction receipt")
+    return intake, ordinals
+
+
+def _timed_replay(replay: AnalysisReplay, query: RecordingQuery) -> TimedRecall:
+    """Project a freshly replayed analysis using an already checked declaration."""
+    intake, ordinals = _recall_population(replay)
+    media = query.recording
+    intervals = {item.unit: item.native for item in query.intervals}
+    word_onsets, onsets = _bind_onsets(intake, query, intervals)
     references: dict[str, list[CorrespondenceRow]] = defaultdict(list)
     for row in replay.views.correspondence:
         references[row.detail].append(row)

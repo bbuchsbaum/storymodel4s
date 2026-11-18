@@ -1,0 +1,63 @@
+diff --git a/align/src/test/scala/storymodel4s/align/TemporalQuerySuite.scala b/align/src/test/scala/storymodel4s/align/TemporalQuerySuite.scala
+index abfd54d3a..6afc944f9 100644
+--- a/align/src/test/scala/storymodel4s/align/TemporalQuerySuite.scala
++++ b/align/src/test/scala/storymodel4s/align/TemporalQuerySuite.scala
+@@ -727,6 +727,58 @@ class TemporalQuerySuite extends FunSuite:
+     assertEquals(f.uncovered, BigInt(2) -> BigInt(3))
+   }
+ 
++  test("emits recall exposure oracle") {
++    def fraction(pair: (BigInt, BigInt)): String = s"[${pair._1},${pair._2}]"
++    def observationJson(observations: Vector[RecallTiming.Observation]): String = {
++      val intervals = observations.collect {
++        case RecallTiming.Observation.Interval(start, end, _) =>
++          s"[${start.numerator},${start.denominator},${end.numerator},${end.denominator}]"
++      }
++      val onsets = observations.collect {
++        case RecallTiming.Observation.OnsetOnly(at, _) => s"[${at.numerator},${at.denominator}]"
++      }
++      val missing = observations.count(_.isInstanceOf[RecallTiming.Observation.Missing])
++      s"{\"intervals\":[${intervals.mkString(",")}],\"onset_only\":[${onsets.mkString(",")}],\"missing_count\":$missing}"
++    }
++    def processingJson(status: ProcessingStatus): String = status match
++      case ProcessingStatus.Complete => "complete"
++      case ProcessingStatus.Failed(ProcessingFailure.ProviderFailure(detail)) => s"failed:provider:$detail"
++      case other => other.toString
++    def readoutJson(readout: TemporalExposure.Readout): String = {
++      val rows = readout.units.zipWithIndex.map { (row, i) =>
++        val onsets = row.onsetEvents.map(at => s"[${at.numerator},${at.denominator}]")
++        s"\"u$i\":{\"duration\":${fraction(row.duration)},\"onsets\":[${onsets.mkString(",")}],\"missing_count\":${row.missingWords},\"processing\":\"${processingJson(row.processing)}\"}"
++      }
++      s"{\"units\":{${rows.mkString(",")}},\"uncovered\":${fraction(readout.uncovered)}}"
++    }
++    def inputJson(timing: RecallTiming): String = {
++      val groups = inventory.units.zipWithIndex.map { (unit, i) =>
++        val observations = unit.words.flatMap(word => timing.entry(word).map(_.observation))
++        s"\"u$i\":${observationJson(observations)}"
++      }
++      s"{\"units\":{${groups.mkString(",")}}}"
++    }
++    def caseJson(id: String, timing: RecallTiming, result: Either[TemporalExposure.Refusal, TemporalExposure.Readout]): String =
++      result match
++        case Right(readout) => s"{\"id\":\"$id\",\"input\":${inputJson(timing)},\"expected\":${readoutJson(readout)}}"
++        case Left(refusal) => s"{\"id\":\"$id\",\"input\":${inputJson(timing)},\"expected\":{\"refusal\":\"$refusal\"}}"
++
++    val a = inventory.units(0).words
++    val b = inventory.units(1).words
++    val separated = timed(Map(a(0) -> interval(0, 2), a(1) -> interval(8, 10), a.last -> RecallTiming.Observation.OnsetOnly(sec(12), timingBasis)))
++    val duplicate = timed(Map(a(0) -> interval(0, 4), a(1) -> interval(0, 4)))
++    val cross = timed(Map(a(0) -> interval(0, 4), a(1) -> interval(0, 4), b(0) -> interval(2, 6)))
++    val cases = Vector(
++      caseJson("separated_intervals_onset", separated, TemporalExposure.checked(mapping(), separated, TemporalExposure.Overlap.Refuse).flatMap(_.query(recallClock, sec(0), sec(14)))),
++      caseJson("gap_between_intervals", separated, TemporalExposure.checked(mapping(), separated, TemporalExposure.Overlap.Refuse).flatMap(_.query(recallClock, sec(2), sec(8)))),
++      caseJson("within_unit_duplicate_intervals", duplicate, TemporalExposure.checked(mapping(), duplicate, TemporalExposure.Overlap.Refuse).flatMap(_.query(recallClock, sec(0), sec(4)))),
++      caseJson("cross_unit_equal_share", cross, TemporalExposure.checked(mapping(), cross, TemporalExposure.Overlap.EqualShare).flatMap(_.query(recallClock, sec(0), sec(8)))),
++      caseJson("processing_and_missingness", cross, TemporalExposure.checked(mapping(failed = true), cross, TemporalExposure.Overlap.EqualShare).flatMap(_.query(recallClock, sec(0), sec(8)))),
++      caseJson("overlap_refusal", cross, TemporalExposure.checked(mapping(), cross, TemporalExposure.Overlap.Refuse).map(_ => throw IllegalStateException("expected overlap refusal")))
++    )
++    println(s"RECALL_EXPOSURE_ORACLE={\"schema\":\"storymodel4s.recall-exposure-oracle/v1\",\"cases\":[${cases.mkString(",")}]}" )
++  }
++
+   test("zero allocatable source does not license a conditional coverage percentage") {
+     val p = prepared(ds = Vector.empty)
+     assertEquals(p.ledger.allocatedSource, 0.0)
