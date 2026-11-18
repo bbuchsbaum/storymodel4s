@@ -1,9 +1,17 @@
 # Case study 2: pre-registration of the sealed-six run (approved endpoint amendment)
 
-**The owner approved the amended endpoint on 2026-11-17 and authorized one run after the preflight checks pass. The executable freeze is pending.** Nothing in this document has been run on the
+**The owner approved the amended endpoint on 2026-11-17 and authorized one run after the preflight checks pass.** Nothing in this document has been run on the
 sealed participants. No sealed recall, gold row or prompt has been opened, rendered or cached.
 Design: [the mapping-object plan](2026-11-16-cs2-mapping-object.md). Bead
 `bd-01M7JRB11CHP7EPC35QQ12DT41`.
+
+Executable freeze commit: `4152ead6df8c919a7a1be5cebd4597e419fc0109`.
+Cold review cleared this commit on 2026-11-17. From the case-study directory,
+`python -m cs2.sealed_production preflight` reconstructs the development fits and
+verifies the frozen inputs. The `run` command repeats that check, checks the clean
+revision and probes the registered subscription using synthetic text before reading any
+held-out participant. The private run manifest records the attempt before segmentation.
+The round-6 boundary screen has no role in this evaluation.
 
 The sealed participants are sub-06, sub-09, sub-11, sub-12, sub-13 and sub-20
 (`data/study/filmfestival/cs2-partition.json`). Each has one recall session (run-01), going by
@@ -66,7 +74,7 @@ development data.
   appears).
 - The two samples are combined by averaging their **distributions** per row
   (`scorer.EnsembleForecast`), and the averaged distribution is scored. This replaces averaging
-  bits per row (changed 2026-11-17, hill-climb round 2; the draft is not yet frozen).
+  bits per row (adopted on development data before the freeze).
   - **It costs nothing extra.** The sealed run already makes two samples.
   - **Evidence (development, pooled over the ten coded participants, cache-only).** Against the
     mean of bits, the scene term falls 0.029 bits, the work term 0.004 and the film term 0.005.
