@@ -1072,3 +1072,48 @@ potentially disconnected set of grid bins. Its thresholds distinguish absolute a
 fractions of supplied mass and fractions of locatable allocated mass. Arbitrary-window
 queries need the original interval and point supports. Bin totals alone lose that geometry.
 [Scala implementation](../../align/src/main/scala/storymodel4s/align/temporalconcentration.scala)
+
+### Source-time concentration across three account measures
+
+At `f2c7735be`, [source concentration](concentration.md) answers three questions for one
+recall unit. It finds the strongest fixed-width window, the shortest window attaining an
+absolute or fractional target, and the fewest caller bins needed to reach that target.
+The connected searches use original point and interval support across the axis, including
+mass outside the displayed bins. Both threshold methods keep the distinction between
+supplied mass and mass that can be allocated on this axis. Alternative weights, the
+bounds of a selected window, unlocated and external mass, and the original transport fit
+status remain available. Repeated questions can share a prepared account and tick index.
+
+The [pinned JVM witness](../evidence/concentration/README.md) reproduced byte-identically
+twice, and 25 Scala temporal query tests passed. The shared-case comparisons include
+an axis spanning 40 ticks, two separated intervals, a point at 4, and two unavailable or
+external alternatives. The best one-tick interval starts at 4. The shortest connected
+window reaching 0.5 mass spans five ticks. Disconnected selection with unit bins picks
+indexes 0, 1 and 4. A crop to the first two bins leaves 0.5 allocated mass outside.
+The separate exhaustive Python oracle checked all window widths on 80 seeded small axes.
+
+In the installed synthetic account workflow, the strongest window capturing half the
+located mass is 12,500 ticks wide. Fixed, shortest and disconnected queries share one
+prepared measure. The wheel reproduced the CLI result byte-for-byte and verified it
+against both accounts. Five earlier artifacts retained their bytes, including transport
+and both other source grids. A mutation allowing inaccessible cropped mass to satisfy
+the target falsely returned a bin set. The refusal assertion failed and two controls
+passed. The full Python suite passed 1,251 tests in 50.33 seconds. Ruff and strict mypy
+passed. Cold review confirmed the window search and denominator handling. A subsequent
+focused check records the Scala refusal precedence for zero absolute targets on
+positive-mass support without an allocation. Signed origins and mixed supports have
+kernel-level coverage. The public Sherlock example supplies one primitive per row.
+
+A local CPython 3.12 run placed 300 intervals across ten billion ticks with an origin
+of 2⁵⁴. Index construction took 0.0056 s, a fixed-width query 0.0068 s, and a
+shortest-window query 0.2302 s with 0.16 MiB peak traced allocation after constructing
+the input. On the synthetic installed-workflow inputs, preparing one transport row took
+0.090 s and running all three questions against it took 0.0014 s. These are engineering
+measurements for those inputs. Imported inspection records, multi-unit trajectories and
+additional clock maps remain open.
+
+The next shared algorithmic gap is deterministic proposition-chart comparison in local
+pricing. Scala's `ChartDistance.reduction` compares available leaf members and records
+which contributed to the aggregate. The current Python producer records chart evidence
+as missing. Adding a checked chart representation and this first consumer advances both
+construction and alignment. [Scala pricing](../../align/src/main/scala/storymodel4s/align/cost.scala)

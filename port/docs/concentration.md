@@ -67,7 +67,8 @@ Use decimal or fraction strings for coverage and integer strings for native tick
   width, the result is the **strongest** window of that width, with the same earliest
   tie rule. Disconnected selection takes bins by descending mass and breaks ties by
   their original input positions. Returned indexes are in input order.
-- An absolute target of zero admits the empty selection. A fractional target whose
+- An absolute target of zero admits the empty selection when all positive located
+  mass has a usable allocation. A fractional target whose
   denominator is zero gives `undefined-conditioning`. Positive mass on known support
   without a usable allocation gives `unavailable-allocation`. An unattainable target
   reports both the quantity requested and the amount available. Missing input measures

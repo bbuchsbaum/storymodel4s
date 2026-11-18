@@ -122,6 +122,12 @@ def test_zero_target_is_distinct_from_undefined_or_undeclared_allocation(example
     unavailable = _run(example, q, grid=support, operation=BestWindow(width_ticks="5"))
     assert unavailable.ledger.support_without_allocation > 0
     assert unavailable.result == ConcentrationRefusal(reason="unavailable-allocation")
+    prepared = PreparedConcentration(example / "analysis-1.json", support, q.unit)
+    for method in (ShortestWindow, DisconnectedBins):
+        zero = prepared.query(method(target=_coverage("0", "absolute")))
+        assert zero.result == ConcentrationRefusal(
+            reason="unavailable-allocation", needed=Fraction(0)
+        )
     missed = q.grid.transport.model_copy(
         update={
             "units": tuple(u.model_copy(update={"targets": ()}) for u in q.grid.transport.units)
