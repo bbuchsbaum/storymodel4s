@@ -1,0 +1,50 @@
+{
+  "reference": "storymodel4s Scala TokenTracks.measure",
+  "command": "sbt \"-Dfeature.measure.parity.fixture=$PWD/port/evidence/lexical-parity/cases.tsv\" 'featuresJVM/testOnly storymodel4s.features.FeatureMeasureParityProbe'",
+  "result": {
+    "source": "Go go ٢,١ _1 _.",
+    "lexicon_input": {
+      "go": 0.0,
+      "_1": 2.0
+    },
+    "tokens": [
+      "Go",
+      "go",
+      "٢,١",
+      "_1",
+      "_",
+      "."
+    ],
+    "length": [
+      "observed:2.0",
+      "observed:2.0",
+      "observed:3.0",
+      "observed:2.0",
+      "ineligible",
+      "ineligible"
+    ],
+    "frequency": [
+      "observed:2.0",
+      "observed:2.0",
+      "observed:1.0",
+      "observed:1.0",
+      "ineligible",
+      "ineligible"
+    ],
+    "lexicon": [
+      "observed:0.0",
+      "observed:0.0",
+      "missing:NotInLexicon",
+      "observed:2.0",
+      "ineligible",
+      "ineligible"
+    ]
+  },
+  "test_totals": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "errors": 0
+  },
+  "scala_source_revision": "3171f5b07"
+}

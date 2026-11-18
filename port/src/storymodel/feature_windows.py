@@ -1,6 +1,7 @@
 """Lexical measures over occurrence-preserving transcript, scene and recording windows."""
 
 from bisect import bisect_right
+from dataclasses import dataclass
 from fractions import Fraction
 from pathlib import Path
 from typing import Literal
@@ -44,6 +45,54 @@ class Lexicon(Identified):
                 raise ValueError("empty or conflicting normalized lexicon key")
             result[key] = 0.0 if value == 0 else value
         return result
+
+
+@dataclass(frozen=True, slots=True)
+class LexicalToken:
+    """One classified surface token, preserving Scala's word/number distinction."""
+
+    form: str
+    normalized: str | None
+    lexical: bool
+    codepoint_length: int
+
+
+class LexicalLedger:
+    """Classify occurrences once and retain whole-text lexical type frequencies.
+
+    Repeated forms retain separate entries.  The frequency is a property of each
+    occurrence's normalized lexical type, never an identity for that occurrence.
+    """
+
+    __slots__ = ("_frequencies", "_tokens")
+
+    def __init__(self, forms: list[str] | tuple[str, ...]) -> None:
+        self._tokens = tuple(_classify(form) for form in forms)
+        self._frequencies: dict[str, int] | None = None
+
+    @classmethod
+    def from_text(cls, text: str) -> "LexicalLedger":
+        """Classify the port's ordinary transcript tokens in their source order."""
+        spans = _token_spans(text, (0, len(text)))
+        return cls([text[start:end] for start, end in spans])
+
+    @property
+    def tokens(self) -> tuple[LexicalToken, ...]:
+        """The immutable, occurrence-preserving classifications."""
+        return self._tokens
+
+    def type_frequency(self, index: int) -> int | None:
+        """Return the lexical type count, or ``None`` for an ineligible token."""
+        token = self.tokens[index]
+        if token.normalized is None:
+            return None
+        if self._frequencies is None:
+            frequencies: dict[str, int] = {}
+            for entry in self.tokens:
+                if entry.normalized is not None:
+                    frequencies[entry.normalized] = frequencies.get(entry.normalized, 0) + 1
+            self._frequencies = frequencies
+        return self._frequencies[token.normalized]
 
 
 class WordSample(Model):
@@ -93,30 +142,35 @@ class FeatureWindows(Model):
 
 def _eligible(form: str) -> bool:
     """Apply the Scala surface word/number test to a complete token."""
+    return _classify(form).lexical
+
+
+def _classify(form: str) -> LexicalToken:
+    """Mirror ``SurfaceSequence.classify`` for a complete surface token."""
     if any(ch.isalpha() for ch in form):
-        return True
+        return LexicalToken(form, lower(form), True, len(form))
     if not any(ch.isdecimal() for ch in form):
-        return False
+        return LexicalToken(form, None, False, len(form))
     for i, ch in enumerate(form):
         if ch.isdecimal() or ch == "_":
             continue
         if ch not in ".," or i == 0 or i + 1 == len(form):
-            return False
+            return LexicalToken(form, None, False, len(form))
         if not (form[i - 1].isdecimal() and form[i + 1].isdecimal()):
-            return False
-    return True
+            return LexicalToken(form, None, False, len(form))
+    return LexicalToken(form, form, True, len(form))
 
 
 def _sample(
-    occurrence: str, span: Span, form: str, onset: str | None, norms: Lexicon
+    occurrence: str, span: Span, token: LexicalToken, onset: str | None, norms: Lexicon
 ) -> WordSample:
     return WordSample(
         occurrence=occurrence,
         span=span,
-        form=form,
+        form=token.form,
         onset_tick=onset,
-        length=len(form),
-        lexicon_score=norms.entries.get(lower(form)),
+        length=token.codepoint_length,
+        lexicon_score=norms.entries.get(token.normalized) if token.normalized is not None else None,
     )
 
 
@@ -153,14 +207,16 @@ def _scene_features(
             offsets = [row.span.start]
             for ch in text:
                 offsets.append(offsets[-1] + (2 if ord(ch) > 0xFFFF else 1))
-            for begin, end in _token_spans(text, (0, len(text))):
-                if _eligible(text[begin:end]):
+            spans = _token_spans(text, (0, len(text)))
+            ledger = LexicalLedger([text[begin:end] for begin, end in spans])
+            for (begin, end), token in zip(spans, ledger.tokens, strict=True):
+                if token.lexical:
                     span = Span(start=offsets[begin], end=offsets[end])
                     scene_words.append(
                         _sample(
                             f"{source_document}@{span.start}-{span.end}",
                             span,
-                            text[begin:end],
+                            token,
                             None,
                             lexicon,
                         )
@@ -189,14 +245,18 @@ def feature_windows(plan: Path, query: RecordingQuery, lexicon: Lexicon) -> Feat
     ineligible = {}
     missing, outside = [], []
     intervals: dict[int, list[WordSample]] = {i.unit: [] for i in query.intervals}
-    for word in recall.words:
+    recall_forms = [
+        encoded[2 * word.span.start : 2 * word.span.end].decode("utf-16-le")
+        for word in recall.words
+    ]
+    ledger = LexicalLedger(recall_forms)
+    for word, token in zip(recall.words, ledger.tokens, strict=True):
         span = word.span
-        form = encoded[2 * span.start : 2 * span.end].decode("utf-16-le")
-        if not _eligible(form):
+        if not token.lexical:
             ineligible[word.id] = span
             continue
         onset = timed.word_onsets[word.id]
-        sample = _sample(word.id, span, form, onset, lexicon)
+        sample = _sample(word.id, span, token, onset, lexicon)
         samples.append(sample)
         if onset is None:
             missing.append(word.id)

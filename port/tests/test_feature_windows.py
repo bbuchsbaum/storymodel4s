@@ -10,6 +10,7 @@ import pytest
 from storymodel.artifacts import publish_json
 from storymodel.cli import main
 from storymodel.feature_windows import Lexicon, feature_windows
+from storymodel.model import Span
 from storymodel.playback import TickInterval
 from storymodel.recall_clock import RecordingQuery
 from storymodel.serialization import canonical, digest
@@ -147,3 +148,56 @@ def test_measure_eligibility_matches_surface_class_instead_of_token_start(form, 
     from storymodel.feature_windows import _eligible
 
     assert _eligible(form) is eligible
+
+
+def test_lexical_ledger_preserves_occurrences_and_matches_scala_normalization():
+    from storymodel.feature_windows import LexicalLedger
+
+    ledger = LexicalLedger(("Go", "go", "٢,١", "_", "23-4", "𐐀A"))
+
+    assert [token.lexical for token in ledger.tokens] == [True, True, True, False, False, True]
+    assert [token.normalized for token in ledger.tokens] == ["go", "go", "٢,١", None, None, "𐐨a"]
+    assert [token.codepoint_length for token in ledger.tokens] == [2, 2, 3, 1, 4, 2]
+    assert [ledger.type_frequency(i) for i in range(len(ledger.tokens))] == [2, 2, 1, None, None, 1]
+
+
+def test_lexical_ledger_matches_scala_token_tracks_witness():
+    from storymodel.feature_windows import LexicalLedger, _sample
+
+    evidence = json.loads(
+        (Path(__file__).resolve().parents[1] / "evidence/lexical-parity/results.json").read_bytes()
+    )
+    expected = evidence["result"]
+    fixture = (
+        (Path(__file__).resolve().parents[1] / "evidence/lexical-parity/cases.tsv")
+        .read_text()
+        .splitlines()
+    )
+    source = next(row.split("\t", 1)[1] for row in fixture if row.startswith("source\t"))
+    entries = {
+        fields[1]: float(fields[2])
+        for row in fixture
+        if (fields := row.split("\t"))[0] == "lexicon"
+    }
+    ledger = LexicalLedger.from_text(source)
+    norms = Lexicon(name="probe", units="u", entries=entries)
+    assert source == expected["source"]
+    assert norms.entries == expected["lexicon_input"]
+    assert [token.form for token in ledger.tokens] == expected["tokens"]
+
+    actual = {"length": [], "frequency": [], "lexicon": []}
+    for i, token in enumerate(ledger.tokens):
+        if not token.lexical:
+            for measure in actual.values():
+                measure.append("ineligible")
+            continue
+        sample = _sample(str(i), Span(start=0, end=len(token.form)), token, None, norms)
+        actual["length"].append(f"observed:{float(sample.length)}")
+        actual["frequency"].append(f"observed:{float(ledger.type_frequency(i))}")
+        actual["lexicon"].append(
+            "missing:NotInLexicon"
+            if sample.lexicon_score is None
+            else f"observed:{sample.lexicon_score}"
+        )
+    for measure, values in actual.items():
+        assert values == expected[measure], measure
