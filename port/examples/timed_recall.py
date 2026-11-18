@@ -7,14 +7,20 @@ from pathlib import Path
 from sherlock_workflow import run as run_sherlock
 
 from storymodel.analysis_workflow import replay_analysis_file
-from storymodel.artifacts import publish_json
+from storymodel.artifacts import export_supported_account, publish_json
 from storymodel.exposure import ExposureQuery, WordIntervals, recall_exposure
 from storymodel.local_evidence import LocalEvidenceSpec, RecallSelection
+from storymodel.local_reference import LocalReferenceSpec
 from storymodel.playback import MediaSource, TickInterval
 from storymodel.recall_clock import RecordingQuery, UnitInterval, timed_recall
 from storymodel.sherlock_composition import compose_sherlock_source
 from storymodel.sherlock_recall import sherlock_recall_timing
-from storymodel.source_grid import SourceGridQuery, SupportDeclaration, project_source_grid
+from storymodel.source_grid import (
+    LocalScoreGridQuery,
+    SourceGridQuery,
+    SupportDeclaration,
+    project_source_grid,
+)
 
 
 def _query(plan: Path) -> RecordingQuery:
@@ -101,6 +107,26 @@ def run(destination: Path) -> None:
             grid = project_source_grid(plan, grid_query)
             publish_json(destination / "source-grid-query.json", grid_query.model_dump(mode="json"))
             publish_json(destination / "source-grid.json", grid.model_dump(mode="json"))
+            # Level 1 is the complete set of constructed annotation rows in this example.
+            reference = LocalReferenceSpec(level=1, evidence=grid_query.inference)
+            local_query = LocalScoreGridQuery(
+                reference=reference,
+                selection=grid_query.selection,
+                axis=axis,
+                bins=grid_query.bins,
+                declarations=grid_query.declarations,
+                exposure=exposure_query,
+            )
+            scores = project_source_grid(plan, local_query)
+            export_supported_account(destination / "local-source.json", replay.source.account)
+            export_supported_account(destination / "local-recall.json", replay.recall.account)
+            for filename, artifact in (
+                ("local-reference-spec.json", reference),
+                ("local-reference.json", scores.reference),
+                ("local-score-grid-query.json", local_query),
+                ("local-score-grid.json", scores),
+            ):
+                publish_json(destination / filename, artifact.model_dump(mode="json"))
 
 
 if __name__ == "__main__":

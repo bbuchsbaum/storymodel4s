@@ -1,0 +1,119 @@
+{
+  "schema": "local-reference-jvm-oracle/v1",
+  "cases": [
+    {
+      "name": "supplied-destinations",
+      "population": "SuppliedDestinations",
+      "prior": "UniformAdmittedStates",
+      "temperature": 1.0,
+      "outcome": {
+        "status": "computed",
+        "information": "DistinguishedCosts",
+        "costs": [
+          {"state": "ext:Association", "cost": 1.0, "excluded": false},
+          {"state": "ext:Commentary", "cost": 1.0, "excluded": false},
+          {"state": "ext:Intrusion", "cost": 1.0, "excluded": false},
+          {"state": "ext:SourceConsistentInference", "cost": 1.0, "excluded": false},
+          {"state": "ext:Uninterpretable", "cost": 1.0, "excluded": false},
+          {"state": "sit:reference-alpha", "cost": 0.0, "excluded": false},
+          {"state": "sit:reference-beta/distorted/Polarity", "cost": 1.0, "excluded": false}
+        ],
+        "mass": [
+          {"state": "ext:Association", "mass": 0.11470149963903493},
+          {"state": "ext:Commentary", "mass": 0.11470149963903493},
+          {"state": "ext:Intrusion", "mass": 0.11470149963903493},
+          {"state": "ext:SourceConsistentInference", "mass": 0.11470149963903493},
+          {"state": "ext:Uninterpretable", "mass": 0.11470149963903493},
+          {"state": "sit:reference-alpha", "mass": 0.31179100216579037},
+          {"state": "sit:reference-beta/distorted/Polarity", "mass": 0.11470149963903493}
+        ]
+      }
+    },
+    {
+      "name": "source-targets-placeholder-refusal",
+      "population": "AdmittedSourceTargets",
+      "prior": "UniformAdmittedSourceTargets",
+      "temperature": 1.0,
+      "outcome": {
+        "status": "not-computed",
+        "reason": "IncomparableTargetCosts",
+        "costs": [
+          {"state": "ext:Association", "cost": 1.0, "excluded": false},
+          {"state": "ext:Commentary", "cost": 1.0, "excluded": false},
+          {"state": "ext:Intrusion", "cost": 1.0, "excluded": false},
+          {"state": "ext:SourceConsistentInference", "cost": 1.0, "excluded": false},
+          {"state": "ext:Uninterpretable", "cost": 1.0, "excluded": false},
+          {"state": "sit:reference-alpha", "cost": 0.0, "excluded": false},
+          {"state": "sit:reference-beta/distorted/Polarity", "cost": 1.0, "excluded": false}
+        ]
+      }
+    },
+    {
+      "name": "source-targets-measured",
+      "population": "AdmittedSourceTargets",
+      "prior": "UniformAdmittedSourceTargets",
+      "temperature": 1.4426950408889634,
+      "outcome": {
+        "status": "computed",
+        "information": "DistinguishedCosts",
+        "costs": [
+          {"state": "ext:Association", "cost": 100.0, "excluded": false},
+          {"state": "ext:Commentary", "cost": 100.0, "excluded": false},
+          {"state": "ext:Intrusion", "cost": 100.0, "excluded": false},
+          {"state": "ext:SourceConsistentInference", "cost": 100.0, "excluded": false},
+          {"state": "ext:Uninterpretable", "cost": 100.0, "excluded": false},
+          {"state": "sit:reference-alpha", "cost": 0.0, "excluded": false},
+          {"state": "sit:reference-beta/distorted/Polarity", "cost": 1.0, "excluded": false}
+        ],
+        "mass": [
+          {"state": "sit:reference-alpha", "mass": 0.6666666666666666},
+          {"state": "sit:reference-beta/distorted/Polarity", "mass": 0.3333333333333333}
+        ]
+      }
+    },
+    {
+      "name": "tie-overflow",
+      "population": "SuppliedDestinations",
+      "prior": "UniformAdmittedStates",
+      "temperature": 1.0,
+      "outcome": {
+        "status": "not-computed",
+        "reason": "TieOverflow",
+        "costs": [
+          {"state": "ext:Association", "cost": 1.0, "excluded": false},
+          {"state": "ext:Commentary", "cost": 1.0, "excluded": false},
+          {"state": "ext:Intrusion", "cost": 1.0, "excluded": false},
+          {"state": "ext:SourceConsistentInference", "cost": 1.0, "excluded": false},
+          {"state": "ext:Uninterpretable", "cost": 1.0, "excluded": false}
+        ]
+      }
+    },
+    {
+      "name": "incomparable-source-targets",
+      "population": "AdmittedSourceTargets",
+      "prior": "UniformAdmittedSourceTargets",
+      "temperature": 1.0,
+      "outcome": {
+        "status": "not-computed",
+        "reason": "IncomparableTargetCosts",
+        "costs": [
+          {"state": "ext:Association", "cost": 0.0, "excluded": false},
+          {"state": "ext:Commentary", "cost": 0.0, "excluded": false},
+          {"state": "ext:Intrusion", "cost": 0.0, "excluded": false},
+          {"state": "ext:SourceConsistentInference", "cost": 0.0, "excluded": false},
+          {"state": "ext:Uninterpretable", "cost": 0.0, "excluded": false},
+          {"state": "sit:reference-alpha", "cost": 0.0, "excluded": false},
+          {"state": "sit:reference-beta/distorted/Polarity", "cost": 0.3, "excluded": false}
+        ]
+      }
+    },
+    {
+      "name": "invalid-temperature",
+      "refusal": "InvalidConfig(local reference,temperature must be finite and positive)"
+    },
+    {
+      "name": "foreign-universe",
+      "refusal": "InvalidConfig(local reference,declared universe must equal the bound source's complete single-level cut)"
+    }
+  ]
+}

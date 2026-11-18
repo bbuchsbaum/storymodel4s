@@ -99,6 +99,7 @@ from .local_evidence import (
     _resolve_account_inference,
     derive_local_evidence,
 )
+from .local_reference import LocalReferenceSpec, local_reference
 from .model import Account, canonical
 from .organization import (
     AccountOrganizationResult,
@@ -182,7 +183,7 @@ from .sherlock_recall import (
 )
 from .sherlock_source import SherlockSource, prepare_sherlock_source
 from .source import SourceRow, prepare_source
-from .source_grid import SourceGridQuery, project_source_grid
+from .source_grid import LocalScoreGridQuery, SourceGridQuery, project_source_grid
 from .source_transitions import (
     SourceSequenceResult,
     SourceSequenceSpec,
@@ -394,7 +395,10 @@ def main(argv: list[str] | None = None) -> int:
     for command, help_text in (
         ("timed-recall", "measure mapped recall details on a declared recording clock"),
         ("verify-timed-recall", "recompute a saved timed recall result"),
-        ("source-time-grid", "project an account posterior into declared source-time bins"),
+        (
+            "source-time-grid",
+            "project a sequence posterior or independent local scores into source-time bins",
+        ),
         ("verify-source-time-grid", "recompute a saved source-time grid"),
         ("recall-exposure", "measure unit durations from word intervals on a recording"),
         ("verify-recall-exposure", "recompute a saved recording-window exposure"),
@@ -830,14 +834,20 @@ def main(argv: list[str] | None = None) -> int:
             source_sequence.add_argument("--output")
         else:
             source_sequence.add_argument("result")
-    for name in ("derive-local-evidence", "infer-accounts", "verify-account-inference"):
-        local = commands.add_parser(name, help="derive account evidence and sequence inference")
+    for name, summary in (
+        ("derive-local-evidence", "derive account evidence and costs"),
+        ("infer-accounts", "run sequence inference on account evidence"),
+        ("verify-account-inference", "verify a saved sequence inference result"),
+        ("local-reference", "normalize independently measured costs on a declared source level"),
+        ("verify-local-reference", "verify local score mass against both original accounts"),
+    ):
+        local = commands.add_parser(name, help=summary)
         local.add_argument("source")
         local.add_argument("recall")
         local.add_argument("spec")
         local.add_argument("--source-sha256")
         local.add_argument("--recall-sha256")
-        if name == "verify-account-inference":
+        if name.startswith("verify-"):
             local.add_argument("result")
         else:
             local.add_argument("--output")
@@ -1017,11 +1027,13 @@ def main(argv: list[str] | None = None) -> int:
             "derive-local-evidence",
             "infer-accounts",
             "verify-account-inference",
+            "local-reference",
+            "verify-local-reference",
         ):
             local_source = read_supported_account(
                 Path(args.source), expected_sha256=args.source_sha256
             )
-            exporting = args.command != "verify-account-inference"
+            exporting = not args.command.startswith("verify-")
             if exporting and local_source.export_permission != "allowed":
                 raise PermissionError("producer denies source inference export")
             local_recall = read_supported_account(
@@ -1029,38 +1041,55 @@ def main(argv: list[str] | None = None) -> int:
             )
             if exporting and local_recall.export_permission != "allowed":
                 raise PermissionError("producer denies recall inference export")
-            account_spec = _read_inference_spec(args.spec)
-            if args.command == "derive-local-evidence":
-                local_spec = (
-                    account_spec.local
-                    if isinstance(account_spec, RefinedInferenceSpec)
-                    else account_spec
+            if args.command in ("local-reference", "verify-local-reference"):
+                ref_spec = LocalReferenceSpec.model_validate_json(
+                    canonical(strict_json(Path(args.spec).read_bytes()))
                 )
-                local_result = derive_local_evidence(local_source, local_recall, local_spec)
-                emit(
-                    (
-                        local_result.sequence.request if args.request_only else local_result
-                    ).model_dump(mode="json"),
-                    args.output,
-                )
-            else:
-                saved = (
-                    _read_saved_inference(args.result, account_spec)
-                    if args.command == "verify-account-inference"
-                    else None
-                )
-                resolved = _resolve_account_inference(
-                    local_source, local_recall, account_spec, saved
-                )
-                if saved is None:
-                    emit(resolved.model_dump(mode="json"), args.output)
+                reference_result = local_reference(local_source, local_recall, ref_spec)
+                ref_payload = reference_result.model_dump(mode="json")
+                if exporting:
+                    emit(ref_payload, args.output)
                 else:
-                    spec_sha256 = (
-                        resolved.spec_sha256
-                        if isinstance(resolved, RefinedAccountInference)
-                        else resolved.evidence.spec_sha256
+                    if canonical(strict_json(Path(args.result).read_bytes())) != canonical(
+                        ref_payload
+                    ):
+                        raise ValueError(
+                            "local reference differs from original accounts or specification"
+                        )
+                    emit({"valid": True, "source_sha256": reference_result.source_sha256}, None)
+            else:
+                account_spec = _read_inference_spec(args.spec)
+                if args.command == "derive-local-evidence":
+                    local_spec = (
+                        account_spec.local
+                        if isinstance(account_spec, RefinedInferenceSpec)
+                        else account_spec
                     )
-                    emit({"valid": True, "spec_sha256": spec_sha256}, None)
+                    local_result = derive_local_evidence(local_source, local_recall, local_spec)
+                    emit(
+                        (
+                            local_result.sequence.request if args.request_only else local_result
+                        ).model_dump(mode="json"),
+                        args.output,
+                    )
+                else:
+                    saved = (
+                        _read_saved_inference(args.result, account_spec)
+                        if args.command == "verify-account-inference"
+                        else None
+                    )
+                    resolved = _resolve_account_inference(
+                        local_source, local_recall, account_spec, saved
+                    )
+                    if saved is None:
+                        emit(resolved.model_dump(mode="json"), args.output)
+                    else:
+                        spec_sha256 = (
+                            resolved.spec_sha256
+                            if isinstance(resolved, RefinedAccountInference)
+                            else resolved.evidence.spec_sha256
+                        )
+                        emit({"valid": True, "spec_sha256": spec_sha256}, None)
         elif args.command in ("build-source-sequence", "verify-source-sequence"):
             graph_source = read_supported_account(
                 Path(args.source), expected_sha256=args.source_sha256
@@ -1628,10 +1657,15 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 emit(feature_result, args.output)
         elif args.command in ("source-time-grid", "verify-source-time-grid"):
-            grid_query = SourceGridQuery.model_validate_json(
-                canonical(strict_json(Path(args.query).read_bytes()))
+            grid_input = strict_json(Path(args.query).read_bytes())
+            grid_schema = (
+                LocalScoreGridQuery
+                if isinstance(grid_input, dict) and "reference" in grid_input
+                else SourceGridQuery
             )
-            grid_result = project_source_grid(Path(args.plan), grid_query)
+            grid_result = project_source_grid(
+                Path(args.plan), grid_schema.model_validate_json(canonical(grid_input))
+            )
             grid_payload = grid_result.model_dump(mode="json")
             if args.command.startswith("verify-"):
                 if canonical(strict_json(Path(args.result).read_bytes())) != canonical(

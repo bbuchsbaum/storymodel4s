@@ -8,10 +8,11 @@ from __future__ import annotations
 
 import math
 from bisect import bisect_left
-from collections import defaultdict
+from collections import Counter, defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass
 from decimal import Decimal, localcontext
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal, Protocol, Self
 
 from pydantic import Field, model_validator
 
@@ -43,6 +44,7 @@ from .sequence import (
 )
 from .serialization import digest
 from .source_transitions import (
+    SourceProjection,
     SourceProjectionPolicy,
     SourceSequenceResult,
     SourceSequenceSpec,
@@ -622,13 +624,95 @@ def derive_local_evidence(
     )
 
 
-def _derive_local_evidence(
+class _ReferencePolicy(Protocol):
+    """The independent reference producer chooses a complete source level before pricing."""
+
+    @property
+    def level(self) -> int: ...
+    @property
+    def pricing(self) -> str: ...
+    def _nominate(
+        self,
+        unit: str,
+        situation: str | None,
+        content: _Content,
+        targets: dict[str, _Content],
+        table: dict[str, SemanticEstimate],
+    ) -> RetrievalRow: ...
+
+
+@dataclass(frozen=True)
+class _PricedRows:
+    projection: SourceProjection
+    retrieval: tuple[RetrievalRow, ...]
+    cells: tuple[LocalCell, ...]
+    rows: tuple[SequenceRow, ...]
+
+
+def _measured_semantic_cell(
+    unit: str,
+    target: str,
+    state: SequenceState,
+    gates: tuple[MemberGate, ...],
+    estimate: SemanticEstimate,
+) -> LocalCell:
+    observed = estimate.value is not None
+    return LocalCell(
+        unit=unit,
+        target=target,
+        state=state,
+        gate_members=gates,
+        terms={"semantic": estimate.value} if estimate.value is not None else {},
+        slot_defaults={},
+        missing={"semantic": estimate.reason} if estimate.reason else {},
+        imputed={},
+        eligible=("semantic",) if estimate.status != "ineligible" else (),
+        measured=("semantic",) if observed else (),
+        support=1.0 if observed else 0.0 if estimate.status == "missing" else None,
+        support_reason="zero-eligible-weight" if estimate.status == "ineligible" else "assessed",
+        excluded=not observed,
+        total=estimate.value,
+    )
+
+
+type _TargetKey = tuple[_Content, str, frozenset[tuple[_Content, int]]]
+
+
+def _content_table(
+    spec: LocalEvidenceSpec,
+    units: dict[str, tuple[_Content, str | None]],
+    target_keys: dict[str, _TargetKey],
+) -> Callable[[str], dict[str, SemanticEstimate]]:
+    keys = {s.unit: (s.function, units[s.unit][0]) for s in spec.units}
+    anchors: dict[_TargetKey, list[str]] = defaultdict(list)
+    for anchor, key in target_keys.items():
+        anchors[key].append(anchor)
+    by_content: dict[tuple[Function, _Content], dict[_TargetKey, SemanticEstimate]] = defaultdict(
+        dict
+    )
+    for cell in spec.semantic_cells:
+        if cell.target in target_keys:
+            row = by_content[keys[cell.unit]]
+            target = target_keys[cell.target]
+            if row.setdefault(target, cell.estimate) != cell.estimate:
+                raise ValueError(
+                    "equal content pairs carry conflicting local reference measurements"
+                )
+
+    def read_unit(unit: str) -> dict[str, SemanticEstimate]:
+        return {a: v for key, v in by_content[keys[unit]].items() for a in anchors[key]}
+
+    return read_unit
+
+
+def _price_account_rows(
     source: SupportedAccount,
     recall: SupportedAccount,
     spec: LocalEvidenceSpec,
     unit_memberships: dict[str, str | None] | None = None,
-) -> LocalEvidenceResult:
-    """Price checked inputs; optionally retain the unique covering unit for each situation."""
+    reference: _ReferencePolicy | None = None,
+) -> _PricedRows:
+    """Construct unit content and all admitted state prices before any sequence operations."""
     projection, anchor_supports = _project_source_and_supports(source, spec.projection)
     if not recall.documents or any(d.side != "recall" for d in recall.documents):
         raise ValueError("local evidence requires an independent recall-only account")
@@ -674,9 +758,19 @@ def _derive_local_evidence(
         )
         targets[segment_id] = _Content(None, participants, "narrated", "unknown", "unknown", lemmas)
     inverted: dict[tuple[int, str, str], list[str]] = defaultdict(list)
-    for anchor, content in targets.items():
-        for key in _query(content):
-            inverted[key].append(anchor)
+    cut: dict[str, _Content] = {}
+    if reference is None:
+        for anchor, content in targets.items():
+            for key in _query(content):
+                inverted[key].append(anchor)
+    else:
+        cut = {
+            node.anchor: targets[node.anchor]
+            for node in projection.nodes
+            if node.level == reference.level
+        }
+        if not cut:
+            raise ValueError("local reference requires a nonempty source level cut")
     postings = {key: tuple(sorted(values)) for key, values in inverted.items()}
     recall_units = {u.id: u for u in recall.units if u.kind == "recall"}
     recall_situations = {s.id: s for s in recall._situations()}
@@ -698,11 +792,14 @@ def _derive_local_evidence(
         if detail.kind == "perceptual":
             sensory_by_unit[detail.unit].update(stem_set(detail.content))
     selected_units = {s.unit for s in spec.units}
-    semantic_table = {(c.unit, c.target): c.estimate for c in spec.semantic_cells}
+    semantic_table: dict[str, dict[str, SemanticEstimate]] = defaultdict(dict)
+    for cell_input in spec.semantic_cells:
+        semantic_table[cell_input.unit][cell_input.target] = cell_input.estimate
     if any(c.unit not in selected_units or c.target not in targets for c in spec.semantic_cells):
         raise ValueError("semantic cell is outside selected units or source anchors")
     retrieval, cells, rows = [], [], []
     max_level = max((n.level for n in projection.nodes), default=0)
+    unit_content: dict[str, tuple[_Content, str | None]] = {}
     for selected in spec.units:
         unit = recall_units.get(selected.unit)
         if unit is None:
@@ -753,8 +850,31 @@ def _derive_local_evidence(
             content.lemmas | stem_set(unit_text),
             sensory,
         )
-        nominated = _nominate(
-            unit.id, situation.id if situation else None, content, selected, targets, postings, spec
+        unit_content[unit.id] = content, situation.id if situation else None
+
+    content_table = None
+    if reference is not None and spec.semantic == "table":
+        # Scores must depend only on content available to this scorer. Repeated
+        # observations keep separate identities and share their measured evidence.
+        target_keys: dict[str, _TargetKey] = {
+            anchor: (
+                content,
+                nodes[anchor].kind,
+                frozenset(Counter(targets[m] for m in under(anchor)).items())
+                if nodes[anchor].kind == "segment"
+                else frozenset(),
+            )
+            for anchor, content in cut.items()
+        }
+        content_table = _content_table(spec, unit_content, target_keys)
+    for selected in spec.units:
+        unit_id = selected.unit
+        content, selected_situation = unit_content[unit_id]
+        unit_table = content_table(unit_id) if content_table else semantic_table.get(unit_id, {})
+        nominated = (
+            reference._nominate(unit_id, selected_situation, content, cut, unit_table)
+            if reference is not None
+            else _nominate(unit_id, selected_situation, content, selected, targets, postings, spec)
         )
         retrieval.append(nominated)
         costs = []
@@ -803,23 +923,27 @@ def _derive_local_evidence(
             semantic = (
                 SemanticEstimate(status="observed", value=_lexical_distance(content, target))
                 if spec.semantic == "lexical"
-                else semantic_table.get(
-                    (unit.id, anchor),
+                else unit_table.get(
+                    anchor,
                     SemanticEstimate(status="missing", reason="provider-abstained"),
                 )
             )
-            cell = _price(
-                unit.id,
-                anchor,
-                content,
-                target,
-                node.level,
-                max_level,
-                selected.function,
-                state,
-                gates,
-                semantic,
-                spec.costs,
+            cell = (
+                _measured_semantic_cell(unit_id, anchor, state, gates, semantic)
+                if reference is not None and reference.pricing == "measured-semantic"
+                else _price(
+                    unit_id,
+                    anchor,
+                    content,
+                    target,
+                    node.level,
+                    max_level,
+                    selected.function,
+                    state,
+                    gates,
+                    semantic,
+                    spec.costs,
+                )
             )
             cells.append(cell)
             if not cell.excluded:
@@ -838,12 +962,23 @@ def _derive_local_evidence(
                     state=SequenceState(kind="external", external=destination), cost=external_cost
                 )
             )
-        rows.append(SequenceRow(unit=unit.id, costs=tuple(costs)))
+        rows.append(SequenceRow(unit=unit_id, costs=tuple(costs)))
+    return _PricedRows(projection, tuple(retrieval), tuple(cells), tuple(rows))
+
+
+def _derive_local_evidence(
+    source: SupportedAccount,
+    recall: SupportedAccount,
+    spec: LocalEvidenceSpec,
+    unit_memberships: dict[str, str | None] | None = None,
+) -> LocalEvidenceResult:
+    """Price checked inputs; optionally retain the unique covering unit for each situation."""
+    priced = _price_account_rows(source, recall, spec, unit_memberships)
     sequence = build_source_sequence(
         source,
         recall,
         SourceSequenceSpec(
-            rows=tuple(rows),
+            rows=priced.rows,
             projection=spec.projection,
             weights=spec.transitions,
             temperature=spec.temperature,
@@ -853,8 +988,8 @@ def _derive_local_evidence(
         source_sha256=sequence.source_sha256,
         recall_sha256=sequence.recall_sha256,
         spec_sha256=digest(spec.model_dump(mode="json")),
-        retrieval=tuple(retrieval),
-        cells=tuple(cells),
+        retrieval=priced.retrieval,
+        cells=priced.cells,
         sequence=sequence,
     )
 

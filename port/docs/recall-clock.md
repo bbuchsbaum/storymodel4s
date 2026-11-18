@@ -140,3 +140,46 @@ receipt separately records the actual timing and replayed mapping decisions.
 Omit `exposure` to compute a source grid without a recording window. A selected
 unit with zero measured duration has an empty weighted grid. A unit excluded from
 inference has no computed grid. Within a computed row, omitted bin keys mean zero.
+
+## Where does local evidence place a recall unit?
+
+`local-reference` compares each selected recall unit with a complete level of the
+source hierarchy. It prices the admitted source and external states using the same
+content and fidelity gates as account inference. The calculation stops before
+sequence transitions. A unit's score distribution can therefore serve as a baseline
+for measuring what sequence order adds.
+
+The timed example saves both account snapshots and a specification selecting level 1,
+the six synthetic film annotation rows. Run from its output directory:
+
+```sh
+storymodel local-reference local-source.json local-recall.json local-reference-spec.json --output scores.json
+storymodel verify-local-reference local-source.json local-recall.json local-reference-spec.json scores.json
+storymodel source-time-grid analysis-1.json local-score-grid-query.json --output scored-grid.json
+storymodel verify-source-time-grid analysis-1.json local-score-grid-query.json scored-grid.json
+```
+
+In Python use `storymodel.local_reference.local_reference(source, recall, spec)`.
+The result retains the source level's complete membership, the nomination cutoff,
+measurement counts, prices, fidelity modes and each unit's normalized weights.
+The two populations answer different questions.
+
+| Population | Interpretation |
+|---|---|
+| `supplied-destinations` | How does local evidence distribute weight across the admitted source states and external alternatives? Each admitted state gets one prior share. This population can feed a film grid. |
+| `admitted-source-targets` | Assuming a source target, which admitted target does the measured semantic evidence favor? Each target gets one prior share, divided across its equal-cost modes. This distribution leaves source membership undetermined. |
+
+For a target-conditional calculation, set `pricing="measured-semantic"` and use a
+`LocalCostPolicy` with `weights={"semantic": 1.0}`, `function_prior={}` and
+`distortion_penalty=0`. Missing semantic measurements have no fallback price.
+Both profiles use the temperature in `LocalEvidenceSpec`. If two targets have costs
+0 and 1, a temperature of `1 / log(2)` gives target-conditional weights 2/3 and 1/3.
+
+The strict candidate search ranks observed semantic distances within the declared level
+and keeps every target tied at the `max_candidates` cutoff. Optional lexical hits join
+that set before the union is checked against `tie_budget`. Overflow withholds the whole
+unit. A supplied semantic table uses IDs to locate measurements in the original accounts.
+Equal scoring content shares a measurement across occurrences, while conflicting outcomes
+for equal content raise an error. The Python semantic representation here covers the
+existing sketch, lexical and recorded-table channels. Chart and provider-specific
+representations require their own comparisons.
