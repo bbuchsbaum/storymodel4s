@@ -35,3 +35,47 @@ denominators. Also report mean gold rank (midrank for ties) and top-one agreemen
 (split credit for a tied maximum). Count participant-level wins and inspect the
 presence and swapped controls. All labels and weights remain fixed for this run.
 This is a descriptive development comparison in one episode.
+
+## Observed development result
+
+Protocol commit `1a55ea7dc`. All 1,744 units in the 11 development sessions joined
+to the archived mapper outputs in order. The scoring support supplied 1,499 eligible
+human-coded units across 10 participants. It excluded 177 units outside the coded
+intervals and 68 with no gold source. There were 101 eligible units with a single
+recognized speaker cue (63 Sherlock, 38 John), distributed across all 10 participants.
+
+| Equal-participant mean | Baseline | Speaker credit | Character present | Swapped credit |
+|---|---:|---:|---:|---:|
+| All units, gold loss in bits | 1.45063 | 1.45169 | 1.45062 | 1.45103 |
+| Cued units, gold loss in bits | 1.56724 | 1.57533 | 1.56308 | 1.57018 |
+| Cued units, mean gold rank | 4.015 | 3.131 | 3.162 | 3.655 |
+| Cued units, top-one agreement | 72.51% | 72.51% | 72.51% | 72.51% |
+
+Lower losses and ranks are better. With speaker credits, primary gain was
+−0.00106 bits per unit across all scored units and −0.00808 on cued units.
+Four of ten participants improved. All-unit top-one agreement stayed at 79.05%.
+An exploratory inspection of the 101 cued units found that gold probability
+increased for 80 and decreased for 21. The set of top-ranked scenes stayed
+identical on every unit. The gold scene's rank changed on 11 cued units, all
+of which initially tied with other scenes. This explains how mean rank could
+improve without improving the top choice or the primary score.
+
+The fixed credit adjustment earns no place in the retrieval default on this
+evidence. This result concerns adding row-credit frequencies to already-informed
+scene scores. The cue rule covers explicit named speech by two characters and the
+endpoint is the human narrative scene at onset. It does not establish the value
+of matching the words or substance of a particular line to the person saying it.
+
+## Reproduce
+
+From this branch root, run the following in the port Python environment with the
+authorized local study root available through the Sherlock loader.
+
+```sh
+python -B port/evidence/sherlock-speaker/retrieval.py run
+```
+
+The output reproduces retrieval-results.json, which contains the aggregate and
+per-session measurements. The script checks the frozen input digest and writes
+no raw recall. All four conditions are deterministic replays of one saved model
+reading per unit.
