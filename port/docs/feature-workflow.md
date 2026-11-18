@@ -57,6 +57,9 @@ retrieved candidates first, then caption scores and local rankings, then the dec
 sequence. This ordering lets a researcher distinguish a target excluded by the retrieval
 budget from a retrieved target that scored poorly.
 
+A decode covers one recall document. Units are sorted by their start in that transcript.
+Selecting units from multiple documents or with tied starts raises a validation error.
+
 The Scala reference is `align/.../captionscoring.scala`. The Python adapter accepts an
 explicit target-to-caption declaration. Scala's media, clock and multi-part correspondence
 checks would be needed to derive that declaration automatically from physical caption files.
@@ -69,6 +72,16 @@ with synthetic, decoded study rows. It preserves both storyboard segmentations, 
 source scale, and the original and presentation times. A reported whole-recall duration
 has its own field. The example carries the recall transcript through to a saved analysis
 without manufacturing word-level measurements.
+
+Open `data/friends-example/prepared.json` to see the crosswalk from MoreEMs (56-event
+scale) to NarrComb (52-event scale). It uses presentation time. For each MoreEMs event
+the artifact lists candidates within five seconds by default, then identifies the nearest
+one when unique. In the synthetic example the event at 5 seconds falls halfway between
+the events at 0 and 10. Both candidates remain visible and the target stays unset.
+This deliberately improves on picking the first tied row. Several MoreEMs events
+can share a NarrComb target. The stored source identity includes the selected scale and
+its decoded rows, so a correction to the original clock remains traceable even when the
+annotation text stays the same.
 
 The Scala reference is `corpus-intake/.../FriendsIntake.scala`. Workbook parsing, full
 workbook qualification and participant-data admission are separate pieces of the corpus

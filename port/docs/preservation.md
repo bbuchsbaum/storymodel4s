@@ -831,3 +831,22 @@ including general clock maps, edit plans with target gaps, nested composition, c
 correspondence, composed evidence admitted directly into accounts, recording/scanner links
 and measured recall-time consumers. No actual media availability or scientific accuracy claim
 follows from declared-coordinate checks.
+
+## Lexical windows, caption evidence and Friends intake
+
+At source `c2f5c9363`, the [worked examples](feature-workflow.md) exercise three
+computational paths and a local artifact inspector. The retained behaviors and limits are:
+
+| Scala reference | Python entry point | Checked distinction |
+|---|---|---|
+| Feature measures, `MeasureSuite` and `WindowSuite` | `feature_windows` | Repeated occurrences retain their own UTF-16 spans and observed ticks. A measured zero contributes to the mean. A missing score contributes only to the missing count. |
+| Caption scoring and sparse alignment | `run_alignment_method` | Changing only supplied caption evidence can change the decoded path with the same retrieved candidates. The decoder requires one recall document and orders units by transcript position. Physical caption localization remains open. |
+| `FriendsIntake.scala` | `prepare_friends_study` | Both storyboard scales and clocks survive replay. Tied presentation-time matches retain all candidates. Whole-recall duration supplies no within-recall clock. The input is decoded rows. Workbook parsing and scoring-code interpretation remain open. |
+
+Local qualification used synthetic inputs. All 1,107 Python tests passed in 44.82 seconds.
+Ruff and mypy passed. The installed wheel's 73 Python modules matched the reviewed source.
+Five CLI outputs matched the Python examples byte for byte (two feature tables, one caption
+alignment, one Friends preparation and its saved analysis). The CLI also refused denied
+export before writing a preparation. The production React build passed, and the inspector's
+TypeScript reader loaded four installed artifacts. Browser interaction and a matched Scala
+runtime comparison remain untested in this slice.

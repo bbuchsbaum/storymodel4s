@@ -18,7 +18,8 @@ at P2 to distinguish this expansion from the initial Stage 1 pilot.
 The pilot has checked accounts and independent pairing, UTF-16 recall intake, exact native
 clocks, recorded execution, a bounded extractive proposal resolver, sparse lexical/role
 alignment, three analysis views, exact temporal allocation, legacy reads, and an API/CLI.
-These are verified bounded capabilities, not full module parity. The React app is a scaffold.
+The React workbench reads saved feature windows, analysis replays and Friends event crosswalks.
+The preservation map tracks remaining module coverage.
 
 The reviewed local slices now include recorded source construction, event-relation admission,
 text identity, and [rich state/circumstance construction](rich-accounts.md). The connected
