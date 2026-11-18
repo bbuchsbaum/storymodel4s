@@ -1021,14 +1021,17 @@ Top scene and within ±1 in this table are row-weighted, as in round 4.
 **What to know before relying on it.**
 - **Order can still change the top scene.** The located mass is unchanged, but where it is a
   minority of the row, the unplaced mass can put another scene on top.
-  - That happens on 6.2% of FilmFestival scene-scored rows (123) and 4.4% of Sherlock's (17).
-  - On those rows the top is right more often than the producer's (65.0% against 59.3%; 47.1%
-    against 41.2%), but it is the weakest group.
+  - Order exceeds the top of the directly located mass on 6.2% of FilmFestival scene-scored
+    rows (123) and 4.4% of Sherlock's (17). The full producer forecast already has a fallback.
+    Relative to that forecast, the top changes on 79 and 13 of those rows, respectively.
+  - Among those changed tops, FilmFestival gains 26 correct rows and loses 19. Sherlock gains
+    six and loses five.
 - **Out-of-order rows lose a little top-scene accuracy,** though not scene bits: a net 2 rows
   of 156 on FilmFestival and 2 of 71 on Sherlock. Every flipped row is one where order set
   the top. Condition 3 is on scene bits and holds.
-- **On gold-blind windows the gain holds and that loss is larger** (a sensitivity check, not
-  part of the rule; everything refitted on the windowed rows).
+- **On fixed-width windows the gain holds and that loss is larger** (a sensitivity check,
+  with parameters refitted on the windowed rows). Width comes from the development gold
+  median. Gold overlap sets labels and determines which windows enter the sequence.
   - FilmFestival, 7 s windows: scene 1.241 to 0.951 (−0.290, 10/10, p = 0.002); top scene
     75.1% to 77.0%. Sherlock, 25.5 s windows: 1.486 to 1.189 (−0.297, 9/10); 72.5% to 72.8%.
   - Out-of-order FilmFestival windows: scene bits 1.63 to 1.58, but top scene 62.0% to 55.7%
@@ -1041,16 +1044,65 @@ restriction, and the row's own evidence left out). Mutants M58–M65 each fail t
 (`mutations/r5-20261117.json` at a482fa3f2: 65 mutants, all caught). Seven discriminate; M58
 is a regression guard, and M65 is the exactness mutant for the null producer.
 
-**Gaps for the vocabulary ADR.**
+### Cold review of rounds 4 and 5
 
-- Memory search inside a framed film is recorded as a work-level reference, which is how the
-  gold codes it. The ADR needs a typed *searching within work* state.
-- Non-film states (memory search between films, gave up, off task, and commentary with no
-  framed work) are typed destinations inside the simplex. A fragment is a ledger count, not a
-  destination. That extends ADR 0031 §3, whose onset-point projection
-  treats not-applicable references as a typed absence ("only not applicable"). The harness has
-  no such absence: a bin of not-applicable words alone is a sampled row whose mass sits on
-  non-film states. The vocabulary ADR must decide this too.
+Reviewed the results commit `4a3d40271` and replayed harness `a482fa3f2` on development data
+from cache. The round-4 protocol (`38b5be76e`) and round-5 rule (`ac001ee6e`) precede their
+respective implementations and outcomes in Git. The round-5 implemented rule places work
+and scene-set mass inside its named support in addition to placing unassigned mass.
+
+- **Reproduced.** FilmFestival sample 1 scene loss was 1.0707 → 0.7977 bits and Sherlock
+  1.0651 → 0.7482. Each improved for 10/10 participants. Exact sign-flip p was 0.00195
+  two-sided and 0.00098 one-sided. Out-of-order deltas were +0.0060 and −0.0471 bits. An
+  independent reconstruction checked 963,998 scored-support probabilities over both
+  FilmFestival samples and Sherlock, with no loss of directly located scene mass or escape
+  from named valid work/scene-set support. The documented title-only work residuals remained
+  outside valid scene support. The null control matched the order prior exactly.
+- **Alpha selection.** The scored participant's transition fit excludes its labels
+  (`cs2/round4.py:320`, `cs2/decoder.py:182`). The alpha objective excludes its score but uses
+  other participants' forecasts fitted with its labels (`cs2/round4.py:345–357`). Nested
+  refits that exclude the outer held-out participant throughout pick the same alpha in every
+  FilmFestival sample-1 fold and reproduce the headline loss. Sherlock uses the transferred
+  FilmFestival alpha of 0.8 at gold-row grain. Freeze a training-only alpha and transition
+  fit for a new cohort. The leave-row-out calculation skips the row's own likelihood.
+  Neighbouring producer outputs can still have overlapping input context.
+- **Row boundaries.** The median-width replay reproduces gains of 0.290 and 0.297 bits.
+  Fixing width at 7 s in both corpora gives gains of 0.290 and 0.442 bits. The sensitivity
+  removes each gold row's exact span but still omits windows with no gold overlap
+  (`cs2/run.py:147–171`). The gain survives the change of spans. These runs cannot isolate
+  how much gain comes from gold coverage or the coders' labels.
+- **Descriptive checks.** Independently recovered participant-mean within-one-scene rates
+  of 93.64% and 93.49%. Located-only film-time means were 5.24 and 27.73 s, conditional on
+  a single-clock gold work with located mass there. The distance calculation distributes
+  scene-set mass within its set. The sample-1 pre-registration draft's development gains
+  reproduce to rounding at 1.43 bits on gold spans and 1.40 bits on 7 s windows.
+- **Synthetic checks.** 72/72 tests passed. Mutants M58–M65 each failed its named test.
+  M65 failed only the exact null-equality test.
+
+The development numbers support retaining the bounded fallback as a secondary forecast.
+A sealed run needs a separately frozen training and evaluation recipe. The earlier
+gold-context fitted and ceiling comparisons use the preceding gold label by design.
+
+### Harness replay declarations before freeze
+
+The archived round-5 replay applies the following rules. They can affect a row even with
+identical recorded replies.
+
+- The harness multiplies pass-2 member weights by the leading pass-1 frame weight
+  (`cs2/ff_producer.py:797`). Record this as a forecast calculation with both inputs.
+- The harness supplies weight 1 for an unframed position (`cs2/ff_producer.py:882–887`).
+  The strict import keeps its weight unavailable.
+- The harness resolves equal-length innermost ties by reply order
+  (`cs2/ff_producer.py:1055–1060`). Before freeze, make these unavailable as in ADR 0031 and
+  rerun affected development rows.
+- The default broad allocation retains a multi-scene set within one work
+  (`cs2/projections.py:124–140, 168–178`). Preserve the set through projection and replay.
+
+The conversion also clips or normalizes frame weights, treats a missing pass-2 reply as
+uncovered, and pools the two passes for scoring. ADR 0032 revision 5 records the strict
+library treatment and the replay comparator's responsibilities. Framed metamemory without
+an anchored address and unframed commentary contribute ledger counts. Searching between
+works, ending recall and off-task speech contribute the three non-work states.
 
 ## Owner decisions (2026-11-16)
 
