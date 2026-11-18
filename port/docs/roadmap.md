@@ -569,8 +569,12 @@ with a broken old implementation needs repair or replacement, not silent deletio
 
 - The [recall clock workflow](recall-clock.md) connects declared Sherlock recording clocks,
   supplied unit intervals and saved detail/reference mappings to window-level measurements.
-  Next, connect aligned feature tracks and window plans to the existing exposure and timing
-  readouts. Keep raw feature coverage, missing observations and derived quantities explicit.
+  The [lexical feature workflow](feature-workflow.md) now measures token length and lexicon
+  scores in recording windows, supplied unit intervals and source annotation scenes. Caption
+  scoring adds an explicit sidecar to sparse decoding, and the synthetic Friends example
+  exercises a second study through the saved analysis inspector. Next, use a matched Scala
+  fixture to broaden caption correspondence and feature eligibility, then take the next
+  retained inference method with stable inputs.
   Review evolving Scala case-study results at computational milestones for confirmed fixes or
   settled changes to shared contracts. General clock maps, additional study adapters and the
   remaining graph, inference and inspection work stay on the phase plan.

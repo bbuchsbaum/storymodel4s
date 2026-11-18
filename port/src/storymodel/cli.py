@@ -343,6 +343,20 @@ def main(argv: list[str] | None = None) -> int:
     sherlock_timing.add_argument("request")
     sherlock_timing.add_argument("--clock", required=True, choices=("princeton", "openneuro"))
     sherlock_timing.add_argument("--output")
+    caption = commands.add_parser(
+        "caption-alignment", help="score retrieved targets against supplied captions and decode"
+    )
+    caption.add_argument("plan")
+    caption.add_argument("captions")
+    caption.add_argument("--blend", type=float, default=0.5)
+    caption.add_argument("--max-candidates", type=int, default=32)
+    caption.add_argument("--max-postings", type=int, default=4096)
+    caption.add_argument("--output")
+    friends = commands.add_parser(
+        "prepare-friends", help="prepare decoded Friends storyboard and recall rows"
+    )
+    friends.add_argument("study")
+    friends.add_argument("--output")
     for name in ("feature-windows", "verify-feature-windows"):
         features = commands.add_parser(name, help="measure lexical features in recording windows")
         features.add_argument("plan")
@@ -1526,6 +1540,29 @@ def main(argv: list[str] | None = None) -> int:
                 raise ValueError("Sherlock recall timing requires a Sherlock recall intake")
             timing = sherlock_recall_timing(sherlock_prepared.intake, args.clock)
             emit(timing.model_dump(mode="json"), args.output)
+        elif args.command == "caption-alignment":
+            from .alignment_method import CaptionEvidence, run_alignment_method
+
+            caption_input = CaptionEvidence.model_validate_json(
+                canonical(strict_json(Path(args.captions).read_bytes()))
+            )
+            aligned = run_alignment_method(
+                Path(args.plan),
+                caption_input,
+                blend=args.blend,
+                max_candidates=args.max_candidates,
+                max_postings=args.max_postings,
+            )
+            emit(aligned.model_dump(mode="json"), args.output)
+        elif args.command == "prepare-friends":
+            from .friends import FriendsStudy, prepare_friends_study
+
+            friends_study = FriendsStudy.model_validate_json(
+                canonical(strict_json(Path(args.study).read_bytes()))
+            )
+            if friends_study.export_permission != "allowed":
+                raise PermissionError("producer denies Friends intake export")
+            emit(prepare_friends_study(friends_study).model_dump(mode="json"), args.output)
         elif args.command in ("feature-windows", "verify-feature-windows"):
             from .feature_windows import Lexicon, feature_windows
 

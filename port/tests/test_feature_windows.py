@@ -73,6 +73,9 @@ def test_lexicon_normalization_conflict_and_provenance():
 
     assert norms({" A ": 1.0, "b": 0}).id == norms({"B": 0, "a": 1}).id
     assert norms({"a": 1}).id != norms({"a": 2}).id
+    assert norms({" A": -0.0, "a": 0.0}).id == norms({"a": -0.0}).id
+    with pytest.raises(ValueError):
+        Lexicon(name="a/b", units="u", entries={"a": 1.0})
     for invalid in ({"a": float("nan")}, {"A": 1, "a": 2}, {" ": 0}):
         with pytest.raises(ValueError):
             norms(invalid)

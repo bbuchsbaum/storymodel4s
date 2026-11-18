@@ -27,6 +27,13 @@ class Lexicon(Identified):
     units: Name
     entries: dict[str, FiniteFloat] = Field(min_length=1)
 
+    @field_validator("name")
+    @classmethod
+    def valid_name(cls, value: str) -> str:
+        if any(ch.isspace() or ch in ":/" for ch in value):
+            raise ValueError("lexicon name cannot contain whitespace, colon or slash")
+        return value
+
     @field_validator("entries")
     @classmethod
     def normalize(cls, entries: dict[str, float]) -> dict[str, float]:
@@ -35,7 +42,7 @@ class Lexicon(Identified):
             key = lower(raw.strip())
             if not key or (key in result and result[key] != value):
                 raise ValueError("empty or conflicting normalized lexicon key")
-            result[key] = value
+            result[key] = 0.0 if value == 0 else value
         return result
 
 
@@ -113,6 +120,39 @@ def _summarize(words: list[WordSample]) -> Summary:
     )
 
 
+def _scene_features(
+    source: SherlockSource, lexicon: Lexicon
+) -> tuple[list[WordSample], dict[str, Summary]]:
+    """Group source-annotation words by declared scene, retaining document-relative UTF-16 spans."""
+    source_words = []
+    scenes = {}
+    prepared = source.prepared
+    source_document = prepared.document.id
+    raw = prepared.document.text.encode("utf-16-le")
+    for scene in source.scenes:
+        scene_words = []
+        for row in prepared.rows[scene.first_row - 1 : scene.last_row]:
+            text = raw[2 * row.span.start : 2 * row.span.end].decode("utf-16-le")
+            offsets = [row.span.start]
+            for ch in text:
+                offsets.append(offsets[-1] + (2 if ord(ch) > 0xFFFF else 1))
+            for begin, end in _token_spans(text, (0, len(text))):
+                if _word_code_point(text[begin]):
+                    span = Span(start=offsets[begin], end=offsets[end])
+                    scene_words.append(
+                        _sample(
+                            f"{source_document}@{span.start}-{span.end}",
+                            span,
+                            text[begin:end],
+                            None,
+                            lexicon,
+                        )
+                    )
+        scenes[f"sherlock:scene:{scene.ordinal:03d}"] = _summarize(scene_words)
+        source_words.extend(scene_words)
+    return source_words, scenes
+
+
 def feature_windows(plan: Path, query: RecordingQuery, lexicon: Lexicon) -> FeatureWindows:
     """Compute both measures over the same eligible lexical occurrences in each window."""
     query = _validate_instance(RecordingQuery, query)
@@ -160,35 +200,13 @@ def feature_windows(plan: Path, query: RecordingQuery, lexicon: Lexicon) -> Feat
         )
         for i, b in enumerate(query.bins)
     )
-    source_words = []
-    scenes = {}
+    source_words: list[WordSample] = []
+    scenes: dict[str, Summary] = {}
     source_document = None
     source = replay.source.request
     if isinstance(source, PreparedConstruction) and isinstance(source.intake, SherlockSource):
-        prepared = source.intake.prepared
-        source_document = prepared.document.id
-        raw = prepared.document.text.encode("utf-16-le")
-        for scene in source.intake.scenes:
-            scene_words = []
-            for row in prepared.rows[scene.first_row - 1 : scene.last_row]:
-                text = raw[2 * row.span.start : 2 * row.span.end].decode("utf-16-le")
-                offsets = [row.span.start]
-                for ch in text:
-                    offsets.append(offsets[-1] + (2 if ord(ch) > 0xFFFF else 1))
-                for begin, end in _token_spans(text, (0, len(text))):
-                    if _word_code_point(text[begin]):
-                        span = Span(start=offsets[begin], end=offsets[end])
-                        scene_words.append(
-                            _sample(
-                                f"{source_document}@{span.start}-{span.end}",
-                                span,
-                                text[begin:end],
-                                None,
-                                lexicon,
-                            )
-                        )
-            scenes[f"sherlock:scene:{scene.ordinal:03d}"] = _summarize(scene_words)
-            source_words.extend(scene_words)
+        source_document = source.intake.prepared.document.id
+        source_words, scenes = _scene_features(source.intake, lexicon)
     return FeatureWindows(
         analysis_sha256=timed.analysis_sha256,
         query=query,

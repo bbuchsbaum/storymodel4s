@@ -45,3 +45,31 @@ The Scala behavioral references are `features/measure.scala` (TokenLength and Le
 `MeasureSuite` and `WindowSuite`. This Python profile uses lexical occurrences as the
 eligible population. Nonlexical punctuation is outside that population. Additional feature
 spaces, smoothing kernels, derivation tracking and the full eligibility ledger remain open.
+
+## Caption evidence and alignment
+
+The same synthetic example saves a separate `captions.json` and a decoded alignment.
+Run `storymodel caption-alignment analysis-1.json captions.json --output aligned.json`.
+The sidecar names source occurrences and binds the source account digest. Supply a blend
+between 0 and 1 to choose the contribution of the stemmed caption distance to the lexical
+distance. The existing inference pipeline uses the resulting local costs. Inspect the
+retrieved candidates first, then caption scores and local rankings, then the decoded
+sequence. This ordering lets a researcher distinguish a target excluded by the retrieval
+budget from a retrieved target that scored poorly.
+
+The Scala reference is `align/.../captionscoring.scala`. The Python adapter accepts an
+explicit target-to-caption declaration. Scala's media, clock and multi-part correspondence
+checks would be needed to derive that declaration automatically from physical caption files.
+
+## A second study
+
+From the port directory, run `python examples/friends_workflow.py data/friends-example`
+and open `data/friends-example/analysis-result.json` in the workbench. This example starts
+with synthetic, decoded study rows. It preserves both storyboard segmentations, the selected
+source scale, and the original and presentation times. A reported whole-recall duration
+has its own field. The example carries the recall transcript through to a saved analysis
+without manufacturing word-level measurements.
+
+The Scala reference is `corpus-intake/.../FriendsIntake.scala`. Workbook parsing, full
+workbook qualification and participant-data admission are separate pieces of the corpus
+workflow. Raw study data is unnecessary for the synthetic exercise.
