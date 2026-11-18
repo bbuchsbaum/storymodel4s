@@ -1,0 +1,1 @@
+{"actor":"codex-port-transport","entity":"port-unbalanced-transport","kind":"reserve_open","mode":"exclusive","op":"20261118T024501.770551Z-p21194-c0000-r71f3-h3997fe","paths":["port/src/storymodel/source_grid.py"],"reservation_id":"rv-01M7P8P6PAA0V7VKV6NS8FHM72","ts":"2026-11-18T02:45:01.770551Z","ttl_s":3600,"v":2}

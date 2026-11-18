@@ -1,0 +1,1 @@
+{"actor":"codex-port-transport","entity":"port-unbalanced-transport","expect":{"status":"20261118T024118.942645Z-p10259-c0000-rdf24-h52998f"},"kind":"patch","op":"20261118T024147.041003Z-p10258-c0002-r9a42-hac9cbb","set":{"status":"doing"},"ts":"2026-11-18T02:41:47.041003Z","v":1}

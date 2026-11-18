@@ -1033,3 +1033,42 @@ account alignment adapter in `align/.../sinkhorn.scala`. Its row and column marg
 penalties, forbidden edges, and convergence status require their own checks. It has a
 distinct mass budget. Source-time concentration, richer semantic representations and
 the remaining P2–P6 capabilities also stay open.
+
+### Unbalanced transport from accounts to source time
+
+At `bc9494874`, [the transport workflow](transport.md) uses the shared account
+projection and candidate retrieval. Each unit can send mass to any admissible member
+of the nominated union. The baseline preserves observed, imputed and forbidden
+comparisons and exposes achieved marginals alongside requested budgets. Its source-time
+grid consumes those masses directly. Missing candidates and unfinished estimation remain
+visible. [Scala source](../../align/src/main/scala/storymodel4s/align/sinkhorn.scala)
+
+The [executable JVM witness](../evidence/transport/README.md) reproduced its output twice
+and passed all 17 Scala Sinkhorn tests. The Python adapter matched all eight cells,
+both marginals and the 27 iterations of the four-unit baseline. Reclassifying a forbidden
+comparison as missing assigned 0.477594 to a cell with known zero mass. The named
+regression failed and two controls passed. One intentional numerical correction keeps
+a viable component when another is removed by a zero prior. A one-cell analytic
+optimum checks it. Ill-conditioned inputs can exhaust the iteration budget or produce
+an explicit precision error.
+
+Independent review of the implementation commit compared 65 small mixed-support cases
+against a 55-digit Decimal solver. Maximum relative cell discrepancy was 3.47e-9 at
+solver tolerance 1e-10. The largest relative discrepancy across 477 converged one-cell
+analytic cases was 9.09e-7 at default tolerance. On CPython 3.12, 5,000 diagonal edges
+with zero distance on two 5,000-element axes took one iteration, 0.292 s and 4.77 MiB
+of peak traced allocation. A shared cost across 2,000 by 2,000 cells took 66 iterations,
+0.712 s and 1.20 MiB. These single-run measurements exclude construction of the input.
+Partially overridden rows or columns can still take quadratic time per sweep.
+
+The installed wheel reproduced both API artifacts through the CLI and verified both
+from the original inputs. The preceding wheel's local scores, score grid, posterior grid
+and exposure remained byte-identical on the same example. The full Python suite passed
+1,232 tests in 47.45 s. Ruff and strict mypy passed. All comparisons used synthetic inputs.
+
+The next temporal operation is concentration on a specified axis and measure. Scala
+supports best fixed-width windows, shortest windows attaining a threshold and a
+potentially disconnected set of grid bins. Its thresholds distinguish absolute amounts,
+fractions of supplied mass and fractions of locatable allocated mass. Arbitrary-window
+queries need the original interval and point supports. Bin totals alone lose that geometry.
+[Scala implementation](../../align/src/main/scala/storymodel4s/align/temporalconcentration.scala)
