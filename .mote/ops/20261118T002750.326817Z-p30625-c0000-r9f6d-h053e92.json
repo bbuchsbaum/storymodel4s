@@ -1,0 +1,1 @@
+{"actor":"codex-port-matched","entity":"port-matched-clock-lexical","kind":"reserve_open","mode":"exclusive","op":"20261118T002750.326817Z-p30625-c0000-r9f6d-h053e92","paths":["port/src/storymodel/sherlock_composition.py","port/examples/feature_windows.py"],"reservation_id":"rv-01M7P0V05P6Q3PMX6ZNDCHTX6X","ts":"2026-11-18T00:27:50.326817Z","ttl_s":3600,"v":2}

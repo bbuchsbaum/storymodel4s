@@ -850,3 +850,27 @@ alignment, one Friends preparation and its saved analysis). The CLI also refused
 export before writing a preparation. The production React build passed, and the inspector's
 TypeScript reader loaded four installed artifacts. Browser interaction and a matched Scala
 runtime comparison remain untested in this slice.
+
+### Native caption correspondence and lexical measurement
+
+Sherlock analyses now resolve native caption declarations against the actual prepared
+source rows. Each observation retains its physical stream and interval. The resulting row
+ID comes from the construction receipt. Caption and lexical costs still enter the existing
+sparse decoder. The v2 output binds the ordered input and records every target assignment,
+including captions whose rows were outside a recall unit's retrieval budget.
+
+Removing the physical-source key from the join in an isolated Python copy failed both the
+wrong-part case and the two-part equal-tick case. The seven other coordinate cases passed.
+A local routing check matched 10,000 reversed captions against 10,000 rows on two axes in
+0.019 seconds with 2,530,220 bytes peak Python allocations traced during the join. This
+timing covers coordinate matching only. Installed CLI replay reproduced the API result and
+refused a one-tick-short input before writing output. The existing target-keyed alignment
+and both v1 feature-window artifacts reproduced their prior bytes.
+
+At `2ffacbd99`, all nine [coordinate cases](../evidence/caption-parity/README.md)
+agreed with the production Scala caption session. Both implementations also consumed
+one [lexical fixture](../evidence/lexical-parity/README.md) and agreed on six token
+forms and their 18 length, frequency and lexicon outcomes. The JVM probes ran on
+reference `3171f5b07`. The Python suite passed 1,120 tests in 40.12 seconds. Ruff,
+mypy and independent review passed. Media acquisition, cross-edition correspondence,
+general feature tracks and relation-aware refinement remain on the roadmap.
