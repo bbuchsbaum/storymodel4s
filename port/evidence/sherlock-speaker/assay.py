@@ -9,7 +9,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parents[2] / "tools/sherlock_mapper"))
-from common import SEGMENTS, film_rows
+from common import SEGMENTS, film_rows  # noqa: E402
 
 SOURCE_SHA = "8c205826dcea8c58db24d7a17c71a3f99a9054e9379435e60b1dd0b987c2b296"
 PEOPLE = ("Sherlock", "John")
@@ -91,7 +91,7 @@ def normalize(directory):
             if choice is None and quote is None:
                 pass
             elif choice in PEOPLE and isinstance(quote, str) and quote and text.count(quote) == 1:
-                start = utf16(text[:text.index(quote)])
+                start = utf16(text[: text.index(quote)])
                 span = Span(start=start, end=start + utf16(quote))
                 assert span.slice(text) == quote
                 rec["evidence"] = span.model_dump()
@@ -126,7 +126,9 @@ def score(readings):
                 decisions.update(sole=labels[0] if group == "one" else None, first=labels[0])
             for method, predicted in decisions.items():
                 gold = row.speaking.strip().title()
-                outcome = "abstain" if predicted is None else "correct" if predicted == gold else "wrong"
+                outcome = (
+                    "abstain" if predicted is None else "correct" if predicted == gold else "wrong"
+                )
                 for stratum in ("all", group):
                     counts[method][stratum][outcome] += 1
     return counts
