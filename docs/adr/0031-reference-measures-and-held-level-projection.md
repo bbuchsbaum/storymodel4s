@@ -406,8 +406,8 @@ from the times of a containing segment. "Measured" has no other sense in this am
      computed from one timed segment;
    - `Undeclared`.
 2. **A declaration needs evidence.** `source` cites the artifact that states how the onsets were
-   obtained, by checksum and locator. A segmentation is read from a declared column or a pinned
-   artifact. And the declaration must pass the evenness check below.
+   obtained, by checksum and locator. A segmentation comes from a declared column or a pinned
+   artifact. Once enabled, the contradiction check below applies to declared provenance.
 3. **It sits on the timing value, not on the intake receipt.** `ReferenceParity.timing` keeps
    `result.timing` and drops the rest of the intake result
    (`P/agentmapping/ReferenceParity.scala:101`), and a projection request takes a `RecallTiming`
@@ -417,9 +417,8 @@ from the times of a containing segment. "Measured" has no other sense in this am
    - *interpolated:* no bin may split a run. All of a run's words that have an onset fall in
      one bin, or all fall outside every bin; otherwise the request is refused with
      `SplitsInterpolatedSegment(run)`;
-   - *undeclared:* there are no runs to check bins against, so no grain can be shown safe. The
-     request is refused at every grain with `OnsetProvenanceUndeclared`. A segmentation assumed
-     by the caller is not accepted in its place.
+   - *undeclared:* refuse a timing-qualified request at every grain with
+     `OnsetProvenanceUndeclared`. A segmentation needs a declaration backed by evidence.
 5. **Persistence.** A declared provenance enters the timing's digest and wire form under a new
    schema version. That **re-keys what cites the timing digest**: the timing build receipt
    (`P/RecallTimingBuild.scala:191`) and the exposure identity (`A/temporalexposure.scala:137`).
@@ -439,38 +438,44 @@ from the times of a containing segment. "Measured" has no other sense in this am
 - **It cannot catch** interpolation that is not linear, onsets jittered after interpolation, or
   a cited source that is itself wrong.
 
-**The evenness check.** A class is derived from what it describes, so a declaration is tested
-against the numbers.
+**The evenness check.** A contradiction check can reject a declaration. It cannot establish
+how the timestamps were obtained.
 
-- Take the words that have an onset, in transcript order. A **step** is a word with a timed
-  neighbour on each side. A step is **even** when its two gaps are equal.
-- A step is **explained** when its three words lie in one declared run. A measured declaration
-  explains none. Neither do one-word runs, so an interpolated declaration with one-word runs is
-  tested exactly like a measured one.
-- **Unexplained evenness** is the share of even steps among the steps that are not explained.
-  At or above a threshold the declaration is refused with `UnexplainedEvenness(share)`.
-- Zero gaps and backward steps are counted as they stand. `RecallTiming` already reports
-  backward pairs (`R/timing.scala:41`) and does not refuse them.
+- In transcript order, take triples of consecutive timed words. Each triple supplies two
+  signed gaps. An interpolated declaration explains a triple when all three words are in one
+  declared run. Measured declarations and one-word runs explain none.
+- A remaining triple is even when the absolute difference between its gaps, expressed in
+  seconds on the declared clock, is at most an absolute tolerance. Include zero and backward
+  gaps in the check and record their counts. Clock quantisation does not set the tolerance.
+- With at least three unexplained triples, divide the even count by the unexplained count.
+  Refuse at or above the calibrated threshold with `UnexplainedEvenness(share)`. With zero
+  unexplained triples there is no share. With one or two, there is insufficient support
+  for the refusal. Keep the declaration and report which check was possible.
 
-**Calibration.** These figures came with the cold review of ADR 0032 and were not recomputed
-here. Sherlock's development participants have onsets quantised to 0.1 s; 11.9% of consecutive
-gaps are equal, 4.9% are zero, 95.1% of words have a distinct onset, and a few onsets run
-backwards (4 in NN03). FilmFestival's onsets are interpolated, so every step inside an utterance
-is even up to the rounding of the written values; its share has not been counted. The threshold
-is provisionally 0.5, between the two. The slice counts both corpora per session before it is
-frozen. If rounding hides FilmFestival's evenness from an exact comparison, the comparison gets
-a declared tolerance; the threshold is not lowered toward Sherlock's value.
+**Calibration.** The validation policy in `recall` owns the absolute tolerance and share
+threshold. A receipted calibration slice sets both before activating the check. It reports
+the eligible and even counts per development session and tests rounded linear interpolation
+against irregular, quantised controls. FilmFestival's converter rounds onsets to milliseconds
+(`tools/corpus/filmfest_recall.py:103–105`). Exact gap equality loses cases at that rounding
+boundary. Keep the calibrated check out of first-wave row parity, which needs the run rule.
 
 **Consequences.**
 
-- **Sherlock.** Its adapter records no value and says how the onsets were measured is not
-  recorded (`tools/case-studies/recall-precision/adapters/sherlock.py:289-290` at `a93763b46`).
-  While it is undeclared, the two `Request.checked` calls of `ReferenceParity`
-  (`P/agentmapping/ReferenceParity.scala:308-330`) are refused, and the 1.5 s series (`:117`)
-  cannot be rebuilt on the new input. Its figures would pass the evenness check, but passing is
-  not evidence of measurement: a source must still be cited.
-- **FilmFestival.** Bins that are whole utterances are admitted. Fixed windows that split
-  utterances are refused.
+- **Sherlock.** The Chen lab's [Word-timestamped-transcripts v1.3 release][chen-timing], already
+  cited in [the local lineage notes][sherlock-lineage], is the source for the word timestamps.
+  Its description confirms word-level timestamps for Sherlock. Its mention of automatic
+  timestamping concerns a FilmFestival file, and the record gives no Sherlock alignment method.
+  Intake must cite the release and retain that qualification. The timing-qualified projections
+  in `ReferenceParity` (`P/agentmapping/ReferenceParity.scala:308–330`) require a supported
+  declaration for the replayed input. An evenness check alone supplies no declaration.
+- **FilmFestival.** Bins containing whole utterance runs are admitted, including a single bin
+  containing every onset. Windows that split runs are refused. The replay CSV has only word
+  and onset columns (`tools/corpus/filmfest_recall.py:137`). Recover runs from the admitted
+  utterance alignment or a pinned companion artifact that binds the exact inventory and clock.
+  Refuse a mismatched companion instead of guessing boundaries from the onsets.
+
+[chen-timing]: https://zenodo.org/records/8208709
+[sherlock-lineage]: ../data/sherlock/README.md
 
 **Rejected:**
 
@@ -518,9 +523,8 @@ rejects ordinary transcripts for an orthographic accident.
 
 **Types.** The token-to-cell layer is a checked map built from a `RecallInventory`.
 
-### Open questions for the owner
+### Pending evidence
 
-1. **Which source can Sherlock cite** for its onsets? Until one is cited, its projections are
-   refused. The alternative is a typed "unverified" result that cannot be used where measured
-   timing is required; this amendment proposes the refusal.
-2. **The evenness threshold** is provisional until both corpora are counted.
+- The development-only calibration sets the absolute tolerance and share threshold.
+- Confirm the Sherlock declaration and its limitations against the admitted release at intake.
+- The transcript-token layer awaits a consumer. The first wave uses existing transcript cells.

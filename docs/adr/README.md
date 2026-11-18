@@ -45,7 +45,7 @@ The "event layer" column marks the ADRs that the film and recall event layer (se
 | [0028](0028-source-graph-export.md) | Exporting the source identity graph | Accepted | yes |
 | [0030](0030-detail-account-and-derived-analysis.md) | Detail account and derived analysis projections | Accepted direction | yes |
 | [0031](0031-reference-measures-and-held-level-projection.md) | Reference measures and onset-point recall-time projection | Accepted (2026-11-16); deferred items open; 2026-11-17 amendment (timing provenance, cell intake) proposed, owner to rule | yes |
-| [0032](0032-recall-reference-vocabulary.md) | Recall talk, topic frame, address classes, pointing distribution and programme | Proposed (2026-11-17, revision 4) | yes |
+| [0032](0032-recall-reference-vocabulary.md) | Recall talk, topic frame, address classes, pointing distribution and programme | Proposed (2026-11-17, revision 5) | yes |
 
 Notes:
 
