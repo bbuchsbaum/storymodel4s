@@ -254,7 +254,13 @@ def participant_gains(producer_scores: list, baseline_scores: dict) -> dict:
     """Per-participant primary gains against the lower-loss frozen TF-IDF/HMM baseline."""
     if not set(REQUIRED_BASELINES).issubset(baseline_scores):
         raise SealedPreflightError("all frozen baseline score sets are required")
-    keyed = lambda rows: {(x.participant, x.session, x.row): x for x in rows}
+
+    def keyed(rows):
+        entries = {(x.participant, x.session, x.row): x for x in rows}
+        if len(entries) != len(rows):
+            raise SealedPreflightError("duplicate score row identity")
+        return entries
+
     prod, tfidf, hmm = (
         keyed(producer_scores),
         keyed(baseline_scores["tfidf"]),

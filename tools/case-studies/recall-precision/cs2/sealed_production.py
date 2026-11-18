@@ -181,9 +181,11 @@ def memorization(gold, comp, valid):
             if (
                 isinstance(answer, dict)
                 and answer.get("id") in ids
-                and type(answer.get("movie")) is int
+                and isinstance(answer.get("movie"), int)
+                and not isinstance(answer["movie"], bool)
                 and 1 <= answer["movie"] <= 10
-                and type(answer.get("scene")) is int
+                and isinstance(answer.get("scene"), int)
+                and not isinstance(answer["scene"], bool)
                 and 1 <= answer["scene"] <= 216
             ):
                 answers[answer["id"]] = answer
