@@ -9,7 +9,7 @@ from __future__ import annotations
 import math
 from collections import defaultdict
 from decimal import Decimal, localcontext
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal, Self, overload
 
 from pydantic import Field, model_validator
 
@@ -17,8 +17,9 @@ from ._decimal_context import computation_context
 from .local_evidence import (
     AccountInferenceResult,
     LocalEvidenceSpec,
-    infer_accounts,
-    verify_account_inference,
+    RefinedAccountInference,
+    RefinedInferenceSpec,
+    _resolve_account_inference,
 )
 from .model import Digest, Model, Name, _validate_instance
 from .rich_account import SupportedAccount, require_text_account
@@ -143,6 +144,17 @@ class AccountReconstructionResult(Model):
     )
     input_kind: Literal["model-conditional-posterior"] = "model-conditional-posterior"
     inference: AccountInferenceResult
+    reconstruction: ReconstructionResult
+
+
+class RefinedAccountReconstructionResult(Model):
+    """Model-conditional reconstruction retains the entire original account inference artifact."""
+
+    schema_version: Literal["storymodel.account-reconstruction/v2"] = (
+        "storymodel.account-reconstruction/v2"
+    )
+    input_kind: Literal["model-conditional-posterior"] = "model-conditional-posterior"
+    inference: RefinedAccountInference
     reconstruction: ReconstructionResult
 
 
@@ -425,22 +437,39 @@ def verify_reconstruction(
     return expected
 
 
+@overload
 def reconstruct_accounts(
     source: SupportedAccount,
     recall: SupportedAccount,
     evidence_spec: LocalEvidenceSpec,
     spec: ReconstructionSpec,
     *,
-    inference: AccountInferenceResult | None = None,
-) -> AccountReconstructionResult:
+    inference: AccountInferenceResult | RefinedAccountInference | None = None,
+) -> AccountReconstructionResult: ...
+
+
+@overload
+def reconstruct_accounts(
+    source: SupportedAccount,
+    recall: SupportedAccount,
+    evidence_spec: RefinedInferenceSpec,
+    spec: ReconstructionSpec,
+    *,
+    inference: AccountInferenceResult | RefinedAccountInference | None = None,
+) -> RefinedAccountReconstructionResult: ...
+
+
+def reconstruct_accounts(
+    source: SupportedAccount,
+    recall: SupportedAccount,
+    evidence_spec: LocalEvidenceSpec | RefinedInferenceSpec,
+    spec: ReconstructionSpec,
+    *,
+    inference: AccountInferenceResult | RefinedAccountInference | None = None,
+) -> AccountReconstructionResult | RefinedAccountReconstructionResult:
     """Connect account inference to reconstruction while retaining the original evidence."""
-    evidence_spec = _validate_instance(LocalEvidenceSpec, evidence_spec)
     spec = _validate_instance(ReconstructionSpec, spec)
-    result = (
-        infer_accounts(source, recall, evidence_spec)
-        if inference is None
-        else verify_account_inference(source, recall, evidence_spec, inference)
-    )
+    result = _resolve_account_inference(source, recall, evidence_spec, inference)
     populations = {
         r.unit: {c.state.id: c.state for c in r.costs}
         for r in result.evidence.sequence.request.rows
@@ -455,19 +484,47 @@ def reconstruct_accounts(
         )
         for r in result.inference.posterior
     )
-    decisions = reconstruct_rows(source, recall, rows, spec, projection=evidence_spec.projection)
+    decisions = reconstruct_rows(
+        source, recall, rows, spec, projection=result.evidence.sequence.projection.policy
+    )
+    if isinstance(result, RefinedAccountInference):
+        return RefinedAccountReconstructionResult(inference=result, reconstruction=decisions)
     return AccountReconstructionResult(inference=result, reconstruction=decisions)
+
+
+@overload
+def verify_account_reconstruction(
+    source: SupportedAccount,
+    recall: SupportedAccount,
+    evidence_spec: LocalEvidenceSpec | RefinedInferenceSpec,
+    spec: ReconstructionSpec,
+    result: AccountReconstructionResult,
+) -> AccountReconstructionResult: ...
+
+
+@overload
+def verify_account_reconstruction(
+    source: SupportedAccount,
+    recall: SupportedAccount,
+    evidence_spec: LocalEvidenceSpec | RefinedInferenceSpec,
+    spec: ReconstructionSpec,
+    result: RefinedAccountReconstructionResult,
+) -> RefinedAccountReconstructionResult: ...
 
 
 def verify_account_reconstruction(
     source: SupportedAccount,
     recall: SupportedAccount,
-    evidence_spec: LocalEvidenceSpec,
+    evidence_spec: LocalEvidenceSpec | RefinedInferenceSpec,
     spec: ReconstructionSpec,
-    result: AccountReconstructionResult,
-) -> AccountReconstructionResult:
+    result: AccountReconstructionResult | RefinedAccountReconstructionResult,
+) -> AccountReconstructionResult | RefinedAccountReconstructionResult:
     """Verify both inference and reconstruction, including all supplied and generated inputs."""
-    checked = _validate_instance(AccountReconstructionResult, result)
+    checked = (
+        _validate_instance(RefinedAccountReconstructionResult, result)
+        if isinstance(result, RefinedAccountReconstructionResult)
+        else _validate_instance(AccountReconstructionResult, result)
+    )
     expected = reconstruct_accounts(source, recall, evidence_spec, spec)
     if checked != expected:
         raise ValueError("account reconstruction differs from original inputs")

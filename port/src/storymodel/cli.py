@@ -95,11 +95,8 @@ from .local_evidence import (
     LocalEvidenceSpec,
     RefinedAccountInference,
     RefinedInferenceSpec,
+    _resolve_account_inference,
     derive_local_evidence,
-    infer_accounts,
-    infer_refined_accounts,
-    verify_account_inference,
-    verify_refined_accounts,
 )
 from .model import Account, canonical
 from .organization import (
@@ -107,6 +104,7 @@ from .organization import (
     OrganizationOrder,
     OrganizationResult,
     OrganizationSpec,
+    RefinedAccountOrganizationResult,
     organization_readout,
     organize_accounts,
     verify_account_organization,
@@ -142,6 +140,7 @@ from .recall_clock import RecordingQuery, timed_recall
 from .reconstruction import (
     AccountReconstructionResult,
     ReconstructionSpec,
+    RefinedAccountReconstructionResult,
     reconstruct_accounts,
     verify_account_reconstruction,
 )
@@ -210,6 +209,27 @@ def emit(value: Any, output: str | None) -> None:
         sys.stdout.write(text)
     else:
         publish_json(Path(output), value)
+
+
+def _read_inference_spec(path: str) -> LocalEvidenceSpec | RefinedInferenceSpec:
+    payload = strict_json(Path(path).read_bytes())
+    if (
+        isinstance(payload, dict)
+        and payload.get("schema_version") == "storymodel.refined-inference-spec/v1"
+    ):
+        return RefinedInferenceSpec.model_validate_json(canonical(payload))
+    return LocalEvidenceSpec.model_validate_json(canonical(payload))
+
+
+def _read_saved_inference(
+    path: str, spec: LocalEvidenceSpec | RefinedInferenceSpec
+) -> AccountInferenceResult | RefinedAccountInference:
+    model = (
+        RefinedAccountInference
+        if isinstance(spec, RefinedInferenceSpec)
+        else AccountInferenceResult
+    )
+    return model.model_validate_json(canonical(strict_json(Path(path).read_bytes())))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -882,17 +902,13 @@ def main(argv: list[str] | None = None) -> int:
             if exporting and org_recall.export_permission != "allowed":
                 raise PermissionError("producer denies recall organization export")
             if "account" in args.command:
-                org_evidence = LocalEvidenceSpec.model_validate_json(
-                    canonical(strict_json(Path(args.evidence_spec).read_bytes()))
-                )
+                org_evidence = _read_inference_spec(args.evidence_spec)
                 org_order = OrganizationOrder.model_validate_json(
                     canonical(strict_json(Path(args.order).read_bytes()))
                 )
                 if exporting:
                     org_inference = (
-                        AccountInferenceResult.model_validate_json(
-                            canonical(strict_json(Path(args.inference).read_bytes()))
-                        )
+                        _read_saved_inference(args.inference, org_evidence)
                         if args.inference
                         else None
                     )
@@ -901,12 +917,17 @@ def main(argv: list[str] | None = None) -> int:
                     )
                     emit(account_organization.model_dump(mode="json"), args.output)
                 else:
+                    organization_model = (
+                        RefinedAccountOrganizationResult
+                        if isinstance(org_evidence, RefinedInferenceSpec)
+                        else AccountOrganizationResult
+                    )
                     verified_org_account = verify_account_organization(
                         org_source,
                         org_recall,
                         org_evidence,
                         org_order,
-                        AccountOrganizationResult.model_validate_json(
+                        organization_model.model_validate_json(
                             canonical(strict_json(Path(args.result).read_bytes()))
                         ),
                     )
@@ -950,17 +971,13 @@ def main(argv: list[str] | None = None) -> int:
             )
             if exporting and reconstruction_recall.export_permission != "allowed":
                 raise PermissionError("producer denies recall reconstruction export")
-            reconstruction_evidence_spec = LocalEvidenceSpec.model_validate_json(
-                canonical(strict_json(Path(args.evidence_spec).read_bytes()))
-            )
+            reconstruction_evidence_spec = _read_inference_spec(args.evidence_spec)
             reconstruction_spec = ReconstructionSpec.model_validate_json(
                 canonical(strict_json(Path(args.spec).read_bytes()))
             )
             if exporting:
                 prior_inference = (
-                    AccountInferenceResult.model_validate_json(
-                        canonical(strict_json(Path(args.inference).read_bytes()))
-                    )
+                    _read_saved_inference(args.inference, reconstruction_evidence_spec)
                     if args.inference
                     else None
                 )
@@ -973,12 +990,17 @@ def main(argv: list[str] | None = None) -> int:
                 )
                 emit(reconstruction_result.model_dump(mode="json"), args.output)
             else:
+                reconstruction_model = (
+                    RefinedAccountReconstructionResult
+                    if isinstance(reconstruction_evidence_spec, RefinedInferenceSpec)
+                    else AccountReconstructionResult
+                )
                 verified_reconstruction = verify_account_reconstruction(
                     reconstruction_source,
                     reconstruction_recall,
                     reconstruction_evidence_spec,
                     reconstruction_spec,
-                    AccountReconstructionResult.model_validate_json(
+                    reconstruction_model.model_validate_json(
                         canonical(strict_json(Path(args.result).read_bytes()))
                     ),
                 )
@@ -1005,19 +1027,13 @@ def main(argv: list[str] | None = None) -> int:
             )
             if exporting and local_recall.export_permission != "allowed":
                 raise PermissionError("producer denies recall inference export")
-            spec_payload = strict_json(Path(args.spec).read_bytes())
-            refined_spec = (
-                RefinedInferenceSpec.model_validate_json(canonical(spec_payload))
-                if isinstance(spec_payload, dict)
-                and spec_payload.get("schema_version") == "storymodel.refined-inference-spec/v1"
-                else None
-            )
-            local_spec = (
-                refined_spec.local
-                if refined_spec
-                else LocalEvidenceSpec.model_validate_json(canonical(spec_payload))
-            )
+            account_spec = _read_inference_spec(args.spec)
             if args.command == "derive-local-evidence":
+                local_spec = (
+                    account_spec.local
+                    if isinstance(account_spec, RefinedInferenceSpec)
+                    else account_spec
+                )
                 local_result = derive_local_evidence(local_source, local_recall, local_spec)
                 emit(
                     (
@@ -1025,33 +1041,24 @@ def main(argv: list[str] | None = None) -> int:
                     ).model_dump(mode="json"),
                     args.output,
                 )
-            elif refined_spec is not None:
-                if args.command == "infer-accounts":
-                    refined = infer_refined_accounts(local_source, local_recall, refined_spec)
-                    emit(refined.model_dump(mode="json"), args.output)
-                else:
-                    saved_refined = RefinedAccountInference.model_validate_json(
-                        canonical(strict_json(Path(args.result).read_bytes()))
-                    )
-                    verified_refined = verify_refined_accounts(
-                        local_source, local_recall, refined_spec, saved_refined
-                    )
-                    emit({"valid": True, "spec_sha256": verified_refined.spec_sha256}, None)
-            elif args.command == "infer-accounts":
-                emit(
-                    infer_accounts(local_source, local_recall, local_spec).model_dump(mode="json"),
-                    args.output,
-                )
             else:
-                verified = verify_account_inference(
-                    local_source,
-                    local_recall,
-                    local_spec,
-                    AccountInferenceResult.model_validate_json(
-                        canonical(strict_json(Path(args.result).read_bytes()))
-                    ),
+                saved = (
+                    _read_saved_inference(args.result, account_spec)
+                    if args.command == "verify-account-inference"
+                    else None
                 )
-                emit({"valid": True, "spec_sha256": verified.evidence.spec_sha256}, None)
+                resolved = _resolve_account_inference(
+                    local_source, local_recall, account_spec, saved
+                )
+                if saved is None:
+                    emit(resolved.model_dump(mode="json"), args.output)
+                else:
+                    spec_sha256 = (
+                        resolved.spec_sha256
+                        if isinstance(resolved, RefinedAccountInference)
+                        else resolved.evidence.spec_sha256
+                    )
+                    emit({"valid": True, "spec_sha256": spec_sha256}, None)
         elif args.command in ("build-source-sequence", "verify-source-sequence"):
             graph_source = read_supported_account(
                 Path(args.source), expected_sha256=args.source_sha256

@@ -64,3 +64,32 @@ before/equal claims. Inverse before/after declarations follow the chronology mod
 orientation. Other interval relations retain an exclusion reason. The kernel also accepts
 declared unit edges directly for numerical comparisons. Use the account workflow for
 claim admission and source binding.
+
+## Read the refined alignment
+
+The same saved inference feeds both account readouts. Reconstruction selects a source
+anchor for each recall unit from its marginal probabilities. Organization assigns the
+joint probability of each adjacent pair to categories such as forward, backward,
+same target and external, using the supplied source order.
+
+From the example output directory:
+
+```sh
+storymodel reconstruct-accounts source.json recall.json spec.json reconstruction-spec.json --inference result.json --output reconstructed.json
+storymodel verify-account-reconstruction source.json recall.json spec.json reconstruction-spec.json reconstructed.json
+storymodel organize-accounts source.json recall.json spec.json order.json --inference result.json --output organized.json
+storymodel verify-account-organization source.json recall.json spec.json order.json organized.json
+```
+
+| Readout on the example | Baseline | Two refinement passes |
+|---|---:|---:|
+| Unconstrained reconstruction, source anchors in recall order | 1, 1 | 1, 3 |
+| Joint probability of a forward move | 0.0952 | 0.2780 |
+| Joint probability of a backward move | 0.0952 | 0.0446 |
+| Probability that either endpoint is external | 0.6192 | 0.4541 |
+
+The baseline has tied source anchors. The reconstruction and sequence decoders have
+their own tie rules, so the baseline reconstruction can differ from the best sequence
+path above. Each refined readout embeds its full inference result, including the
+relation claims and base evidence. A supplied inference is checked against the two
+accounts and the inference specification. Omitting it computes the same result.

@@ -14,6 +14,8 @@ from storymodel.local_evidence import (
     infer_refined_accounts,
 )
 from storymodel.model import Relation
+from storymodel.organization import OrganizationOrder, organize_accounts
+from storymodel.reconstruction import ReconstructionSpec, reconstruct_accounts
 from storymodel.refinement import RefinementPolicy
 from storymodel.rich_account import RichAccount, validate_rich_account
 from storymodel.source_transitions import TransitionWeights
@@ -52,11 +54,26 @@ def example() -> tuple[RichAccount, RichAccount, RefinedInferenceSpec]:
 def run(output: Path) -> None:
     source, recall, spec = example()
     result = infer_refined_accounts(source, recall, spec)
+    order = OrganizationOrder(
+        axis="discourse", positions={s.id: float(i) for i, s in enumerate(source.states)}
+    )
+    reconstruction_spec = ReconstructionSpec()
+    organization = organize_accounts(source, recall, spec, order, inference=result)
+    reconstruction = reconstruct_accounts(
+        source, recall, spec, reconstruction_spec, inference=result
+    )
     output.mkdir(parents=True, exist_ok=False)
     export_supported_account(output / "source.json", source)
     export_supported_account(output / "recall.json", recall)
-    publish_json(output / "spec.json", spec.model_dump(mode="json"))
-    publish_json(output / "result.json", result.model_dump(mode="json"))
+    for name, artifact in (
+        ("spec", spec),
+        ("result", result),
+        ("order", order),
+        ("reconstruction-spec", reconstruction_spec),
+        ("organization", organization),
+        ("reconstruction", reconstruction),
+    ):
+        publish_json(output / f"{name}.json", artifact.model_dump(mode="json"))
 
 
 if __name__ == "__main__":

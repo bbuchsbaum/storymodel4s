@@ -9,15 +9,16 @@ from __future__ import annotations
 import math
 from collections import defaultdict
 from fractions import Fraction
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal, Self, overload
 
 from pydantic import Field, model_validator
 
 from .local_evidence import (
     AccountInferenceResult,
     LocalEvidenceSpec,
-    infer_accounts,
-    verify_account_inference,
+    RefinedAccountInference,
+    RefinedInferenceSpec,
+    _resolve_account_inference,
 )
 from .model import Digest, Model, Name, _validate_instance
 from .rich_account import SupportedAccount, require_text_account
@@ -193,6 +194,19 @@ class AccountOrganizationResult(Model):
         "model-conditional-not-independent-measurement"
     )
     inference: AccountInferenceResult
+    organization: OrganizationResult
+
+
+class RefinedAccountOrganizationResult(Model):
+    """Joint-flow readout retains its model; it cannot certify independent organization."""
+
+    schema_version: Literal["storymodel.account-organization/v2"] = (
+        "storymodel.account-organization/v2"
+    )
+    interpretation: Literal["model-conditional-not-independent-measurement"] = (
+        "model-conditional-not-independent-measurement"
+    )
+    inference: RefinedAccountInference
     organization: OrganizationResult
 
 
@@ -398,22 +412,39 @@ def _destination(state: SequenceState) -> OrganizationDestination:
     return OrganizationDestination(target=state.anchor, external=state.external)
 
 
+@overload
 def organize_accounts(
     source: SupportedAccount,
     recall: SupportedAccount,
     evidence_spec: LocalEvidenceSpec,
     order: OrganizationOrder,
     *,
-    inference: AccountInferenceResult | None = None,
-) -> AccountOrganizationResult:
+    inference: AccountInferenceResult | RefinedAccountInference | None = None,
+) -> AccountOrganizationResult: ...
+
+
+@overload
+def organize_accounts(
+    source: SupportedAccount,
+    recall: SupportedAccount,
+    evidence_spec: RefinedInferenceSpec,
+    order: OrganizationOrder,
+    *,
+    inference: AccountInferenceResult | RefinedAccountInference | None = None,
+) -> RefinedAccountOrganizationResult: ...
+
+
+def organize_accounts(
+    source: SupportedAccount,
+    recall: SupportedAccount,
+    evidence_spec: LocalEvidenceSpec | RefinedInferenceSpec,
+    order: OrganizationOrder,
+    *,
+    inference: AccountInferenceResult | RefinedAccountInference | None = None,
+) -> AccountOrganizationResult | RefinedAccountOrganizationResult:
     """Read adjacent joint flow over the exact ordered inference population, retaining its model."""
-    evidence_spec = _validate_instance(LocalEvidenceSpec, evidence_spec)
     order = _validate_instance(OrganizationOrder, order)
-    result = (
-        infer_accounts(source, recall, evidence_spec)
-        if inference is None
-        else verify_account_inference(source, recall, evidence_spec, inference)
-    )
+    result = _resolve_account_inference(source, recall, evidence_spec, inference)
     populations = {
         r.unit: {m.state.id: _destination(m.state) for m in r.costs}
         for r in result.evidence.sequence.request.rows
@@ -470,20 +501,45 @@ def organize_accounts(
         joints=tuple(joints),
         product_bounds=False,
     )
-    return AccountOrganizationResult(
-        inference=result, organization=organization_readout(source, recall, spec)
-    )
+    readout = organization_readout(source, recall, spec)
+    if isinstance(result, RefinedAccountInference):
+        return RefinedAccountOrganizationResult(inference=result, organization=readout)
+    return AccountOrganizationResult(inference=result, organization=readout)
+
+
+@overload
+def verify_account_organization(
+    source: SupportedAccount,
+    recall: SupportedAccount,
+    evidence_spec: LocalEvidenceSpec | RefinedInferenceSpec,
+    order: OrganizationOrder,
+    result: AccountOrganizationResult,
+) -> AccountOrganizationResult: ...
+
+
+@overload
+def verify_account_organization(
+    source: SupportedAccount,
+    recall: SupportedAccount,
+    evidence_spec: LocalEvidenceSpec | RefinedInferenceSpec,
+    order: OrganizationOrder,
+    result: RefinedAccountOrganizationResult,
+) -> RefinedAccountOrganizationResult: ...
 
 
 def verify_account_organization(
     source: SupportedAccount,
     recall: SupportedAccount,
-    evidence_spec: LocalEvidenceSpec,
+    evidence_spec: LocalEvidenceSpec | RefinedInferenceSpec,
     order: OrganizationOrder,
-    result: AccountOrganizationResult,
-) -> AccountOrganizationResult:
+    result: AccountOrganizationResult | RefinedAccountOrganizationResult,
+) -> AccountOrganizationResult | RefinedAccountOrganizationResult:
     """Verify both the original account inference and its conditional joint-flow readout."""
-    checked = _validate_instance(AccountOrganizationResult, result)
+    checked = (
+        _validate_instance(RefinedAccountOrganizationResult, result)
+        if isinstance(result, RefinedAccountOrganizationResult)
+        else _validate_instance(AccountOrganizationResult, result)
+    )
     expected = organize_accounts(source, recall, evidence_spec, order)
     if checked != expected:
         raise ValueError("account organization differs from original inputs")

@@ -320,6 +320,11 @@ class RefinedAccountInference(Model):
     refinement: RefinementResult
     excluded_claims: dict[str, ClaimExclusion]
 
+    @property
+    def inference(self) -> SequenceResult:
+        """The final distribution consumed by downstream readouts."""
+        return self.refinement.inference
+
 
 @dataclass(frozen=True)
 class _Content:
@@ -971,3 +976,23 @@ def verify_refined_accounts(
     if checked != expected:
         raise ValueError("refined inference differs from original inputs")
     return expected
+
+
+def _resolve_account_inference(
+    source: SupportedAccount,
+    recall: SupportedAccount,
+    spec: LocalEvidenceSpec | RefinedInferenceSpec,
+    saved: AccountInferenceResult | RefinedAccountInference | None,
+) -> AccountInferenceResult | RefinedAccountInference:
+    """Recompute the declared model and bind any supplied result to both accounts."""
+    if isinstance(spec, RefinedInferenceSpec):
+        if saved is None:
+            return infer_refined_accounts(source, recall, spec)
+        if isinstance(saved, RefinedAccountInference):
+            return verify_refined_accounts(source, recall, spec, saved)
+    else:
+        if saved is None:
+            return infer_accounts(source, recall, spec)
+        if isinstance(saved, AccountInferenceResult):
+            return verify_account_inference(source, recall, spec, saved)
+    raise ValueError("saved inference family differs from the inference specification")
