@@ -38,3 +38,45 @@ gain, participant wins, top-scene agreement (ties split), and mean gold rank.
   loading evaluation labels. The unit is one recall unit and the endpoint is its
   human-coded narrative scene. Literal overlap on this development set is the
   scope of the comparison. There is no word-level or verbatim recall ground truth.
+
+## Development result
+
+Frozen protocol `d043f012c`. Of 5,232 film transcript word records, 5,223 had
+a unique segment and 3,340 fell in a segment singly credited to either candidate.
+After token filtering, 375 segments in 34 of the 50 scenes were searchable.
+The existing evaluation supported 1,499 units from 10 participants. Of the 101
+cued units, 89 had an indexed query term, 83 had a positive match in at least
+one same-speaker segment, and 79 had different scene evidence under the restriction.
+
+| Scene ranking on 101 cued units | Gold loss (bits) | Top-scene agreement | Mean gold rank |
+|---|---:|---:|---:|
+| Saved mapper | 1.5672 | 72.51% | 4.01 |
+| Mapper with word match | 1.6056 | 72.05% | 3.50 |
+| Mapper with word and speaker match | 1.6189 | 72.05% | 3.96 |
+| Mapper with word and swapped speaker match | 1.5770 | 72.51% | 3.35 |
+
+The primary gain from requiring the speaker was −0.01328 bits on cued units
+and −0.00056 bits across all units. Four of ten participants improved. The
+top-scene sets for the two primary arms were identical for every cued unit.
+Neither adjustment improved the saved mapper's loss. The swapped control also
+outscored the correct-credit arm on this endpoint.
+
+In standalone dialogue search, the speaker restriction changed 37 top-scene sets.
+Top-scene agreement rose from 25.30% to 29.12%, but mean gold rank worsened from
+13.04 to 14.78. This standalone result describes a different use from reranking
+the mapper's candidates.
+
+An exploratory coverage check against the 101 coded scenes found 100 with
+searchable dialogue and 98 with a searchable row credited to the recalled speaker.
+Only 60 had positive word overlap in any eligible row in the coded scene, and only
+50 had positive overlap in a same-speaker row there. The measurement cannot tell
+whether a mismatch reflects paraphrase, word timing, the source and recall
+segment boundaries, or a recalled reference to a different scene.
+
+Keep the current retrieval default. These data test a literal word-matching
+recipe, one film, two explicitly named speakers, and existing scene-level coding.
+
+Run `python -B port/evidence/sherlock-speaker/dialogue.py run` from the research
+branch using the port Python environment and the authorized local study files.
+The text-free output reproduces dialogue-results.json. No new provider calls
+or human coding were needed.
