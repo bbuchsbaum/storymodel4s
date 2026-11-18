@@ -1541,11 +1541,18 @@ def main(argv: list[str] | None = None) -> int:
             timing = sherlock_recall_timing(sherlock_prepared.intake, args.clock)
             emit(timing.model_dump(mode="json"), args.output)
         elif args.command == "caption-alignment":
-            from .alignment_method import CaptionEvidence, run_alignment_method
-
-            caption_input = CaptionEvidence.model_validate_json(
-                canonical(strict_json(Path(args.captions).read_bytes()))
+            from .alignment_method import (
+                CaptionEvidence,
+                NativeCaptionEvidence,
+                run_alignment_method,
             )
+
+            declaration = strict_json(Path(args.captions).read_bytes())
+            caption_input: CaptionEvidence | NativeCaptionEvidence
+            if isinstance(declaration, dict) and "schema_version" in declaration:
+                caption_input = NativeCaptionEvidence.model_validate_json(canonical(declaration))
+            else:
+                caption_input = CaptionEvidence.model_validate_json(canonical(declaration))
             aligned = run_alignment_method(
                 Path(args.plan),
                 caption_input,

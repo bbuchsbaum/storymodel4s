@@ -11,8 +11,9 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Literal, Self
 
-from pydantic import model_validator
+from pydantic import Field, model_validator
 
+from ._base import Name
 from ._lexical import stem_set
 from .analysis_workflow import AnalysisPlan, AnalysisReplay, replay_analysis
 from .local_evidence import (
@@ -27,9 +28,13 @@ from .local_evidence import (
     infer_accounts,
 )
 from .model import Digest, Model, _validate_instance, text_support
+from .playback import PlaybackSupport, TickInterval
+from .prepared_construction import PreparedConstruction, PreparedConstructionResult
 from .rich_account import SupportedAccount
 from .sequence import SequenceResult
 from .serialization import canonical, digest, strict_json
+from .sherlock_composition import _native_row_supports
+from .sherlock_source import SherlockSource
 
 
 def _distance(left: frozenset[str], right: frozenset[str]) -> float:
@@ -61,10 +66,72 @@ class CaptionLexicalScore(Model):
     blended_distance: float | None
 
 
+class NativeCaption(Model):
+    """An independent text observation declared over one physical stream's native ticks."""
+
+    source: Name
+    interval: TickInterval
+    text: str
+
+
+class NativeCaptionEvidence(Model):
+    """Ordered caption declarations for the checked native axes of a source account."""
+
+    schema_version: Literal["storymodel.native-captions/v1"] = "storymodel.native-captions/v1"
+    source_sha256: Digest
+    captions: tuple[NativeCaption, ...] = Field(min_length=1)
+
+
+def _match_native_captions(
+    rows: dict[str, PlaybackSupport], captions: tuple[NativeCaption, ...]
+) -> tuple[str, ...]:
+    """Bind each caption exactly once. Rows without a caption are legitimate."""
+    observations: dict[tuple[str, str, str], list[int]] = {}
+    for index, caption in enumerate(captions):
+        key = (caption.source, caption.interval.start, caption.interval.end)
+        observations.setdefault(key, []).append(index)
+    targets: dict[int, str] = {}
+    reused = False
+    for target, support in rows.items():
+        if len(support.intervals) == 1 and not support.points:
+            interval = support.intervals[0]
+            hits = observations.get((support.source, interval.start, interval.end), [])
+            if len(hits) > 1:
+                raise ValueError("ambiguous caption support")
+            if hits:
+                index = hits[0]
+                reused |= index in targets
+                targets[index] = target
+    if reused or len(targets) != len(captions):
+        raise ValueError("caption has no unique exact target")
+    return tuple(targets[i] for i in range(len(captions)))
+
+
+def _native_targets(replay: AnalysisReplay, captions: NativeCaptionEvidence) -> tuple[str, ...]:
+    trace = replay.source
+    request, result = trace.request, trace.construction
+    if not (
+        isinstance(request, PreparedConstruction)
+        and isinstance(request.intake, SherlockSource)
+        and isinstance(result, PreparedConstructionResult)
+    ):
+        raise ValueError("native caption alignment requires prepared Sherlock source rows")
+    _, supports = _native_row_supports(request.intake)
+    # The row owns its physical interval. A state extracted from that row may cover less.
+    rows = {row.unit: supports[row.row] for row in result.construction.resolutions}
+    return _match_native_captions(rows, captions.captions)
+
+
 class AlignmentMethodResult(Model):
     """One plan-bound lexical run, with each inferential stage left inspectable."""
 
-    schema_version: Literal["storymodel.alignment-method/v1"] = "storymodel.alignment-method/v1"
+    schema_version: Literal["storymodel.alignment-method/v1", "storymodel.alignment-method/v2"] = (
+        "storymodel.alignment-method/v1"
+    )
+    # In input order, including captions on rows that retrieval did not nominate.
+    native_caption_targets: tuple[str, ...] | None = Field(
+        default=None, exclude_if=lambda x: x is None
+    )
     blend: float
     max_candidates: int
     max_postings: int
@@ -76,6 +143,12 @@ class AlignmentMethodResult(Model):
     caption_scores: tuple[CaptionLexicalScore, ...]
     local_ranking: tuple[LocalCell, ...]
     decoding: SequenceResult
+
+    @model_validator(mode="after")
+    def caption_profile(self) -> Self:
+        if self.schema_version.endswith("/v2") != (self.native_caption_targets is not None):
+            raise ValueError("native caption targets require alignment method v2")
+        return self
 
 
 def _recall_before_pairing(replay: AnalysisReplay) -> SupportedAccount:
@@ -110,7 +183,7 @@ def _ordered_selections(recall: SupportedAccount) -> tuple[RecallSelection, ...]
 
 def run_alignment_method(
     plan_path: Path,
-    captions: CaptionEvidence,
+    captions: CaptionEvidence | NativeCaptionEvidence,
     *,
     blend: float = 0.5,
     max_candidates: int = 32,
@@ -125,7 +198,10 @@ def run_alignment_method(
     textual occurrence order and as ``text-only``, avoiding an implicit choice
     among multiple recall graph situations.
     """
-    captions = _validate_instance(CaptionEvidence, captions)
+    if isinstance(captions, NativeCaptionEvidence):
+        captions = _validate_instance(NativeCaptionEvidence, captions)
+    else:
+        captions = _validate_instance(CaptionEvidence, captions)
     if not 0.0 <= blend <= 1.0:
         raise ValueError("caption blend must be in [0, 1]")
     raw_plan = plan_path.read_bytes()
@@ -135,6 +211,15 @@ def run_alignment_method(
     source_sha256 = digest(replay.source.account.model_dump(mode="json"))
     if captions.source_sha256 != source_sha256:
         raise ValueError("caption evidence is bound to a different source account")
+    native_targets = None
+    if isinstance(captions, NativeCaptionEvidence):
+        native_targets = _native_targets(replay, captions)
+        texts = {
+            target: caption.text
+            for target, caption in zip(native_targets, captions.captions, strict=True)
+        }
+    else:
+        texts = captions.captions
     selections = _ordered_selections(recall)
     if not selections:
         raise ValueError("analysis plan recall branch has no recall units for lexical alignment")
@@ -147,7 +232,7 @@ def run_alignment_method(
     candidates = derive_local_evidence(replay.source.account, recall, baseline_spec)
     recall_docs = {document.id: document.text for document in recall.documents}
     known_targets = {node.anchor for node in candidates.sequence.projection.nodes}
-    unknown = captions.captions.keys() - known_targets
+    unknown = texts.keys() - known_targets
     if unknown:
         raise ValueError("caption evidence names a target outside the checked source")
     recall_terms = {}
@@ -159,7 +244,7 @@ def run_alignment_method(
     semantic_cells = []
     for cell in candidates.cells:
         unit_terms = recall_terms[cell.unit]
-        caption = captions.captions.get(cell.target, "")
+        caption = texts.get(cell.target, "")
         lexical = cell.terms["semantic"]
         caption_distance = _distance(unit_terms, stem_set(caption)) if caption.strip() else None
         blended = (
@@ -214,6 +299,10 @@ def run_alignment_method(
         )
     )
     return AlignmentMethodResult(
+        schema_version="storymodel.alignment-method/v2"
+        if native_targets is not None
+        else "storymodel.alignment-method/v1",
+        native_caption_targets=native_targets,
         blend=blend,
         max_candidates=max_candidates,
         max_postings=max_postings,

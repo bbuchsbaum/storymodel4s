@@ -5,12 +5,19 @@ from pathlib import Path
 
 from timed_recall import run as build_plans
 
-from storymodel.alignment_method import CaptionEvidence, run_alignment_method
+from storymodel.alignment_method import (
+    CaptionEvidence,
+    NativeCaption,
+    NativeCaptionEvidence,
+    run_alignment_method,
+)
 from storymodel.analysis_workflow import replay_analysis_file
 from storymodel.artifacts import publish_json
 from storymodel.feature_windows import Lexicon, feature_windows
+from storymodel.playback import TickInterval
 from storymodel.recall_clock import RecordingQuery
 from storymodel.serialization import digest
+from storymodel.sherlock_composition import compose_sherlock_source
 
 
 def run(destination: Path) -> None:
@@ -25,7 +32,8 @@ def run(destination: Path) -> None:
         publish_json(destination / f"feature-windows-{n}.json", result.model_dump(mode="json"))
 
     plan = destination / "analysis-1.json"
-    source = replay_analysis_file(plan).source.account
+    trace = replay_analysis_file(plan).source
+    source = trace.account
     # Independent abstract caption annotations, each bound to a source occurrence.
     captions = CaptionEvidence(
         source_sha256=digest(source.model_dump(mode="json")),
@@ -34,6 +42,24 @@ def run(destination: Path) -> None:
     publish_json(destination / "captions.json", captions.model_dump(mode="json"))
     alignment = run_alignment_method(plan, captions)
     publish_json(destination / "caption-alignment.json", alignment.model_dump(mode="json"))
+
+    # Two independent observations on different physical parts, both starting at tick zero.
+    composition = compose_sherlock_source(trace.request.intake)
+    part_a, part_b = composition.composition.parts
+    native = NativeCaptionEvidence(
+        source_sha256=captions.source_sha256,
+        captions=(
+            NativeCaption(
+                source=part_a.source, interval=TickInterval(start="0", end="25000"), text="AA"
+            ),
+            NativeCaption(
+                source=part_b.source, interval=TickInterval(start="0", end="12500"), text="BB"
+            ),
+        ),
+    )
+    publish_json(destination / "native-captions.json", native.model_dump(mode="json"))
+    localized = run_alignment_method(plan, native)
+    publish_json(destination / "native-caption-alignment.json", localized.model_dump(mode="json"))
 
 
 if __name__ == "__main__":

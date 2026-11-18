@@ -27,10 +27,10 @@ class ComposedSourceUnit(Model):
     support: PlaybackSupport
 
 
-def _derive(
+def _native_row_supports(
     source: SherlockSource,
-) -> tuple[PlaybackComposition, tuple[ComposedSourceUnit, ...], tuple[ComposedSourceUnit, ...]]:
-    """Derive geometry only from an already checked intake, never notebook offsets."""
+) -> tuple[tuple[MediaSource, ...], dict[str, PlaybackSupport]]:
+    """Project checked annotation rows on their declared physical part clocks."""
     axes = {
         run["partId"]: run["axisId"]
         for run in source.repair["annotationToPlaybackCrosswalk"]["runs"]
@@ -51,6 +51,25 @@ def _derive(
         )
         for part in ordered
     )
+    by_part = {part.key: part.id for part in media}
+    native_rows = {
+        f"sherlock:row:{row.row:04d}": PlaybackSupport(
+            source=by_part[locus.part_id],
+            intervals=(TickInterval(start=str(locus.start_tick), end=str(locus.end_tick)),)
+            if locus.kind == "extent"
+            else (),
+            points=(str(locus.start_tick),) if locus.kind == "instant" else (),
+        )
+        for row, locus in zip(source.rows, source.loci, strict=True)
+    }
+    return media, native_rows
+
+
+def _derive(
+    source: SherlockSource,
+) -> tuple[PlaybackComposition, tuple[ComposedSourceUnit, ...], tuple[ComposedSourceUnit, ...]]:
+    """Derive geometry only from an already checked intake, never notebook offsets."""
+    media, native_rows = _native_row_supports(source)
     composition = concatenate_playback(
         source.key,
         media,
@@ -62,26 +81,11 @@ def _derive(
             for part in media
         ),
     )
-    occurrences = {
-        part.key: (part, segment.occurrence)
-        for part, segment in zip(media, composition.segments, strict=True)
-    }
+    occurrences = {segment.source: segment.occurrence for segment in composition.segments}
     rows: list[ComposedSourceUnit] = []
-    for row, locus in zip(source.rows, source.loci, strict=True):
-        part, occurrence = occurrences[locus.part_id]
-        native = PlaybackSupport(
-            source=part.id,
-            intervals=(TickInterval(start=str(locus.start_tick), end=str(locus.end_tick)),)
-            if locus.kind == "extent"
-            else (),
-            points=(str(locus.start_tick),) if locus.kind == "instant" else (),
-        )
-        anchor = compose_support(composition, occurrence, native)
-        rows.append(
-            ComposedSourceUnit(
-                key=f"sherlock:row:{row.row:04d}", anchors=(anchor,), support=anchor.composed
-            )
-        )
+    for key, native in native_rows.items():
+        anchor = compose_support(composition, occurrences[native.source], native)
+        rows.append(ComposedSourceUnit(key=key, anchors=(anchor,), support=anchor.composed))
     scenes = tuple(
         ComposedSourceUnit(
             key=f"sherlock:scene:{scene.ordinal:03d}",
