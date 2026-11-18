@@ -1,0 +1,1 @@
+{"actor":"codex-port-exposure","entity":"port-recall-exposure","kind":"reserve_open","mode":"exclusive","op":"20261118T012933.005885Z-p80412-c0000-r47b9-h029f33","paths":["port/tests/test_recall_clock.py"],"reservation_id":"rv-01M7P4C02DZJ7A9J8TQ265PJWZ","ts":"2026-11-18T01:29:33.005885Z","ttl_s":3600,"v":2}

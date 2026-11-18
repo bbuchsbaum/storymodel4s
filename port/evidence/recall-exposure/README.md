@@ -21,11 +21,27 @@ git -C "$clone" apply /path/to/temporal-exposure-oracle.patch
 (cd "$clone" && sbt -Dsbt.supershell=false 'alignJVM/testOnly storymodel4s.align.TemporalQuerySuite')
 ```
 
-The probe prints exactly one line prefixed `RECALL_EXPOSURE_ORACLE=`. Strip that
-prefix and compare the parsed JSON's `schema` and `cases` with `expected.json`
-after adding the saved query windows from this file. The checked-in expected
-artifact is the canonical consumer contract; the probe is intentionally a
-disposable clone-only source change.
+The probe prints one JSON object after `RECALL_EXPOSURE_ORACLE=`. The saved
+`expected.json` adds the reference, encoding description and query bounds. To compare
+the emitted object with those six cases, capture the sbt output in `probe.log`
+and run the following from this evidence directory:
+
+```sh
+python3 - <<'PYTHON'
+import json
+from pathlib import Path
+
+marker = "RECALL_EXPOSURE_ORACLE="
+lines = [line.split(marker, 1)[1] for line in Path("probe.log").read_text().splitlines() if marker in line]
+assert len(lines) == 1
+observed = json.loads(lines[0])
+saved = json.loads(Path("expected.json").read_text())
+assert observed["schema"] == saved["schema"]
+assert observed["cases"] == [
+    {k: v for k, v in case.items() if k != "query"} for case in saved["cases"]
+]
+PYTHON
+```
 
 Actual JVM run: Scala 3.7.4 / sbt 1.12.14, `TemporalQuerySuite`, 26 total,
 26 passed, 0 failed, exit status 0. No broader gate or non-JVM platform was run.

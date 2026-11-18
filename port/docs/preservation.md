@@ -920,9 +920,39 @@ The full Python suite passed 1,137 tests, and lint and type checking passed. Ind
 review of the implementation commit also checked cross-family substitution, changed
 accounts, and agreement with the baseline at zero passes.
 
-The next temporal workflow is exposure per recall unit in a declared recording window.
+The next timing gap identified at this checkpoint was exposure per recall unit in a declared recording window.
 Scala's `TemporalExposure.checked` and `TemporalProjection.exposure` bind a mapping
 to the timing inventory and clock. `TemporalQuerySuite` distinguishes uncovered time,
 within-unit overlap, between-unit sharing, onset-only events and failed processing.
 Python's `timed_recall` and interval allocator already serve detail-level queries.
-A checked mapping-to-unit exposure readout is still owed.
+The workflow below now connects the replayed mapping to unit exposure.
+
+### Recording-window exposure from a replayed mapping
+
+The [exposure workflow](recall-clock.md#time-attributed-to-each-recall-unit) at
+`faefb60b3` joins the prepared Sherlock lexical inventory to constructed recall units
+and the decisions for a named mapping interpretation. The result retains unmatched
+words, measured time without complete mapping, uncovered time and onset-only events.
+The clock and interval provenance identify the physical recording. Exposure arithmetic
+uses exact ticks and rational shares. An endpoint sweep counts a unit once however many
+of its words overlap, and credits time at unit exits.
+
+The [executed Scala/JVM oracle](../evidence/recall-exposure/README.md) covers six cases
+in `TemporalQuerySuite` at `cdb432cf9`. Python reproduced unit durations, onset events,
+missing counts, uncovered time and overlap refusal. The Scala suite passed all 26 tests.
+The Python stage adapter retains individual detail decisions, including failed and
+unrequested work. In the two-unit workflow the measurements were 19/8 and 9/8 seconds,
+including the second unit's failed mapping, with 1/2 second uncovered. Dividing by the
+number of active word intervals instead of distinct units failed the duration assertion
+while both neighboring controls passed.
+
+The installed CLI and API produced identical bytes. Replay verified the result, and the
+earlier timed-recall example reproduced its original bytes. The Python suite passed
+1,151 tests in 47.53 seconds. Ruff, mypy and independent implementation review passed. A local sweep over 30,000 disjoint
+intervals in 10,000 units took 0.816 seconds and peaked at 18.26 MiB of traced Python
+allocations, excluding input construction. It accounted for all 330,000 ticks.
+
+The next numerical consumer is a conditional grid over source playback regions and bins.
+Scala's `TemporalQuery`, `TemporalGrid` and `TemporalProjection` distinguish the source
+measure, external mass, unavailable support and the optional recall exposure window.
+The Python exposure result supplies the recall side of that calculation.

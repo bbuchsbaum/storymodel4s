@@ -5,7 +5,8 @@ index abfd54d3a..6afc944f9 100644
 @@ -727,6 +727,58 @@ class TemporalQuerySuite extends FunSuite:
      assertEquals(f.uncovered, BigInt(2) -> BigInt(3))
    }
- 
+-
++
 +  test("emits recall exposure oracle") {
 +    def fraction(pair: (BigInt, BigInt)): String = s"[${pair._1},${pair._2}]"
 +    def observationJson(observations: Vector[RecallTiming.Observation]): String = {
